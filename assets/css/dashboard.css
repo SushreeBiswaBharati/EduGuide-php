@@ -1,0 +1,98 @@
+body {
+    background: linear-gradient(135deg, #e0f0ff 0%, #6ab4f5 100% )!important;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+}
+.sidebar{
+    width: 250px;
+    background: linear-gradient(100deg, #5c8fdc, #1758bb);
+    color: white;
+    transition: width 0.3s ease;
+
+}
+
+.sidebar small{
+    font-size: larger;
+}
+.sidebar .nav-link {
+    color: rgba(255,255,255,0.85);
+    border-radius: 8px;
+    padding: 8px 10px;
+    white-space: nowrap;
+    display: flex;          
+    align-items: center;   
+    gap: 8px;               
+}
+
+.sidebar .nav-link:hover{
+    background: rgba(255,255,255,0.18);
+    color: white;
+}
+
+.sidebar.collapsed .nav-link {
+    justify-content: center;  
+    padding: 8px 0;
+}
+
+.sidebar.collapsed .px-3 {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
+/* Hamburge Menu */
+.hamburger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 5px;
+    border-radius: 6px;
+    line-height: 1;
+}
+
+.hamburger-btn:hover {
+    background: rgba(255,255,255,0.18);
+}
+
+/* This forces the SVG icon to appear white */
+.hamburger-btn img {
+    width: 24px;
+    filter: brightness(0) invert(1);
+}
+
+.logout{
+    color: white;
+    background-color: #08244f;
+    white-space: nowrap;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.main-content {
+    background: linear-gradient(120deg, white,rgb(133, 210, 241));
+    overflow-y: auto;
+}
+.greet-bar{
+    background: linear-gradient(180deg, #5c8fdc, #1758bb);
+}
+.card{
+    border: 3px solid rgb(7, 7, 77);
+    transition: 0.3s;
+}
+.card:hover{
+    transform: translateY(-5px);
+    
+    
+}
+
+.panel{
+    display: none;
+}
+.panel.active{
+    display: block;
+}
+#edit-form{
+    display: none;
+}
