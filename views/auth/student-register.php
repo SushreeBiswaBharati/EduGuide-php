@@ -17,7 +17,7 @@
                 <div class="card-body p-4">
 
                     <h2 class="text-center mb-1">Student Registration</h2>
-                    <p class="text-center text-warning mb-4">Create your academic profile</p>
+                    <p class="text-center text-danger fw-bold mb-4">Create your academic profile</p>
 
                     <!-- Form success message -->
                     <?php if (!empty($formSuccess)): ?>

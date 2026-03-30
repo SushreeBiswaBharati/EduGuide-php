@@ -186,7 +186,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
-                            <input type="text" name="">
+                            <input type="text" name="edit_name" class="form-control" value="<?php htmlspacialchars($tutor['name']) ?? '' ?> required">
                         </div>
                     </div>
                 </form>
@@ -195,6 +195,22 @@
 
     </div>
     <script>
+        function showPanel(name, el){
+            document.querySelectorAll('.panel').forEach(p=> p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(a=> a.classList.remove('active'));
+            document.getElementById('panel-' +name).classList.add('active');
+            if(el) el.classList.add('active');
+            return false;
+        }
+
+        function toggleEdit(){
+            const view = document.getElementById('profile-view');
+            const form = document.getElementById('edit-form');
+            const isHidden = view.style.display === 'none';
+            view.style.display = ishidden ? 'block' : 'none';
+            form.style.display = isHidden ? 'none' : 'block';
+        }
+
         const toggleBtn  = document.getElementById('toggleBtn');
         const sidebar    = document.getElementById('sidebar');
         const navSpans   = sidebar.querySelectorAll('nav .nav-link span');
@@ -223,6 +239,22 @@
                 subTitle.style.display   = 'block';
                 logoutSpan.style.display = 'inline';
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function (){
+            <?php if($profileSuccess || $profileError): ?>
+                const profileLink = document.querySelector("[onclick*=\" 'profile'\"]");
+                showPanel('pprofile', profileLink);
+                <?php if($profileError): ?>
+                    document.getelemtById('profile-view').style.display = 'none';
+                    document.getElementById('edit-form').style.display = 'block';
+                <?php endif; ?>
+            <?php endif; ?>
+
+            <?php if($complaintSuccess || $complaintError): ?>
+                const compLink = document.querySelector("[onclick*=\"'complaiint'\"]");
+                showPanel('complaint', compLink);
+            <?php endif; ?>
         });
     </script>
 </body>

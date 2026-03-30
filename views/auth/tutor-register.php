@@ -22,7 +22,7 @@ if (!isset($nameError)) {
                 <div class="card-body p-4">
 
                     <h2 class="text-center mb-1">Tutor Registration</h2>
-                    <p class="text-center text-warning mb-4">Join EduGuide as a verified academic mentor</p>
+                    <p class="text-center text-danger fw-bold mb-4">Join EduGuide as a verified academic mentor</p>
 
                     <!-- Success message -->
                     <?php if (!empty($formSuccess)): ?>

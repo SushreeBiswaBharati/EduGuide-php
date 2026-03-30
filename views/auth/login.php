@@ -31,7 +31,7 @@ if (!isset($emailError)) {
                         <div class="card-body p-4">
 
                             <h2 class="text-center mb-3">Welcome Back</h2>
-                            <p class="text-center text-warning mb-4">
+                            <p class="text-center text-danger fw-bold mb-4">
                                 Log in to continue your learning journey
                             </p>
 
