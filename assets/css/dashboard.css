@@ -4,8 +4,8 @@ body {
     overflow: hidden;
 }
 .sidebar{
-    width: 250px;
-    background: linear-gradient(100deg, #5c8fdc, #1758bb);
+    width: 300px;
+    background: linear-gradient(100deg, #5c8fdc, #0b48a4);
     color: white;
     transition: width 0.3s ease;
 
@@ -13,9 +13,10 @@ body {
 
 .sidebar small{
     font-size: larger;
+    
 }
 .sidebar .nav-link {
-    color: rgba(255,255,255,0.85);
+    font-size: larger;
     border-radius: 8px;
     padding: 8px 10px;
     white-space: nowrap;
@@ -44,7 +45,7 @@ body {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 5px 5px;
+    padding: 5px 15px;
     border-radius: 6px;
     line-height: 1;
 }
@@ -55,7 +56,7 @@ body {
 
 /* This forces the SVG icon to appear white */
 .hamburger-btn img {
-    width: 24px;
+    width: 32px;
     filter: brightness(0) invert(1);
 }
 
@@ -67,7 +68,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    /* gap: 6px; */
 }
 
 .main-content {
@@ -75,7 +76,7 @@ body {
     overflow-y: auto;
 }
 .greet-bar{
-    background: linear-gradient(180deg, #5c8fdc, #1758bb);
+    background: linear-gradient(180deg, #5c8fdc, #0b48a4);
 }
 .card{
     border: 3px solid rgb(7, 7, 77);

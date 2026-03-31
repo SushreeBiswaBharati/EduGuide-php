@@ -1,14 +1,15 @@
 <?php
+// controllers/tutorDashboardController.php
 session_start();
 require_once '../middleware/auth.php';
 requireRole('tutor');
 require_once '../database/dbconnection.php';
 
-// Fetch tutor profile
+// ── FETCH TUTOR PROFILE ───────────────────────────────────
 $stmt = $conn->prepare("
     SELECT u.name, u.email, u.created_at,
            t.gender, t.qualification, t.experience,
-           t.phone, t.address, t.availability, t.is_verified,
+           t.phone, t.address, t.availability,
            s.name AS subject_name,
            b.name AS board_name
     FROM users u
@@ -22,7 +23,7 @@ $stmt->execute();
 $tutor = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-// Get tutor id
+// ── GET TUTOR ID ──────────────────────────────────────────
 $tid_stmt = $conn->prepare("SELECT id FROM tutors WHERE user_id = ?");
 $tid_stmt->bind_param("i", $_SESSION['user_id']);
 $tid_stmt->execute();
@@ -30,12 +31,11 @@ $tid_row  = $tid_stmt->get_result()->fetch_assoc();
 $tid_stmt->close();
 $tutor_id = $tid_row['id'] ?? 0;
 
-// Booking counts
-$totalRequests    = 0;
-$confirmedCount   = 0;
-$pendingCount     = 0;
-$rejectedCount    = 0;
-$completedCount   = 0;
+// ── BOOKING COUNTS ────────────────────────────────────────
+$totalRequests  = 0;
+$confirmedCount = 0;
+$pendingCount   = 0;
+$completedCount = 0;
 
 $count_stmt = $conn->prepare("
     SELECT status, COUNT(*) AS cnt
@@ -48,16 +48,15 @@ $count_stmt->execute();
 $count_result = $count_stmt->get_result();
 while ($row = $count_result->fetch_assoc()) {
     $totalRequests += $row['cnt'];
-    if (strtolower($row['status']) === 'confirmed')  $confirmedCount = $row['cnt'];
-    if (strtolower($row['status']) === 'pending')    $pendingCount   = $row['cnt'];
-    if (strtolower($row['status']) === 'cancelled')  $rejectedCount  = $row['cnt'];
-    if (strtolower($row['status']) === 'completed')  $completedCount = $row['cnt'];
+    if ($row['status'] === 'Confirmed') $confirmedCount = $row['cnt'];
+    if ($row['status'] === 'Pending')   $pendingCount   = $row['cnt'];
+    if ($row['status'] === 'Completed') $completedCount = $row['cnt'];
 }
 $count_stmt->close();
 
-// All booking requests
-$requests_stmt = $conn->prepare("
-    SELECT bk.id, bk.status, bk.message, bk.mode, bk.created_at,
+// ── ALL BOOKING REQUESTS ──────────────────────────────────
+$req_stmt = $conn->prepare("
+    SELECT bk.id, bk.status, bk.created_at,
            u.name   AS student_name,
            sub.name AS subject_name
     FROM bookings bk
@@ -67,14 +66,14 @@ $requests_stmt = $conn->prepare("
     WHERE bk.tutor_id = ?
     ORDER BY bk.created_at DESC
 ");
-$requests_stmt->bind_param("i", $tutor_id);
-$requests_stmt->execute();
-$requests = $requests_stmt->get_result();
-$requests_stmt->close();
+$req_stmt->bind_param("i", $tutor_id);
+$req_stmt->execute();
+$requests = $req_stmt->get_result();
+$req_stmt->close();
 
-// My schedult
-$schedule_stmt = $conn->prepare("
-    SELECT bk.id, bk.mode, bk.created_at,
+// ── MY SCHEDULE (Confirmed only) ──────────────────────────
+$sch_stmt = $conn->prepare("
+    SELECT bk.id, bk.created_at,
            u.name   AS student_name,
            sub.name AS subject_name
     FROM bookings bk
@@ -82,16 +81,16 @@ $schedule_stmt = $conn->prepare("
     JOIN users     u   ON u.id   = st.user_id
     LEFT JOIN subjects sub ON sub.id = bk.subject_id
     WHERE bk.tutor_id = ?
-    AND   bk.status   = 'Confirmed'
-    ORDER BY bk.created_at ASC
+      AND bk.status   = 'Confirmed'
+    ORDER BY bk.created_at DESC
 ");
-$schedule_stmt->bind_param("i", $tutor_id);
-$schedule_stmt->execute();
-$schedule = $schedule_stmt->get_result();
-$schedule_stmt->close();
+$sch_stmt->bind_param("i", $tutor_id);
+$sch_stmt->execute();
+$schedule = $sch_stmt->get_result();
+$sch_stmt->close();
 
-// My reviews
-$reviews_stmt = $conn->prepare("
+// ── REVIEWS ───────────────────────────────────────────────
+$rev_stmt = $conn->prepare("
     SELECT r.rating, r.comment, r.created_at,
            u.name AS student_name
     FROM reviews r
@@ -100,36 +99,46 @@ $reviews_stmt = $conn->prepare("
     WHERE r.tutor_id = ?
     ORDER BY r.created_at DESC
 ");
-$reviews_stmt->bind_param("i", $tutor_id);
-$reviews_stmt->execute();
-$reviews = $reviews_stmt->get_result();
-$reviews_stmt->close();
+$rev_stmt->bind_param("i", $tutor_id);
+$rev_stmt->execute();
+$reviews = $rev_stmt->get_result();
+$rev_stmt->close();
 
-// Ratings
-$avg_stmt = $conn->prepare("SELECT ROUND(AVG(rating), 1) AS avg_rating, COUNT(*) AS total_reviews FROM reviews WHERE tutor_id = ?");
-$avg_stmt->bind_param("i", $tutor_id);
-$avg_stmt->execute();
-$avg_row      = $avg_stmt->get_result()->fetch_assoc();
-$avg_stmt->close();
-$avgRating    = $avg_row['avg_rating'] ?? 0;
-$totalReviews = $avg_row['total_reviews'] ?? 0;
+// ── AVG RATING ────────────────────────────────────────────
+$rat_stmt = $conn->prepare("
+    SELECT ROUND(AVG(rating), 1) AS avg_rating, COUNT(*) AS total
+    FROM reviews
+    WHERE tutor_id = ?
+");
+$rat_stmt->bind_param("i", $tutor_id);
+$rat_stmt->execute();
+$rat_row      = $rat_stmt->get_result()->fetch_assoc();
+$rat_stmt->close();
+$avgRating    = $rat_row['avg_rating'] ?? '0.0';
+$totalReviews = $rat_row['total'] ?? 0;
 
-// Booking status (reject/ accept)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['booking_action'])) {
+// ── ACCEPT / REJECT BOOKING ───────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['booking_action'], $_POST['booking_id'])) {
+    $action     = $_POST['booking_action'];   // 'Confirmed' or 'Cancelled'
     $booking_id = intval($_POST['booking_id']);
-    $action     = $_POST['booking_action'];
 
+    // Only allow valid statuses
     if (in_array($action, ['Confirmed', 'Cancelled'])) {
-        $upd = $conn->prepare("UPDATE bookings SET status = ? WHERE id = ? AND tutor_id = ?");
+        $upd = $conn->prepare("
+            UPDATE bookings SET status = ?
+            WHERE id = ? AND tutor_id = ?
+        ");
         $upd->bind_param("sii", $action, $booking_id, $tutor_id);
         $upd->execute();
         $upd->close();
     }
-    header("Location: /EduGuide-php/controllers/tutorDashboardController.php");
+
+    // Redirect to avoid form re-submission on refresh
+    header("Location: /EduGuide-php/controllers/tutorDashboardController.php?action=requests");
     exit;
 }
 
-// Complaint submit
+// ── COMPLAINT SUBMIT ──────────────────────────────────────
 $complaintSuccess = "";
 $complaintError   = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject'])) {
@@ -146,29 +155,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject']))
     }
 }
 
-// Edit profile details
+// ── EDIT PROFILE SUBMIT ───────────────────────────────────
 $profileSuccess = "";
 $profileError   = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_name'])) {
-    $newName     = trim($_POST['edit_name']);
-    $newPhone    = trim($_POST['edit_phone']);
-    $newAddress  = trim($_POST['edit_address']);
-    $newQual     = trim($_POST['edit_qualification']);
-    $newExp      = intval($_POST['edit_experience']);
-    $newAvail    = $_POST['edit_availability'] ?? 'Yes';
+    $newName         = trim($_POST['edit_name']);
+    $newPhone        = trim($_POST['edit_phone']);
+    $newQualification= trim($_POST['edit_qualification']);
+    $newExperience   = intval($_POST['edit_experience']);
+    $newAddress      = trim($_POST['edit_address']);
+    $newAvailability = $_POST['edit_availability'] === 'Yes' ? 'Yes' : 'No';
 
     if ($newName === '') {
         $profileError = "Name cannot be empty.";
     } elseif ($newPhone !== '' && !preg_match('/^[6-9][0-9]{9}$/', $newPhone)) {
         $profileError = "Enter a valid 10-digit phone number.";
     } else {
+        // Update users table
         $u = $conn->prepare("UPDATE users SET name = ? WHERE id = ?");
         $u->bind_param("si", $newName, $_SESSION['user_id']);
         $u->execute();
         $u->close();
 
-        $t = $conn->prepare("UPDATE tutors SET phone = ?, address = ?, qualification = ?, experience = ?, availability = ? WHERE user_id = ?");
-        $t->bind_param("sssisi", $newPhone, $newAddress, $newQual, $newExp, $newAvail, $_SESSION['user_id']);
+        // Update tutors table
+        $t = $conn->prepare("
+            UPDATE tutors
+            SET phone = ?, qualification = ?, experience = ?, address = ?, availability = ?
+            WHERE user_id = ?
+        ");
+        $t->bind_param("ssissi",
+            $newPhone, $newQualification, $newExperience,
+            $newAddress, $newAvailability, $_SESSION['user_id']
+        );
         $t->execute();
         $t->close();
 
@@ -179,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_name'])) {
         $stmt2 = $conn->prepare("
             SELECT u.name, u.email, u.created_at,
                    t.gender, t.qualification, t.experience,
-                   t.phone, t.address, t.availability, t.is_verified,
+                   t.phone, t.address, t.availability,
                    s.name AS subject_name,
                    b.name AS board_name
             FROM users u
@@ -195,6 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_name'])) {
     }
 }
 
+// ── HELPERS ───────────────────────────────────────────────
 $registeredDate = isset($tutor['created_at'])
     ? date('F j, Y', strtotime($tutor['created_at']))
     : 'N/A';
@@ -207,5 +226,6 @@ $statusBadge = [
     'Completed' => 'bg-primary text-white',
 ];
 
+// ── LOAD VIEW ─────────────────────────────────────────────
 require_once '../views/tutor/tutorDashboard.php';
 ?>

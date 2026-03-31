@@ -81,34 +81,99 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject']))
     }
 }
 
-// Edit profile section
+$classes = $conn->query("SELECT id, name FROM classes");
+$boards  = $conn->query("SELECT id, name FROM boards");
+$exams   = $conn->query("SELECT id, name FROM exams");
+
 $profileSuccess = "";
 $profileError   = "";
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_name'])) {
-    $newName    = trim($_POST['edit_name']);
-    $newPhone   = trim($_POST['edit_phone']);
-    $newAddress = trim($_POST['edit_address']);
-    $newSchool  = trim($_POST['edit_school']);
 
-    if ($newName === '') {
-        $profileError = "Name cannot be empty.";
-    } elseif ($newPhone !== '' && !preg_match('/^[6-9][0-9]{9}$/', $newPhone)) {
-        $profileError = "Enter a valid 10-digit phone number.";
-    } else {
-        $u = $conn->prepare("UPDATE users SET name = ? WHERE id = ?");
-        $u->bind_param("si", $newName, $_SESSION['user_id']);
-        $u->execute();
-        $u->close();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-        $s = $conn->prepare("UPDATE students SET parent_phone = ?, address = ?, school_name = ? WHERE user_id = ?");
-        $s->bind_param("sssi", $newPhone, $newAddress, $newSchool, $_SESSION['user_id']);
-        $s->execute();
-        $s->close();
+    $updates = [];
+    $params  = [];
+    $types   = "";
 
-        $_SESSION['name'] = $newName;
-        $profileSuccess   = "Profile updated successfully!";
+    if (isset($_POST['edit_class'])) {
+        if ($_POST['edit_class'] === "") {
+            $profileError = "Class cannot be empty.";
+        } else {
+            $updates[] = "class_id = ?";
+            $params[]  = $_POST['edit_class'];
+            $types    .= "i";
+        }
+    }
 
-        // Refresh student data after update
+    if (isset($_POST['edit_board'])) {
+        if ($_POST['edit_board'] === "") {
+            $profileError = "Board cannot be empty.";
+        } else {
+            $updates[] = "board_id = ?";
+            $params[]  = $_POST['edit_board'];
+            $types    .= "i";
+        }
+    }
+
+    if (isset($_POST['edit_exam'])) {
+        if ($_POST['edit_exam'] === "") {
+            $profileError = "Exam cannot be empty.";
+        } else {
+            $updates[] = "exam_id = ?";
+            $params[]  = $_POST['edit_exam'];
+            $types    .= "i";
+        }
+    }
+
+    if (isset($_POST['edit_school'])) {
+        if (trim($_POST['edit_school']) === "") {
+            $profileError = "School cannot be empty.";
+        } else {
+            $updates[] = "school_name = ?";
+            $params[]  = trim($_POST['edit_school']);
+            $types    .= "s";
+        }
+    }
+
+    if (isset($_POST['edit_phone'])) {
+        if (trim($_POST['edit_phone']) === "") {
+            $profileError = "Phone number cannot be empty.";
+        } elseif (!preg_match('/^[6-9][0-9]{9}$/', $_POST['edit_phone'])) {
+            $profileError = "Invalid phone number.";
+        } else {
+            $updates[] = "parent_phone = ?";
+            $params[]  = trim($_POST['edit_phone']);
+            $types    .= "s"; 
+        }
+    }
+
+    if (isset($_POST['edit_address'])) {
+        if (trim($_POST['edit_address']) === "") {
+            $profileError = "Address cannot be empty.";
+        } else {
+            $updates[] = "address = ?";
+            $params[]  = trim($_POST['edit_address']);
+            $types    .= "s";
+        }
+    }
+
+    if ($profileError === "" && count($updates) > 0) {
+
+        $sql = "UPDATE students SET " . implode(", ", $updates) . " WHERE user_id = ?";
+        $params[] = $_SESSION['user_id'];
+        $types   .= "i";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+
+        if ($stmt->execute()) {
+            $profileSuccess = "Profile updated successfully!";
+        } else {
+            $profileError = "Update failed.";
+        }
+
+        $stmt->close();
+
+        // Refresh
         $stmt2 = $conn->prepare("
             SELECT u.name, u.email, u.created_at,
                    s.gender, s.school_name, s.parent_name, s.parent_phone, s.address,
@@ -125,7 +190,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_name'])) {
         $student = $stmt2->get_result()->fetch_assoc();
         $stmt2->close();
     }
+
+    if (count($updates) === 0 && $profileError === "") {
+        $profileError = "Please update at least one field.";
+    }
 }
+
+// ================= BROWSE TUTORS =================
+$subjects = $conn->query("SELECT id, name FROM subjects");
+$browseBoards = $conn->query("SELECT id, name FROM boards");
+
+$search = $_GET['search'] ?? '';
+$gender = $_GET['gender'] ?? '';
+$sort   = $_GET['sort'] ?? '';
+
+$sql = "
+SELECT t.id, u.name, t.gender, t.experience,
+       sub.name AS subject_name,
+       b.name AS board_name
+FROM tutors t
+JOIN users u ON u.id = t.user_id
+LEFT JOIN subjects sub ON sub.id = t.subject_id
+LEFT JOIN boards b ON b.id = t.board_id
+WHERE t.is_verified = 1
+";
+$params = [];
+$types  = "";
+
+// SEARCH
+if ($search !== '') {
+    $sql .= " AND (u.name LIKE ? OR sub.name LIKE ? OR b.name LIKE ? OR t.address LIKE ?)";
+    $searchTerm = "%$search%";
+    $params[] = $searchTerm;
+    $params[] = $searchTerm;
+    $params[] = $searchTerm;
+    $params[] = $searchTerm;
+    $types .= "ssss";
+}
+
+// FILTER GENDER
+if ($gender !== '') {
+    $sql .= " AND t.gender = ? AND t.is_verified = 1";
+    $params[] = $gender;
+    $types .= "s";
+}
+
+// SORTING
+if ($sort === 'asc') {
+    $sql .= " ORDER BY u.name ASC";
+} elseif ($sort === 'desc') {
+    $sql .= " ORDER BY u.name DESC";
+} elseif ($sort === 'exp') {
+    $sql .= " ORDER BY t.experience DESC";
+} 
+
+// EXECUTE
+$stmt = $conn->prepare($sql);
+
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+$tutors = $stmt->get_result();
+$stmt->close();
 
 // created_at
 $registeredDate = isset($student['created_at'])
@@ -141,31 +269,5 @@ $statusBadge = [
 ];
 
 $page = $_GET['page'] ?? 'dashboard';
-
-switch ($page) {
-    case 'profile':
-        $view = 'profile.php';
-        break;
-
-    case 'browse':
-        $view = 'browse.php';
-        break;
-
-    case 'bookings':
-        $view = 'bookings.php';
-        break;
-
-    case 'reviews':
-        $view = 'reviews.php';
-        break;
-
-    case 'complaint':
-        $view = 'complaint.php';
-        break;
-
-    default:
-        $view = 'dashboard.php';
-}
-
 require_once '../views/student/studentDashboard.php';
 ?>
