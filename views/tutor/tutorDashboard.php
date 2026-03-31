@@ -25,7 +25,7 @@
 
             <!-- Nav Links -->
             <nav class="flex-grow-1 px-3 py-3 d-flex flex-column gap-2 fw-semibold">
-                <a href="#" class="nav-link active" onclick="return showPanel('dashboard', this)" ><small>🏡</small> <span>Dashboard</span></a>
+                <a href="/EduGuide-php/controllers/tutorDashboardController.php?page=dashboard" class="nav-link active" onclick="return showPanel('dashboard', this)" ><small>🏡</small> <span>Dashboard</span></a>
                 <a href="#" class="nav-link" onclick="return showPanel('profile', this)"><small>👤</small> <span>My Profile</span></a>
                 <a href="#" class="nav-link" onclick="return showPanel('requests', this)"><small>📥</small> <span>Booking Requests</span></a>
                 <a href="#" class="nav-link" onclick="return showPanel('schedule', this)"><small>📅</small> <span>My Shedule</span></a>
@@ -107,7 +107,7 @@
                 </div>
             </div>
 
-        <!-- my profile -->
+            <!-- my profile -->
             <div class="panel" id="panel-profile">
                 <h5 class="fw-bold text-primary mb-3">👤 My Profile</h5>
                 <div id="profile-view">
@@ -220,146 +220,146 @@
                     </form>
                 </div>
             </div>
-        </div>
-        <!-- Booking request -->
-        <div class="panel" id="panel-requests">
-            <h5 class="fw-bold text-primary mb-4">📥 Booking Requests</h5>
-            <div class="card shadow-sm p-4">
-                <?php $requests->data_seek(0);
-                if($requests->num_rows === 0): ?>
-                    <p class="text-muted text-center py-4">No booking requests yet.</p>
-                <?php else: ?>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Student</th>
-                                <th>Subject</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $i = 1; while($bk = $requests->fetch_assoc()): $badge = $statusBadge[$bk['status']] ?? 'bg-secondary text-white'; ?>
-                            <tr>
-                                <td><?php echo $i++ ?></td>
-                                <td><?php echo htmlspecialchars($bk['student_name']) ?></td>
-                                <td><?php echo htmlspecialchars($bk['subject_name']) ?></td>
-                                <td><?php echo date('d M Y',  strtotime($bk['created_at'])) ?></td>
-                                <td><span class="badge <?php echo $badge ?>"><?= $bk['status'] ?></span></td>
-                                <td>
-                                    <?php if ($bk['status'] === 'Pending'): ?>
-                                        <form method="POST" action="" class="d-flex gap-1">
-                                            <input type="hidden" name="booking_id" value="<?= $bk['id'] ?>">
-                                            <button type="submit" name="booking_action" value="Confirmed"
-                                                class="btn btn-success btn-sm">✅ Accept</button>
-                                            <button type="submit" name="booking_action" value="Cancelled"
-                                                class="btn btn-danger btn-sm">❌ Reject</button>
-                                        </form>
-                                    <?php else: ?>
-                                        <span class="text-muted small">—</span>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <?php endif; ?>
-            </div>
-        </div>
-        <!-- My schedule -->
-        <div class="panel" id="panel-schedule">
-            <h5 class="fw-bold text-primary mb-4">📆 My Schedule</h5>
-            <div class="card shadow-sm p-4">
-                <?php
-                $schedule->data_seek(0);
-                if($schedule->num_rows === 0): ?>
-                    <p class="text-muted text-center py-4">No confirmed session in your schedule yet.</p>
-                <?php else: ?>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Student</th>
-                                <th>Subject</th>
-                                <th>Booked On</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $i = 1; while($sc = $schedule->fetch_assoc()): ?>
+            <!-- Booking request -->
+            <div class="panel" id="panel-requests">
+                <h5 class="fw-bold text-primary mb-4">📥 Booking Requests</h5>
+                <div class="card shadow-sm p-4">
+                    <?php $requests->data_seek(0);
+                    if($requests->num_rows === 0): ?>
+                        <p class="text-muted text-center py-4">No booking requests yet.</p>
+                    <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Student</th>
+                                    <th>Subject</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $i = 1; while($bk = $requests->fetch_assoc()): $badge = $statusBadge[$bk['status']] ?? 'bg-secondary text-white'; ?>
                                 <tr>
                                     <td><?php echo $i++ ?></td>
-                                    <td><?php echo htmlspecialchars($sc['student_name']) ?></td>
-                                    <td><?php echo htmlspecialchars($sc['subject_name'] ?? 'N/A') ?></td>
-                                    <td><?php echo date('d M Y', strtotime($sc['created_at'])) ?></td>
-                                    <td><span class="badge bg-success text-white">Confirmed</span></td>
+                                    <td><?php echo htmlspecialchars($bk['student_name']) ?></td>
+                                    <td><?php echo htmlspecialchars($bk['subject_name']) ?></td>
+                                    <td><?php echo date('d M Y',  strtotime($bk['created_at'])) ?></td>
+                                    <td><span class="badge <?php echo $badge ?>"><?= $bk['status'] ?></span></td>
+                                    <td>
+                                        <?php if ($bk['status'] === 'Pending'): ?>
+                                            <form method="POST" action="" class="d-flex gap-1">
+                                                <input type="hidden" name="booking_id" value="<?= $bk['id'] ?>">
+                                                <button type="submit" name="booking_action" value="Confirmed"
+                                                    class="btn btn-success btn-sm">✅ Accept</button>
+                                                <button type="submit" name="booking_action" value="Cancelled"
+                                                    class="btn btn-danger btn-sm">❌ Reject</button>
+                                            </form>
+                                        <?php else: ?>
+                                            <span class="text-muted small">—</span>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <?php endif; ?>
-            </div>
-        </div>
-        <!-- My reviews -->
-        <div class="panel" id="panel-reviews">
-            <h5 class="fw-bold text-primary mb-4">⭐ My Reviews</h5>
-            <div class="card shadow-sm p-4 mb-4 text-center">
-                <h2 class="fw-bold text-warning mb-0"><?php echo $avgRating ?></h2>
-                <p class="text-muted mb-0">Based on <?php echo $totalReviews ?></p>
-            </div>
-
-            <div class="card shadow-sm p-4">
-                <?php
-                $reviews->data_seek(0);
-                if($reviews->num_rows === 0):?>
-                    <p class="text-muted text-center py-4">No reviews received yet.</p>
-                <?php else: ?>
-                    <?php while($rv = $reviews->fetch_assoc()): ?>
-                        <div class="border-bottom pb-3 mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <strong><?php echo htmlspecialchars($rv['student_name']) ?></strong>
-                                <small class="text-muted"><?php echo date('d M Y', strtotime($rv['created_at'])) ?></small>
-                            </div>
-                            <div class="mb-1">
-                                <?php for ($s = 1; $s <= 5; $s++): ?>
-                                    <span class="<?= $s <= $rv['rating'] ? 'star-filled' : 'star-empty' ?>">★</span>
-                                <?php endfor; ?>
-                            </div>
-                            <p class="mb-0 text-muted small"><?php echo htmlspecialchars($rv['comment'] ?? '') ?></p>
-                        </div>
-                        <?php endwhile; ?>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
                     <?php endif; ?>
+                </div>
             </div>
-        </div>
-        <!-- Raise complaint -->
-        <div class="panel" id="panel-complaint">
-            <h5 class="fw-bold text-primary mb-4">📢 Raise Complaint</h5>
-            <?php if ($complaintSuccess): ?>
-                <div class="alert alert-success"><?php echo htmlspecialchars($complaintSuccess) ?></div>
-            <?php endif; ?>
-            <?php if ($complaintError): ?>
-                <div class="alert alert-danger"><?php echo htmlspecialchars($complaintError) ?></div>
-            <?php endif; ?>
-            <div class="card shadow-sm p-4">
-                <form method="POST" action="">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Subject <span class="text-danger">*</span></label>
-                        <input type="text" name="complaint_subject" class="form-control" placeholder="Brief subject of your complaint" required>
+            <!-- My schedule -->
+            <div class="panel" id="panel-schedule">
+                <h5 class="fw-bold text-primary mb-4">📆 My Schedule</h5>
+                <div class="card shadow-sm p-4">
+                    <?php
+                    $schedule->data_seek(0);
+                    if($schedule->num_rows === 0): ?>
+                        <p class="text-muted text-center py-4">No confirmed session in your schedule yet.</p>
+                    <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Student</th>
+                                    <th>Subject</th>
+                                    <th>Booked On</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $i = 1; while($sc = $schedule->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><?php echo $i++ ?></td>
+                                        <td><?php echo htmlspecialchars($sc['student_name']) ?></td>
+                                        <td><?php echo htmlspecialchars($sc['subject_name'] ?? 'N/A') ?></td>
+                                        <td><?php echo date('d M Y', strtotime($sc['created_at'])) ?></td>
+                                        <td><span class="badge bg-success text-white">Confirmed</span></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Message <span class="text-danger">*</span></label>
-                        <textarea name="complaint_message" class="form-control" rows="5" placeholder="Describe your issue in detail..." required></textarea>
-                    </div>
-                    <div class="text-end">
-                        <button type="submit" class="btn btn-danger px-4">Submit Complaint</button>
-                    </div>
-                </form>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <!-- My reviews -->
+            <div class="panel" id="panel-reviews">
+                <h5 class="fw-bold text-primary mb-4">⭐ My Reviews</h5>
+                <div class="card shadow-sm p-4 mb-4 text-center">
+                    <h2 class="fw-bold text-warning mb-0"><?php echo $avgRating ?></h2>
+                    <p class="text-muted mb-0">Based on <?php echo $totalReviews ?></p>
+                </div>
+
+                <div class="card shadow-sm p-4">
+                    <?php
+                    $reviews->data_seek(0);
+                    if($reviews->num_rows === 0):?>
+                        <p class="text-muted text-center py-4">No reviews received yet.</p>
+                    <?php else: ?>
+                        <?php while($rv = $reviews->fetch_assoc()): ?>
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong><?php echo htmlspecialchars($rv['student_name']) ?></strong>
+                                    <small class="text-muted"><?php echo date('d M Y', strtotime($rv['created_at'])) ?></small>
+                                </div>
+                                <div class="mb-1">
+                                    <?php for ($s = 1; $s <= 5; $s++): ?>
+                                        <span class="<?= $s <= $rv['rating'] ? 'star-filled' : 'star-empty' ?>">★</span>
+                                    <?php endfor; ?>
+                                </div>
+                                <p class="mb-0 text-muted small"><?php echo htmlspecialchars($rv['comment'] ?? '') ?></p>
+                            </div>
+                            <?php endwhile; ?>
+                        <?php endif; ?>
+                </div>
+            </div>
+            <!-- Raise complaint -->
+            <div class="panel" id="panel-complaint">
+                <h5 class="fw-bold text-primary mb-4">📢 Raise Complaint</h5>
+                <?php if ($complaintSuccess): ?>
+                    <div class="alert alert-success"><?php echo htmlspecialchars($complaintSuccess) ?></div>
+                <?php endif; ?>
+                <?php if ($complaintError): ?>
+                    <div class="alert alert-danger"><?php echo htmlspecialchars($complaintError) ?></div>
+                <?php endif; ?>
+                <div class="card shadow-sm p-4">
+                    <form method="POST" action="">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Subject <span class="text-danger">*</span></label>
+                            <input type="text" name="complaint_subject" class="form-control" placeholder="Brief subject of your complaint" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Message <span class="text-danger">*</span></label>
+                            <textarea name="complaint_message" class="form-control" rows="5" placeholder="Describe your issue in detail..." required></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-danger px-4">Submit Complaint</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

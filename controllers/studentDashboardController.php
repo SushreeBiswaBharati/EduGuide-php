@@ -140,5 +140,32 @@ $statusBadge = [
     'Completed' => 'bg-primary text-white',
 ];
 
+$page = $_GET['page'] ?? 'dashboard';
+
+switch ($page) {
+    case 'profile':
+        $view = 'profile.php';
+        break;
+
+    case 'browse':
+        $view = 'browse.php';
+        break;
+
+    case 'bookings':
+        $view = 'bookings.php';
+        break;
+
+    case 'reviews':
+        $view = 'reviews.php';
+        break;
+
+    case 'complaint':
+        $view = 'complaint.php';
+        break;
+
+    default:
+        $view = 'dashboard.php';
+}
+
 require_once '../views/student/studentDashboard.php';
 ?>

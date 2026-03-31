@@ -12,7 +12,11 @@
 
         <!-- Sidebar-->
         <div class="sidebar d-flex flex-column justify-content-between p-0 rounded-4" id="sidebar">
-
+             <?php
+                if (isset($view)) {
+                    include __DIR__ . '/' . $view;
+                }
+            ?>
             <div class="p-3 border-bottom border-white border-opacity-25 d-flex align-items-center justify-content-between">
                 <div>
                     <div class="fw-bold fs-5 brand-title">EduGuide</div>
@@ -25,17 +29,31 @@
 
             <!-- Nav Links -->
             <nav class="flex-grow-1 px-3 py-3 d-flex flex-column gap-2 fw-semibold">
-                <a href="#" class="nav-link active" onclick="return showPanel('dashboard, this')"><small>🏡</small> <span>Dashboard</span></a>
 
-                <a href="#" class="nav-link" onclick="return showPanel('profile, this')"><small>👤</small> <span>My Profile</span></a>
+                <a href="/EduGuide-php/controllers/studentDashboardController.php?page=dashboard" class="nav-link active" onclick="return showPanel('dashboard', this)">
+                    <small>🏡</small> <span>Dashboard</span>
+                </a>
 
-                <a href="#" class="nav-link" onclick="return showPanel('browse, this')"><small>🔍</small> <span>Browse Tutors</span></a>
+                <a href="/EduGuide-php/controllers/studentDashboardController.php?page=profile" class="nav-link" onclick="return showPanel('profile', this)">
+                    <small>👤</small> <span>My Profile</span>
+                </a>
 
-                <a href="#" class="nav-link" onclick="return showPanel('bookings, this')"><small>📅</small> <span>My Bookings</span></a>
+                <a href="/EduGuide-php/controllers/studentDashboardController.php?page=browse" class="nav-link" onclick="return showPanel('browse', this)">
+                    <small>🔍</small> <span>Browse Tutors</span>
+                </a>
 
-                <a href="#" class="nav-link" onclick="return showPanel('reviews, this')"><small>⭐</small> <span>My Reviews</span></a>
+                <a href="/EduGuide-php/controllers/studentDashboardController.php?page=bookings" class="nav-link" onclick="return showPanel('bookings', this)">
+                    <small>📅</small> <span>My Bookings</span>
+                </a>
 
-                <a href="#" class="nav-link" onclick="return showPanel('complaint, this')"><small>📢</small> <span>Raise Complaint</span></a>
+                <a href="/EduGuide-php/controllers/studentDashboardController.php?page=reviews" class="nav-link" onclick="return showPanel('reviews', this)">
+                    <small>⭐</small> <span>My Reviews</span>
+                </a>
+
+                <a href="/EduGuide-php/controllers/studentDashboardController.php?page=complaint" class="nav-link" onclick="return showPanel('complaint', this)">
+                    <small>📢</small> <span>Raise Complaint</span>
+                </a>
+
             </nav>
 
             <!-- Logout -->
@@ -54,7 +72,7 @@
             <div class="mb-4 greet-bar rounded-4 p-4 text-white">
                 <span><?php echo $today;?></span>
                 <h4 class="fw-bold mb-1">
-                    welcome Back <?= htmlspecialchars($student['name'] ?? 'Student') ?>!</h4>
+                    welcome Back <?php echo htmlspecialchars($student['name'] ?? 'Student') ?>!</h4>
                 <p class="fst-italic mb-2">"Your future is created by what you do today."</p>
                 <span class="badge bg-white bg-opacity-75 text-primary px-3 py-2">Student</span>
             </div>
@@ -70,7 +88,7 @@
                 <div class="col-md-3 col-6">
                     <div class="card shadow-sm text-center px-2 py-3 bg-success bg-opacity-50">
                         <div class="fw-bold mb-1">Confirmed</div>
-                        <div class="text-success fw-bold fs-4"><?php echo $confirmBookings; ?></div>
+                        <div class="text-success fw-bold fs-4"><?php echo $confirmedBookings; ?></div>
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
@@ -89,8 +107,21 @@
             <div class="row g-3">
                 
             </div>
-
+            <div class="panel" id="panel-profile">
+                <h5 class="fw-bold text-primary mb-4">My Profile</h5>
+                <!-- Profile Details -->
+                <div id="profile-view">
+                    <div class="card shadow-sm p-4 mb-3">
+                        <div class="row"><div class="col-md-6">
+                            <p class="mb-2">
+                                span.text-muted
+                            </p>
+                        </div></div>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </div>
     <script>
         const toggleBtn  = document.getElementById('toggleBtn');
