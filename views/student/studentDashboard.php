@@ -9,7 +9,6 @@
 </head>
 <body>
     <div class="d-flex p-3 gap-3 vh-100">
-
         <!-- Sidebar-->
         <div class="sidebar d-flex flex-column justify-content-between p-0 rounded-4" id="sidebar">
 
@@ -53,9 +52,10 @@
             </nav>
 
             <!-- Logout -->
-           <div class="pb-3 px-2 mb-3">
-                <a href="#" class="logout nav-link fw-semibold btn btn-sm shadow w-100 rounded"
-                style="white-space:nowrap; overflow:hidden; display:flex; align-items:center; justify-content:center; gap:6px;"><small style="font-size: larger;">👉</small><span class="logout-span">Logout</span>
+           <div class="pb-3 px-2 mb-3 d-flex justify-content-center">
+                <a href="/EduGuide-php/views/auth/logout.php" class="logout nav-link fw-semibold btn btn-sm shadow w-75 rounded"
+                onclick="return confirm('Are you sure you want to logout?')">
+                <small style="font-size: larger;">👉</small><span class="logout-span">Logout</span>
                 </a>
             </div>
         </div>
@@ -63,8 +63,7 @@
         <!--Main Content-->
         <div class="flex-grow-1 main-content p-4 rounded-4 shadow-sm">
                 <?php if ($page === 'dashboard'): ?>
-
-                    <!-- DASHBOARD -->
+                    <!-- Dashboard -->
                     <div class="mb-4 greet-bar rounded-4 p-4 text-white">
                         <span><?php echo $today;?></span>
                         <h4 class="fw-bold mb-1">
@@ -105,52 +104,102 @@
                     </div>
 
                 <?php elseif ($page === 'profile'): ?>
-                    <!-- PROFILE -->
+                    <!-- Profile -->
                     <h5 class="fw-bold text-primary mb-4">My Profile</h5>
-                <?php if ($profileSuccess): ?>
-                    <div class="alert alert-success"><?php echo $profileSuccess; ?></div>
-                <?php endif; ?>
+                    <?php if ($profileSuccess): ?>
+                        <div class="alert alert-success"><?php echo $profileSuccess; ?></div>
+                    <?php endif; ?>
 
-                <?php if ($profileError): ?>
-                    <div class="alert alert-danger"><?php echo $profileError; ?></div>
-                <?php endif; ?>
+                    <?php if ($profileError): ?>
+                        <div class="alert alert-danger"><?php echo $profileError; ?></div>
+                    <?php endif; ?>
 
                 <!-- VIEW MODE -->
                 <div id="profile-view">
                     <div class="card shadow-sm p-4">
-                        <p class="mb-3 ">
-                            <strong class="fw-semibold fs-5 text-primary">Name:</strong>
-                            <span><?php echo $student['name']; ?></span>
-                        </p>
-                        <p class="mb-3">
-                            <strong class="fw-semibold fs-5 text-primary">Class:</strong>
-                            <span><?php echo $student['class_name']; ?></span>
-                        </p>
-                        <p class="mb-3">
-                            <strong class="fw-semibold fs-5 text-primary">Board:</strong>
-                            <span><?php echo $student['board_name']; ?></span>
-                        </p>
-                        <p class="mb-3">
-                            <strong class="fw-semibold fs-5 text-primary">Exam:</strong> 
-                            <span><?php echo $student['exam_name']; ?></span>
-                        </p>
-                        <p class="mb-3">
-                            <strong class="fw-semibold fs-5 text-primary">School:</strong>
-                            <span><?php echo $student['school_name']; ?></span>
-                        </p>
-                        <p class="mb-3">
-                            <strong class="fw-semibold fs-5 text-primary">Parent:</strong>
-                            <span><?php echo $student['parent_name']; ?></span>
-                        </p>
-                        <p class="mb-3">
-                            <strong class="fw-semibold fs-5 text-primary">Phone:</strong>
-                            <span><?php echo $student['parent_phone']; ?></span>
-                        </p>
-                        <p class="mb-3">
-                            <strong class="fw-semibold fs-5 text-primary">Address:</strong>
-                            <span><?php echo $student['address']; ?></span>
-                        </p>
+                        <div class="row g-3">
 
+                            <!-- LEFT: PROFILE CARD -->
+                            <div class="col-md-4">
+                                <div class="card shadow-sm p-3 text-center h-100">
+
+                                    <!-- Profile Image -->
+                                    <div class="mb-2">
+                                        <?php
+                                        $image = !empty($student['profile_image'])
+                                            ? "/EduGuide-php/uploads/profile/" . $student['profile_image']
+                                            : "/EduGuide-php/assets/default-user.png";
+                                        ?>
+                                        <img src="<?php echo $image; ?>" 
+                                            style="width:90px; height:90px; border-radius:50%; object-fit:cover;">
+                                    </div>
+
+                                    <!-- Name -->
+                                    <h6 class="fw-bold mb-1"><?php echo $student['name']; ?></h6>
+
+                                    <!-- Small Info -->
+                                    <small class="text-muted d-block">Student ID: <?php echo $student_id; ?></small>
+                                    <small class="text-muted d-block">Class: <?php echo $student['class_name']; ?></small>
+
+                                </div>
+                            </div>
+
+                            <!-- RIGHT: DETAILS TABLE -->
+                            <div class="col-md-8">
+                                <div class="shadow-sm p-3 h-100">
+
+                                    <h6 class="fw-bold mb-3">General Information</h6>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-sm align-middle mb-0">
+
+                                            <tr>
+                                                <td class="fw-semibold text-muted">Email</td>
+                                                <td><?php echo $student['email']; ?></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="fw-semibold text-muted">Gender</td>
+                                                <td><?php echo $student['gender']; ?></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="fw-semibold text-muted">Board</td>
+                                                <td><?php echo $student['board_name']; ?></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="fw-semibold text-muted">Exam</td>
+                                                <td><?php echo $student['exam_name']; ?></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="fw-semibold text-muted">School</td>
+                                                <td><?php echo $student['school_name']; ?></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="fw-semibold text-muted">Parent</td>
+                                                <td><?php echo $student['parent_name']; ?></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="fw-semibold text-muted">Phone</td>
+                                                <td><?php echo $student['parent_phone']; ?></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="fw-semibold text-muted">Address</td>
+                                                <td><?php echo $student['address']; ?></td>
+                                            </tr>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
                         <button type="button" class="btn btn-primary mt-3" onclick="toggleEdit()">Edit Profile</button>
                     </div>
                 </div>
