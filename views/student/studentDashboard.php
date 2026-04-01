@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
     <link rel="stylesheet" href="/EduGuide-php/assets/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="/EduGuide-php/assets/css/dashboard.css ? v=1.1">
+    <link rel="stylesheet" href="/EduGuide-php/assets/css/dashboard.css?v=1.1">
 </head>
 <body>
     <div class="d-flex p-3 gap-3 vh-100">
@@ -105,7 +105,7 @@
 
                 <?php elseif ($page === 'profile'): ?>
                     <!-- Profile -->
-                    <h5 class="fw-bold text-primary mb-4">My Profile</h5>
+                    <h5 class="fw-bold text-primary mb-4">👤 My Profile</h5>
                     <?php if ($profileSuccess): ?>
                         <div class="alert alert-success"><?php echo $profileSuccess; ?></div>
                     <?php endif; ?>
@@ -124,21 +124,19 @@
                                 <div class="card shadow-sm p-3 text-center h-100">
 
                                     <!-- Profile Image -->
-                                    <div class="mb-2">
+                                    <div class="mb-2 my-auto">
                                         <?php
                                         $image = !empty($student['profile_image'])
-                                            ? "/EduGuide-php/uploads/profile/" . $student['profile_image']
+                                            ? "/EduGuide-php/assets/profile/" . $student['profile_image']
                                             : "/EduGuide-php/assets/default-user.png";
                                         ?>
                                         <img src="<?php echo $image; ?>" 
-                                            style="width:90px; height:90px; border-radius:50%; object-fit:cover;">
+                                            style="width:120px; height:120px; border-radius:50%; object-fit:cover;">
                                     </div>
 
                                     <!-- Name -->
                                     <h6 class="fw-bold mb-1"><?php echo $student['name']; ?></h6>
 
-                                    <!-- Small Info -->
-                                    <small class="text-muted d-block">Student ID: <?php echo $student_id; ?></small>
                                     <small class="text-muted d-block">Class: <?php echo $student['class_name']; ?></small>
 
                                 </div>
@@ -148,49 +146,49 @@
                             <div class="col-md-8">
                                 <div class="shadow-sm p-3 h-100">
 
-                                    <h6 class="fw-bold mb-3">General Information</h6>
+                                    <h6 class="fw-bold fs-4 mb-3 text-center text-warning">Your Details</h6>
 
                                     <div class="table-responsive">
                                         <table class="table table-sm align-middle mb-0">
 
                                             <tr>
-                                                <td class="fw-semibold text-muted">Email</td>
-                                                <td><?php echo $student['email']; ?></td>
+                                                <td class="fw-semibold text-primary">Email</td>
+                                                <td class="fw-semibold text-muted"><?php echo $student['email']; ?></td>
                                             </tr>
 
                                             <tr>
-                                                <td class="fw-semibold text-muted">Gender</td>
-                                                <td><?php echo $student['gender']; ?></td>
+                                                <td class="fw-semibold text-primary">Gender</td>
+                                                <td class="fw-semibold text-muted"><?php echo $student['gender']; ?></td>
                                             </tr>
 
                                             <tr>
-                                                <td class="fw-semibold text-muted">Board</td>
-                                                <td><?php echo $student['board_name']; ?></td>
+                                                <td class="fw-semibold text-primary">Board</td>
+                                                <td class="fw-semibold text-muted"><?php echo $student['board_name']; ?></td>
                                             </tr>
 
                                             <tr>
-                                                <td class="fw-semibold text-muted">Exam</td>
-                                                <td><?php echo $student['exam_name']; ?></td>
+                                                <td class="fw-semibold text-primary">Exam</td>
+                                                <td class="fw-semibold text-muted"><?php echo $student['exam_name']; ?></td>
                                             </tr>
 
                                             <tr>
-                                                <td class="fw-semibold text-muted">School</td>
-                                                <td><?php echo $student['school_name']; ?></td>
+                                                <td class="fw-semibold text-primary">School Name</td>
+                                                <td class="fw-semibold text-muted"><?php echo $student['school_name']; ?></td>
                                             </tr>
 
                                             <tr>
-                                                <td class="fw-semibold text-muted">Parent</td>
-                                                <td><?php echo $student['parent_name']; ?></td>
+                                                <td class="fw-semibold text-primary">Parent</td>
+                                                <td class="fw-semibold text-muted"><?php echo $student['parent_name']; ?></td>
                                             </tr>
 
                                             <tr>
-                                                <td class="fw-semibold text-muted">Phone</td>
-                                                <td><?php echo $student['parent_phone']; ?></td>
+                                                <td class="fw-semibold text-primary">Phone</td>
+                                                <td class="fw-semibold text-muted"><?php echo $student['parent_phone']; ?></td>
                                             </tr>
 
                                             <tr>
-                                                <td class="fw-semibold text-muted">Address</td>
-                                                <td><?php echo $student['address']; ?></td>
+                                                <td class="fw-semibold text-primary">Address</td>
+                                                <td class="fw-semibold text-muted"><?php echo $student['address']; ?></td>
                                             </tr>
 
                                         </table>
@@ -200,61 +198,76 @@
                             </div>
 
                         </div>
-                        <button type="button" class="btn btn-primary mt-3" onclick="toggleEdit()">Edit Profile</button>
+                        <div class="text-center py-3 ">
+                            <button type="button" class="btn btn-primary mt-3 w-25" onclick="toggleEdit()">Edit Profile</button>
+                        </div>
+                        
                     </div>
                 </div>
 
                 <!-- EDIT MODE -->
                 <div id="edit-form" style="display:none;">
                     <div class="card shadow-sm p-4">
-                        <form method="POST">
-                            <!-- CLASS -->
-                            <label for="class" class="form-label fw-semibold fs-5 text-primary">Class:</label>
-                            <select name="edit_class" class="form-control mb-3" required>
-                                <option value="">Select Class</option>
-                                <?php while($c = $classes->fetch_assoc()): ?>
-                                    <option value="<?php echo $c['id']; ?>" <?php if($c['name']==$student['class_name']) echo 'selected'; ?>>
-                                        <?php echo $c['name']; ?>
-                                    </option>
-                                <?php endwhile; ?>
-                            </select>
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                
+                                <form method="POST" enctype="multipart/form-data">
+                                    <label class="form-label fe-semibold">Profile Photo</label>
+                                    <input type="file" name="profile_image" class="form-control mb-3" accept="image/*">
+                                    <label for="class" class="form-label fw-semibold fs-5 text-primary">Class:</label>
+                                    <select name="edit_class" class="form-control mb-3" required>
+                                        <option value="">Select Class</option>
+                                        <?php while($c = $classes->fetch_assoc()): ?>
+                                            <option value="<?php echo $c['id']; ?>" <?php if($c['name']==$student['class_name']) echo 'selected'; ?>>
+                                                <?php echo $c['name']; ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    </select>
 
-                            <!-- BOARD -->
-                            <label for="class" class="form-label fw-semibold fs-5 text-primary">Education Board:</label>
-                            <select name="edit_board" class="form-control mb-3" required>
-                                <option value="">Select Board</option>
-                                <?php while($b = $boards->fetch_assoc()): ?>
-                                    <option value="<?php echo $b['id']; ?>" <?php if($b['name']==$student['board_name']) echo 'selected'; ?>>
-                                        <?php echo $b['name']; ?>
-                                    </option>
-                                <?php endwhile; ?>
-                            </select>
+                                    <!-- BOARD -->
+                                    <label for="class" class="form-label fw-semibold fs-5 text-primary">Education Board:</label>
+                                    <select name="edit_board" class="form-control mb-3" required>
+                                        <option value="">Select Board</option>
+                                        <?php while($b = $boards->fetch_assoc()): ?>
+                                            <option value="<?php echo $b['id']; ?>" <?php if($b['name']==$student['board_name']) echo 'selected'; ?>>
+                                                <?php echo $b['name']; ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    </select>
 
-                            <!-- EXAM -->
-                            <label for="class" class="form-label fw-semibold fs-5 text-primary">Exam:</label>
-                            <select name="edit_exam" class="form-control mb-3" required>
-                                <option value="">Select Exam</option>
-                                <?php while($e = $exams->fetch_assoc()): ?>
-                                    <option value="<?php echo $e['id']; ?>" <?php if($e['name']==$student['exam_name']) echo 'selected'; ?>>
-                                        <?php echo $e['name']; ?>
-                                    </option>
-                                <?php endwhile; ?>
-                            </select>
+                                    <!-- EXAM -->
+                                    <label for="class" class="form-label fw-semibold fs-5 text-primary">Exam:</label>
+                                    <select name="edit_exam" class="form-control mb-3" required>
+                                        <option value="">Select Exam</option>
+                                        <?php while($e = $exams->fetch_assoc()): ?>
+                                            <option value="<?php echo $e['id']; ?>" <?php if($e['name']==$student['exam_name']) echo 'selected'; ?>>
+                                                <?php echo $e['name']; ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    </select>
 
-                            <label for="class" class="form-label fw-semibold fs-5 text-primary">Parent's Phone:</label>
-                            <input type="tel" name="edit_phone" class="form-control mb-3" value="<?php echo $student['parent_phone']; ?>" required>
-                            
-                            <label for="class" class="form-label fw-semibold fs-5 text-primary">School Name:</label>
-                            <input type="text" name="edit_school" class="form-control mb-3" value="<?php echo $student['school_name']; ?>" required>
-                            
-                            <label for="class" class="form-label fw-semibold fs-5 text-primary">Address:</label>
-                            <input type="text" name="edit_address" class="form-control mb-3" value="<?php echo $student['address']; ?>" required>
+                                    <label for="class" class="form-label fw-semibold fs-5 text-primary">Parent's Phone:</label>
+                                    <input type="tel" name="edit_phone" class="form-control mb-3" value="<?php echo $student['parent_phone']; ?>" required>
+                                    
+                                    <label for="class" class="form-label fw-semibold fs-5 text-primary">School Name:</label>
+                                    <input type="text" name="edit_school" class="form-control mb-3" value="<?php echo $student['school_name']; ?>" required>
+                                    
+                                    <label for="class" class="form-label fw-semibold fs-5 text-primary">Address:</label>
+                                    <input type="text" name="edit_address" class="form-control mb-3" value="<?php echo $student['address']; ?>" required>
 
-                            <div class="d-flex gap-2 mt-3">
-                                <button type="button" class="btn btn-secondary" onclick="toggleEdit()">Cancel</button>
-                                <button type="submit" class="btn btn-success">Save</button>
+                                    <div class="d-flex gap-2 mt-3">
+                                        <button type="button" class="btn btn-secondary" onclick="toggleEdit()">Cancel</button>
+                                        <button type="submit" class="btn btn-success">Save</button>
+                                    </div>
+                                </form>
                             </div>
-                        </form>
+                            <div class="col-md-4">
+                                <form action="" method="POST">
+                                    
+                                </form>
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
 

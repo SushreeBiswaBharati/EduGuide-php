@@ -6,7 +6,7 @@ require_once '../database/dbconnection.php';
 
 // Fetch student profile
 $stmt = $conn->prepare("
-    SELECT u.name, u.email, u.created_at,
+    SELECT u.name, u.email, u.created_at, u.profile_image,
            s.gender, s.school_name, s.parent_name, s.parent_phone, s.address,
            c.name AS class_name, b.name AS board_name, e.name AS exam_name
     FROM users u
@@ -94,6 +94,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $params  = [];
     $types   = "";
 
+    if(isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0){
+        $fileName = $_FILES['profile_image']['name'];
+        $tmpName = $_FILES['profile_image']['tmp_name'];
+
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png'];
+        if(!in_array($ext, $allowed)){
+            $profileError = "Only JPG, JPEG, PNG allowed";
+        }else{
+            $newFileName = "user_" . $_SESSION['user_id'] . "_" . time() . "." .$ext;
+            $uploadPath = "EduGuide-php/assets/profile/" .$newFileName;
+            move_uploaded_file($tmpName, $uploadPath);
+            $stmtImg = $conn->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
+            $stmtImg->bind_param("si", $newFileName, $_SESSION['user_id']);
+            $stmtImg->execute();
+            $stmtImg->close();
+        }
+    }
     if (isset($_POST['edit_class'])) {
         if ($_POST['edit_class'] === "") {
             $profileError = "Class cannot be empty.";
@@ -175,7 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Refresh
         $stmt2 = $conn->prepare("
-            SELECT u.name, u.email, u.created_at,
+            SELECT u.name, u.email, u.created_at, u.profile_image,
                    s.gender, s.school_name, s.parent_name, s.parent_phone, s.address,
                    c.name AS class_name, b.name AS board_name, e.name AS exam_name
             FROM users u
