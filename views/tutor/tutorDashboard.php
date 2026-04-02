@@ -125,7 +125,6 @@
                         <div class="col-md-4">
                             <div class="card shadow-sm p-3 text-center h-100">
 
-                                <!-- Profile Image -->
                                 <div class=" my-auto">
                                     <?php
                                     $image = !empty($tutor['profile_image'])
@@ -135,7 +134,6 @@
                                     <img src="<?php echo $image; ?>" class="profile-img">
                                 </div>
 
-                            
                                 <h6 class="fw-bold my-2"><?php echo $tutor['name']; ?></h6>
                             </div>
                         </div>
@@ -194,59 +192,46 @@
 
             <!-- Edit profile -->
             <div id="edit-form" style="display:none;">
-                <div class="card shadow-sm p-4">
-                    <div class="row g-3 d-flex justify-content-center">
-                        <div class="col-md-8">
-                                
-                            <form method="POST" enctype="multipart/form-data">
-                                <label class="form-label fw-semibold fs-5 text-primary">Profile Photo</label>
-                                <input type="file" name="profile_image" class="form-control mb-3" accept="image/*">
-                                <label for="class" class="form-label fw-semibold fs-5 text-primary">Class:</label>
-                                <select name="edit_class" class="form-control mb-3" required>
-                                    <option value="">Select Class</option>
-                                    <?php while($c = $classes->fetch_assoc()): ?>
-                                        <option value="<?php echo $c['id']; ?>" <?php if($c['name']==$tutor['class_name']) echo 'selected'; ?>>
-                                            <?php echo $c['name']; ?>
-                                        </option>
-                                    <?php endwhile; ?>
-                                </select>
+                    <div class="card shadow-sm p-4">
+                        <div class="row g-3 d-flex justify-content-center">
+                            <div class="col-md-8">
 
-                                <!-- BOARD -->
-                                <label for="class" class="form-label fw-semibold fs-5 text-primary">Education Board:</label>
-                                <select name="edit_board" class="form-control mb-3" required>
-                                    <option value="">Select Board</option>
-                                    <?php while($b = $boards->fetch_assoc()): ?>
-                                        <option value="<?php echo $b['id']; ?>" <?php if($b['name']==$tutor['board_name']) echo 'selected'; ?>>
-                                            <?php echo $b['name']; ?>
-                                        </option>
-                                    <?php endwhile; ?>
-                                </select>
+                                <form method="POST" enctype="multipart/form-data">
 
-                                <!-- EXAM -->
-                                <label for="class" class="form-label fw-semibold fs-5 text-primary">Exam:</label>
-                                <select name="edit_exam" class="form-control mb-3" required>
-                                    <option value="">Select Exam</option>
-                                    <?php while($e = $exams->fetch_assoc()): ?>
-                                        <option value="<?php echo $e['id']; ?>" <?php if($e['name']==$student['exam_name']) echo 'selected'; ?>>
-                                            <?php echo $e['name']; ?>
-                                        </option>
-                                    <?php endwhile; ?>
-                                </select>
+                                    <!-- Profile Image -->
+                                    <label class="form-label fw-semibold fs-5 text-primary">Profile Photo</label>
+                                    <input type="file" name="profile_image" class="form-control mb-3" accept="image/*">
 
-                                <label for="class" class="form-label fw-semibold fs-5 text-primary">Parent's Phone:</label>
-                                <input type="tel" name="edit_phone" class="form-control mb-3" value="<?php echo $tutor['parent_phone']; ?>" required>
-                                    
-                                <label for="class" class="form-label fw-semibold fs-5 text-primary">School Name:</label>
-                                <input type="text" name="edit_school" class="form-control mb-3" value="<?php echo $tutor['school_name']; ?>" required>
-                                    
-                                <label for="class" class="form-label fw-semibold fs-5 text-primary">Address:</label>
-                                <input type="text" name="edit_address" class="form-control mb-3" value="<?php echo $tutor['address']; ?>" required>
+                                    <label class="form-label fw-semibold fs-5 text-primary">Phone</label>
+                                    <input type="tel" name="edit_phone" class="form-control mb-3"
+                                        value="<?php echo $tutor['phone']; ?>">
 
-                                <div class="d-flex gap-2 mt-3">
-                                    <button type="button" class="btn btn-secondary" onclick="toggleEdit()">Cancel</button>
-                                    <button type="submit" class="btn btn-success">Save</button>
-                                </div>
-                            </form>
+                                    <label class="form-label fw-semibold fs-5 text-primary">Qualification</label>
+                                    <input type="text" name="edit_qualification" class="form-control mb-3"
+                                        value="<?php echo $tutor['qualification']; ?>">
+
+                                    <label class="form-label fw-semibold fs-5 text-primary">Experience (years)</label>
+                                    <input type="number" name="edit_experience" class="form-control mb-3"
+                                        value="<?php echo $tutor['experience']; ?>">
+
+                                    <label class="form-label fw-semibold fs-5 text-primary">Address</label>
+                                    <input type="text" name="edit_address" class="form-control mb-3"
+                                        value="<?php echo $tutor['address']; ?>">
+
+                                    <label class="form-label fw-semibold fs-5 text-primary">Availability</label>
+                                    <select name="edit_availability" class="form-control mb-3">
+                                        <option value="Yes" <?php if($tutor['availability']=='Yes') echo 'selected'; ?>>Yes</option>
+                                        <option value="No" <?php if($tutor['availability']=='No') echo 'selected'; ?>>No</option>
+                                    </select>
+
+                                    <div class="d-flex gap-2 mt-3">
+                                        <button type="button" class="btn btn-secondary" onclick="toggleEdit()">Cancel</button>
+                                        <button type="submit" class="btn btn-success">Save</button>
+                                    </div>
+
+                                </form>
+
+                            </div>
                         </div>
                     </div>
                 </div>

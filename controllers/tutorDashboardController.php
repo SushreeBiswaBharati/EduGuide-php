@@ -1,6 +1,4 @@
 <?php
-// controllers/tutorDashboardController.php
-session_start();
 require_once '../middleware/auth.php';
 requireRole('tutor');
 require_once '../database/dbconnection.php';
@@ -89,7 +87,7 @@ $sch_stmt->execute();
 $schedule = $sch_stmt->get_result();
 $sch_stmt->close();
 
-// ── REVIEWS ───────────────────────────────────────────────
+// Reviews
 $rev_stmt = $conn->prepare("
     SELECT r.rating, r.comment, r.created_at,
            u.name AS student_name
@@ -104,7 +102,7 @@ $rev_stmt->execute();
 $reviews = $rev_stmt->get_result();
 $rev_stmt->close();
 
-// ── AVG RATING ────────────────────────────────────────────
+// Average rating
 $rat_stmt = $conn->prepare("
     SELECT ROUND(AVG(rating), 1) AS avg_rating, COUNT(*) AS total
     FROM reviews
@@ -156,44 +154,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject']))
 // Edit profile
 $profileSuccess = "";
 $profileError   = "";
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_name'])) {
-    $newName         = trim($_POST['edit_name']);
-    $newPhone        = trim($_POST['edit_phone']);
-    $newQualification= trim($_POST['edit_qualification']);
-    $newExperience   = intval($_POST['edit_experience']);
-    $newAddress      = trim($_POST['edit_address']);
-    $newAvailability = $_POST['edit_availability'] === 'Yes' ? 'Yes' : 'No';
 
-    if ($newName === '') {
-        $profileError = "Name cannot be empty.";
-    } elseif ($newPhone !== '' && !preg_match('/^[6-9][0-9]{9}$/', $newPhone)) {
-        $profileError = "Enter a valid 10-digit phone number.";
-    } else {
-        // Update users table
-        $u = $conn->prepare("UPDATE users SET name = ? WHERE id = ?");
-        $u->bind_param("si", $newName, $_SESSION['user_id']);
-        $u->execute();
-        $u->close();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-        // Update tutors table
-        $t = $conn->prepare("
-            UPDATE tutors
+    // IMAGE UPLOAD
+    if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
+
+        $fileName = $_FILES['profile_image']['name'];
+        $tmpName  = $_FILES['profile_image']['tmp_name'];
+
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png'];
+
+        if (!in_array($ext, $allowed)) {
+            $profileError = "Only JPG, JPEG, PNG allowed.";
+        } else {
+            $newFileName = "user_" . $_SESSION['user_id'] . "_" . time() . "." . $ext;
+
+            $uploadPath = __DIR__ . "/../assets/profile/" . $newFileName;
+
+            if (move_uploaded_file($tmpName, $uploadPath)) {
+                $stmtImg = $conn->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
+                $stmtImg->bind_param("si", $newFileName, $_SESSION['user_id']);
+                $stmtImg->execute();
+                $stmtImg->close();
+            } else {
+                $profileError = "Image upload failed.";
+            }
+        }
+    }
+
+    $phone        = trim($_POST['edit_phone'] ?? '');
+    $qualification= trim($_POST['edit_qualification'] ?? '');
+    $experience   = intval($_POST['edit_experience'] ?? 0);
+    $address      = trim($_POST['edit_address'] ?? '');
+    $availability = ($_POST['edit_availability'] ?? 'No') === 'Yes' ? 'Yes' : 'No';
+
+    if ($profileError === "") {
+
+        $stmt2 = $conn->prepare("
+            UPDATE tutors 
             SET phone = ?, qualification = ?, experience = ?, address = ?, availability = ?
             WHERE user_id = ?
         ");
-        $t->bind_param("ssissi",
-            $newPhone, $newQualification, $newExperience,
-            $newAddress, $newAvailability, $_SESSION['user_id']
+
+        $stmt2->bind_param(
+            "ssissi", $phone, $qualification, $experience, $address, $availability, $_SESSION['user_id']
         );
-        $t->execute();
-        $t->close();
 
-        $_SESSION['name'] = $newName;
-        $profileSuccess   = "Profile updated successfully!";
+        if ($stmt2->execute()) {
+            $profileSuccess = "Profile updated successfully!";
+        } else {
+            $profileError = "Update failed.";
+        }
 
-        // Refresh tutor data
-        $stmt2 = $conn->prepare("
-            SELECT u.name, u.email, u.created_at,
+        $stmt2->close();
+
+        // Refresh data
+        $stmt3 = $conn->prepare("
+            SELECT u.name, u.email, u.created_at, u.profile_image,
                    t.gender, t.qualification, t.experience,
                    t.phone, t.address, t.availability,
                    s.name AS subject_name,
@@ -201,15 +220,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_name'])) {
             FROM users u
             JOIN tutors t ON t.user_id = u.id
             LEFT JOIN subjects s ON s.id = t.subject_id
-            LEFT JOIN boards   b ON b.id = t.board_id
+            LEFT JOIN boards b ON b.id = t.board_id
             WHERE u.id = ?
         ");
-        $stmt2->bind_param("i", $_SESSION['user_id']);
-        $stmt2->execute();
-        $tutor = $stmt2->get_result()->fetch_assoc();
-        $stmt2->close();
+
+        $stmt3->bind_param("i", $_SESSION['user_id']);
+        $stmt3->execute();
+        $tutor = $stmt3->get_result()->fetch_assoc();
+        $stmt3->close();
     }
 }
+
 
 $registeredDate = isset($tutor['created_at'])
     ? date('F j, Y', strtotime($tutor['created_at']))
