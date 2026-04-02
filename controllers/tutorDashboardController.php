@@ -5,9 +5,9 @@ require_once '../middleware/auth.php';
 requireRole('tutor');
 require_once '../database/dbconnection.php';
 
-// ── FETCH TUTOR PROFILE ───────────────────────────────────
+// Fetch Profile Details
 $stmt = $conn->prepare("
-    SELECT u.name, u.email, u.created_at,
+    SELECT u.name, u.email, u.created_at, u.profile_image,
            t.gender, t.qualification, t.experience,
            t.phone, t.address, t.availability,
            s.name AS subject_name,
@@ -23,7 +23,7 @@ $stmt->execute();
 $tutor = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-// ── GET TUTOR ID ──────────────────────────────────────────
+// Get Tutor id
 $tid_stmt = $conn->prepare("SELECT id FROM tutors WHERE user_id = ?");
 $tid_stmt->bind_param("i", $_SESSION['user_id']);
 $tid_stmt->execute();
@@ -31,7 +31,7 @@ $tid_row  = $tid_stmt->get_result()->fetch_assoc();
 $tid_stmt->close();
 $tutor_id = $tid_row['id'] ?? 0;
 
-// ── BOOKING COUNTS ────────────────────────────────────────
+// Booking count
 $totalRequests  = 0;
 $confirmedCount = 0;
 $pendingCount   = 0;
@@ -54,7 +54,7 @@ while ($row = $count_result->fetch_assoc()) {
 }
 $count_stmt->close();
 
-// ── ALL BOOKING REQUESTS ──────────────────────────────────
+// All booking requests
 $req_stmt = $conn->prepare("
     SELECT bk.id, bk.status, bk.created_at,
            u.name   AS student_name,
@@ -71,7 +71,7 @@ $req_stmt->execute();
 $requests = $req_stmt->get_result();
 $req_stmt->close();
 
-// ── MY SCHEDULE (Confirmed only) ──────────────────────────
+// My schedules
 $sch_stmt = $conn->prepare("
     SELECT bk.id, bk.created_at,
            u.name   AS student_name,
@@ -117,7 +117,7 @@ $rat_stmt->close();
 $avgRating    = $rat_row['avg_rating'] ?? '0.0';
 $totalReviews = $rat_row['total'] ?? 0;
 
-// ── ACCEPT / REJECT BOOKING ───────────────────────────────
+// Accept / Reject bookings
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['booking_action'], $_POST['booking_id'])) {
     $action     = $_POST['booking_action'];   // 'Confirmed' or 'Cancelled'
     $booking_id = intval($_POST['booking_id']);
@@ -132,13 +132,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['booking_action'], $_P
         $upd->execute();
         $upd->close();
     }
-
-    // Redirect to avoid form re-submission on refresh
-    header("Location: /EduGuide-php/controllers/tutorDashboardController.php?action=requests");
+    header("Location: /EduGuide-php/controllers/tutorDashboardController.php?page=requests");
     exit;
 }
 
-// ── COMPLAINT SUBMIT ──────────────────────────────────────
+// Complaint submit
 $complaintSuccess = "";
 $complaintError   = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject'])) {
@@ -155,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject']))
     }
 }
 
-// ── EDIT PROFILE SUBMIT ───────────────────────────────────
+// Edit profile
 $profileSuccess = "";
 $profileError   = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_name'])) {
@@ -213,7 +211,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_name'])) {
     }
 }
 
-// ── HELPERS ───────────────────────────────────────────────
 $registeredDate = isset($tutor['created_at'])
     ? date('F j, Y', strtotime($tutor['created_at']))
     : 'N/A';
@@ -226,6 +223,6 @@ $statusBadge = [
     'Completed' => 'bg-primary text-white',
 ];
 
-// ── LOAD VIEW ─────────────────────────────────────────────
+$page = $_GET['page'] ?? 'dashboard';
 require_once '../views/tutor/tutorDashboard.php';
 ?>

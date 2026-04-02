@@ -85,6 +85,7 @@ $classes = $conn->query("SELECT id, name FROM classes");
 $boards  = $conn->query("SELECT id, name FROM boards");
 $exams   = $conn->query("SELECT id, name FROM exams");
 
+// Edit profile
 $profileSuccess = "";
 $profileError   = "";
 
@@ -104,12 +105,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $profileError = "Only JPG, JPEG, PNG allowed";
         }else{
             $newFileName = "user_" . $_SESSION['user_id'] . "_" . time() . "." .$ext;
-            $uploadPath = "EduGuide-php/assets/profile/" .$newFileName;
-            move_uploaded_file($tmpName, $uploadPath);
-            $stmtImg = $conn->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
-            $stmtImg->bind_param("si", $newFileName, $_SESSION['user_id']);
-            $stmtImg->execute();
-            $stmtImg->close();
+            $uploadPath = __DIR__ . "/../assets/profile/" .$newFileName;
+            if (move_uploaded_file($tmpName, $uploadPath)) {
+                $stmtImg = $conn->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
+                $stmtImg->bind_param("si", $newFileName, $_SESSION['user_id']);
+                $stmtImg->execute();
+                $stmtImg->close();
+            } else {
+                $profileError = "Image upload failed.";
+            }
         }
     }
     if (isset($_POST['edit_class'])) {
@@ -214,7 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// ================= BROWSE TUTORS =================
+// Browse tutors
 $subjects = $conn->query("SELECT id, name FROM subjects");
 $browseBoards = $conn->query("SELECT id, name FROM boards");
 

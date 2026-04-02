@@ -105,92 +105,220 @@
                 </div>
             </div>
 
-        <?php if($page === 'profile') ?>    
-            <!-- Profile -->
-            <h5 class="fw-bold text-primary mb-4">My Profile</h5>
-            <?php if ($profileSuccess): ?>
-                <div class="alert alert-success"><?php echo $profileSuccess; ?></div>
-            <?php endif; ?>
+            <?php elseif($page === 'profile'): ?>    
+                <!-- Profile -->
+                <h5 class="fw-bold text-primary mb-4">My Profile</h5>
+                <?php if ($profileSuccess): ?>
+                    <div class="alert alert-success"><?php echo $profileSuccess; ?></div>
+                <?php endif; ?>
 
-            <?php if ($profileError): ?>
-                <div class="alert alert-danger"><?php echo $profileError; ?></div>
-            <?php endif; ?>
+                <?php if ($profileError): ?>
+                    <div class="alert alert-danger"><?php echo $profileError; ?></div>
+                <?php endif; ?>
+
+            <!-- View profile -->
+            <div id="profile-view">
+                <div class="card shadow-sm p-4">
+                    <div class="row g-3">
+
+                        <!-- Left : profile image -->
+                        <div class="col-md-4">
+                            <div class="card shadow-sm p-3 text-center h-100">
+
+                                <!-- Profile Image -->
+                                <div class=" my-auto">
+                                    <?php
+                                    $image = !empty($tutor['profile_image'])
+                                                ? "/EduGuide-php/assets/profile/" . $tutor['profile_image']
+                                                : "/EduGuide-php/assets/default-user.png";
+                                    ?>
+                                    <img src="<?php echo $image; ?>" class="profile-img">
+                                </div>
+
+                            
+                                <h6 class="fw-bold my-2"><?php echo $tutor['name']; ?></h6>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="shadow-sm p-3 h-100">
+
+                                <h6 class="fw-bold fs-4 mb-3 text-center text-warning">Your Details</h6>
+
+                                <div class="table-responsive">
+                                    <table class="table table-sm align-middle mb-0">
+
+                                        <tr>
+                                            <td class="fw-semibold text-primary">Email</td>
+                                            <td class="fw-semibold text-muted"><?php echo $tutor['email']; ?></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="fw-semibold text-primary">Gender</td>
+                                            <td class="fw-semibold text-muted"><?php echo $tutor['gender']; ?></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="fw-semibold text-primary">Qualification</td>
+                                            <td class="fw-semibold text-muted"><?php echo $tutor['qualification']; ?></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="fw-semibold text-primary">Experience</td>
+                                            <td class="fw-semibold text-muted"><?php echo $tutor['experience']; ?> yrs</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="fw-semibold text-primary">Phone</td>
+                                            <td class="fw-semibold text-muted"><?php echo $tutor['phone']; ?></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="fw-semibold text-primary">Address</td>
+                                            <td class="fw-semibold text-muted"><?php echo $tutor['address']; ?></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="fw-semibold text-primary">Availability</td>
+                                            <td class="fw-semibold text-muted"><?php echo $tutor['availability']; ?></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center py-3 ">
+                        <button type="button" class="btn btn-primary mt-3 w-25" onclick="toggleEdit()">Edit Profile</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit profile -->
+            <div id="edit-form" style="display:none;">
+                <div class="card shadow-sm p-4">
+                    <div class="row g-3 d-flex justify-content-center">
+                        <div class="col-md-8">
+                                
+                            <form method="POST" enctype="multipart/form-data">
+                                <label class="form-label fw-semibold fs-5 text-primary">Profile Photo</label>
+                                <input type="file" name="profile_image" class="form-control mb-3" accept="image/*">
+                                <label for="class" class="form-label fw-semibold fs-5 text-primary">Class:</label>
+                                <select name="edit_class" class="form-control mb-3" required>
+                                    <option value="">Select Class</option>
+                                    <?php while($c = $classes->fetch_assoc()): ?>
+                                        <option value="<?php echo $c['id']; ?>" <?php if($c['name']==$tutor['class_name']) echo 'selected'; ?>>
+                                            <?php echo $c['name']; ?>
+                                        </option>
+                                    <?php endwhile; ?>
+                                </select>
+
+                                <!-- BOARD -->
+                                <label for="class" class="form-label fw-semibold fs-5 text-primary">Education Board:</label>
+                                <select name="edit_board" class="form-control mb-3" required>
+                                    <option value="">Select Board</option>
+                                    <?php while($b = $boards->fetch_assoc()): ?>
+                                        <option value="<?php echo $b['id']; ?>" <?php if($b['name']==$tutor['board_name']) echo 'selected'; ?>>
+                                            <?php echo $b['name']; ?>
+                                        </option>
+                                    <?php endwhile; ?>
+                                </select>
+
+                                <!-- EXAM -->
+                                <label for="class" class="form-label fw-semibold fs-5 text-primary">Exam:</label>
+                                <select name="edit_exam" class="form-control mb-3" required>
+                                    <option value="">Select Exam</option>
+                                    <?php while($e = $exams->fetch_assoc()): ?>
+                                        <option value="<?php echo $e['id']; ?>" <?php if($e['name']==$student['exam_name']) echo 'selected'; ?>>
+                                            <?php echo $e['name']; ?>
+                                        </option>
+                                    <?php endwhile; ?>
+                                </select>
+
+                                <label for="class" class="form-label fw-semibold fs-5 text-primary">Parent's Phone:</label>
+                                <input type="tel" name="edit_phone" class="form-control mb-3" value="<?php echo $tutor['parent_phone']; ?>" required>
+                                    
+                                <label for="class" class="form-label fw-semibold fs-5 text-primary">School Name:</label>
+                                <input type="text" name="edit_school" class="form-control mb-3" value="<?php echo $tutor['school_name']; ?>" required>
+                                    
+                                <label for="class" class="form-label fw-semibold fs-5 text-primary">Address:</label>
+                                <input type="text" name="edit_address" class="form-control mb-3" value="<?php echo $tutor['address']; ?>" required>
+
+                                <div class="d-flex gap-2 mt-3">
+                                    <button type="button" class="btn btn-secondary" onclick="toggleEdit()">Cancel</button>
+                                    <button type="submit" class="btn btn-success">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <?php elseif ($page === 'requests'): ?>
+                    <h5>My Bookings Requests</h5>
+                
+                <?php elseif ($page === 'schedules'): ?>
+
+                    <h5>My Bookings</h5>
+
+                <?php elseif ($page === 'reviews'): ?>
+
+                    <h5>My Reviews</h5>
+
+                <?php elseif ($page === 'complaint'): ?>
+
+                    <h5>Raise Complaint</h5>
+
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-    // ── PANEL SWITCHING ───────────────────────────────────
-    function showPanel(name, el) {
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
-        document.getElementById('panel-' + name).classList.add('active');
-        if (el) el.classList.add('active');
-        return false;
-    }
+    <script>
+        const toggleBtn  = document.getElementById('toggleBtn');
+        const sidebar    = document.getElementById('sidebar');
+        const navSpans   = sidebar.querySelectorAll('nav .nav-link span');
+        const brandTitle = sidebar.querySelector('.brand-title');
+        const subTitle   = sidebar.querySelector('.brand-subtitle');
+        const logoutSpan = sidebar.querySelector('.logout-span');
 
-    // ── EDIT PROFILE TOGGLE ───────────────────────────────
-    function toggleEdit() {
-        const view = document.getElementById('profile-view');
-        const form = document.getElementById('edit-form');
-        const isHidden = view.style.display === 'none';
-        view.style.display = isHidden ? 'block' : 'none';
-        form.style.display = isHidden ? 'none'  : 'block';
-    }
+        let isCollapsed = false;
 
-    // ── SIDEBAR COLLAPSE ──────────────────────────────────
-    const toggleBtn  = document.getElementById('toggleBtn');
-    const sidebar    = document.getElementById('sidebar');
-    const navSpans   = sidebar.querySelectorAll('nav .nav-link span');
-    const brandTitle = sidebar.querySelector('.brand-title');
-    const subTitle   = sidebar.querySelector('.brand-subtitle');
-    const logoutSpan = sidebar.querySelector('.logout-span');
-    let isCollapsed  = false;
+        toggleBtn.addEventListener('click', function () {
+            isCollapsed = !isCollapsed;
 
-    toggleBtn.addEventListener('click', function () {
-        isCollapsed = !isCollapsed;
-        if (isCollapsed) {
-            sidebar.style.width = '100px';
-            sidebar.classList.add('collapsed');
-            navSpans.forEach(s => s.style.display = 'none');
-            brandTitle.style.display = 'none';
-            subTitle.style.display   = 'none';
-            logoutSpan.style.display = 'none';
-        } else {
-            sidebar.style.width = '300px';
-            sidebar.classList.remove('collapsed');
-            navSpans.forEach(s => s.style.display = 'inline');
-            brandTitle.style.display = 'block';
-            subTitle.style.display   = 'block';
-            logoutSpan.style.display = 'inline';
+            if (isCollapsed) {
+                sidebar.style.width = '100px';
+                sidebar.classList.add('collapsed');      
+                navSpans.forEach(s => s.style.display = 'none');
+                brandTitle.style.display = 'none';
+                subTitle.style.display   = 'none';
+                logoutSpan.style.display = 'none';
+
+            } else {
+                sidebar.style.width = '300px';
+                sidebar.classList.remove('collapsed');   
+                navSpans.forEach(s => s.style.display = 'inline');
+                brandTitle.style.display = 'block';
+                subTitle.style.display   = 'block';
+                logoutSpan.style.display = 'inline';
+            }
+        });
+        
+        function toggleEdit() {
+            const view = document.getElementById('profile-view');
+            const form = document.getElementById('edit-form');
+
+            if (view.style.display === 'none') {
+                view.style.display = 'block';
+                form.style.display = 'none';
+            } else {
+                view.style.display = 'none';
+                form.style.display = 'block';
+            }
         }
-    });
-
-    // ── AUTO RESTORE PANEL ────────────────────────────────
-    document.addEventListener('DOMContentLoaded', function () {
-
-        // After accept/reject booking redirect
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('action') === 'requests') {
-            const reqLink = document.querySelector("[onclick*=\"'requests'\"]");
-            showPanel('requests', reqLink);
-        }
-
-        // After edit profile submit
-        <?php if ($profileSuccess || $profileError): ?>
-            const profileLink = document.querySelector("[onclick*=\"'profile'\"]");
-            showPanel('profile', profileLink);
+        window.onload = function () {
             <?php if ($profileError): ?>
-                document.getElementById('profile-view').style.display = 'none';
-                document.getElementById('edit-form').style.display    = 'block';
+                toggleEdit();
             <?php endif; ?>
-        <?php endif; ?>
-
-        // After complaint submit
-        <?php if ($complaintSuccess || $complaintError): ?>
-            const compLink = document.querySelector("[onclick*=\"'complaint'\"]");
-            showPanel('complaint', compLink);
-        <?php endif; ?>
-    });
-</script>
+        };
+    </script>
 </body>
 </html>

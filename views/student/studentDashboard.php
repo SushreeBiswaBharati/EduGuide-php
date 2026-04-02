@@ -62,46 +62,46 @@
 
         <!--Main Content-->
         <div class="flex-grow-1 main-content p-4 rounded-4 shadow-sm">
-                <?php if ($page === 'dashboard'): ?>
-                    <!-- Dashboard -->
-                    <div class="mb-4 greet-bar rounded-4 p-4 text-white">
-                        <span><?php echo $today;?></span>
-                        <h4 class="fw-bold mb-1">
-                            Welcome Back <?php echo htmlspecialchars($student['name'] ?? 'Student') ?>!
-                        </h4>
-                        <p class="fst-italic mb-3">"Your future is created by what you do today."</p>
-                        <span class="badge bg-white bg-opacity-75 text-primary px-3 py-2">Student</span>
-                    </div>
+            <?php if ($page === 'dashboard'): ?>
+                <!-- Dashboard -->
+                <div class="mb-4 greet-bar rounded-4 p-4 text-white">
+                    <span><?php echo $today;?></span>
+                    <h4 class="fw-bold mb-1">
+                        Welcome Back <?php echo htmlspecialchars($student['name'] ?? 'Student') ?>!
+                    </h4>
+                    <p class="fst-italic mb-3">"Your future is created by what you do today."</p>
+                    <span class="badge bg-white bg-opacity-75 text-primary px-3 py-2">Student</span>
+                </div>
 
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-3 col-6">
-                            <div class="card text-center px-2 py-3 bg-warning bg-opacity-50">
-                                <div class="fw-semibold">Total Bookings</div>
-                                <div class="fw-bold fs-4"><?php echo $totalBookings; ?></div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3 col-6">
-                            <div class="card text-center px-2 py-3 bg-success bg-opacity-50">
-                                <div class="fw-semibold">Confirmed</div>
-                                <div class="fw-bold fs-4"><?php echo $confirmedBookings; ?></div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3 col-6">
-                            <div class="card text-center px-2 py-3 bg-danger bg-opacity-50">
-                                <div class="fw-semibold">Pending</div>
-                                <div class="fw-bold fs-4"><?php echo $pendingBookings; ?></div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3 col-6">
-                            <div class="card text-center px-2 py-3 bg-primary bg-opacity-50">
-                                <div class="fw-semibold">Completed</div>
-                                <div class="fw-bold fs-4"><?php echo $completedBookings; ?></div>
-                            </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3 col-6">
+                        <div class="card text-center px-2 py-3 bg-warning bg-opacity-50">
+                            <div class="fw-semibold">Total Bookings</div>
+                            <div class="fw-bold fs-4"><?php echo $totalBookings; ?></div>
                         </div>
                     </div>
+
+                    <div class="col-md-3 col-6">
+                        <div class="card text-center px-2 py-3 bg-success bg-opacity-50">
+                            <div class="fw-semibold">Confirmed</div>
+                            <div class="fw-bold fs-4"><?php echo $confirmedBookings; ?></div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-6">
+                        <div class="card text-center px-2 py-3 bg-danger bg-opacity-50">
+                            <div class="fw-semibold">Pending</div>
+                            <div class="fw-bold fs-4"><?php echo $pendingBookings; ?></div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-6">
+                        <div class="card text-center px-2 py-3 bg-primary bg-opacity-50">
+                            <div class="fw-semibold">Completed</div>
+                            <div class="fw-bold fs-4"><?php echo $completedBookings; ?></div>
+                        </div>
+                    </div>
+                </div>
 
                 <?php elseif ($page === 'profile'): ?>
                     <!-- Profile -->
@@ -114,40 +114,32 @@
                         <div class="alert alert-danger"><?php echo $profileError; ?></div>
                     <?php endif; ?>
 
-                <!-- VIEW MODE -->
+                <!-- View profile -->
                 <div id="profile-view">
                     <div class="card shadow-sm p-4">
                         <div class="row g-3">
-
-                            <!-- LEFT: PROFILE CARD -->
+                            <!-- Left : profile image -->
                             <div class="col-md-4">
                                 <div class="card shadow-sm p-3 text-center h-100">
-
                                     <!-- Profile Image -->
-                                    <div class="mb-2 my-auto">
+                                    <div class=" my-auto">
                                         <?php
                                         $image = !empty($student['profile_image'])
                                             ? "/EduGuide-php/assets/profile/" . $student['profile_image']
                                             : "/EduGuide-php/assets/default-user.png";
                                         ?>
-                                        <img src="<?php echo $image; ?>" 
-                                            style="width:120px; height:120px; border-radius:50%; object-fit:cover;">
+                                        <img src="<?php echo $image; ?>" class="profile-img">
                                     </div>
 
-                                    <!-- Name -->
-                                    <h6 class="fw-bold mb-1"><?php echo $student['name']; ?></h6>
-
+                                    <h6 class="fw-bold my-2"><?php echo $student['name']; ?></h6>
                                     <small class="text-muted d-block">Class: <?php echo $student['class_name']; ?></small>
-
                                 </div>
                             </div>
 
                             <!-- RIGHT: DETAILS TABLE -->
                             <div class="col-md-8">
                                 <div class="shadow-sm p-3 h-100">
-
                                     <h6 class="fw-bold fs-4 mb-3 text-center text-warning">Your Details</h6>
-
                                     <div class="table-responsive">
                                         <table class="table table-sm align-middle mb-0">
 
@@ -190,29 +182,25 @@
                                                 <td class="fw-semibold text-primary">Address</td>
                                                 <td class="fw-semibold text-muted"><?php echo $student['address']; ?></td>
                                             </tr>
-
                                         </table>
                                     </div>
-
                                 </div>
                             </div>
-
                         </div>
                         <div class="text-center py-3 ">
                             <button type="button" class="btn btn-primary mt-3 w-25" onclick="toggleEdit()">Edit Profile</button>
                         </div>
-                        
                     </div>
                 </div>
 
-                <!-- EDIT MODE -->
+                <!-- Edit profile -->
                 <div id="edit-form" style="display:none;">
                     <div class="card shadow-sm p-4">
-                        <div class="row g-3">
+                        <div class="row g-3 d-flex justify-content-center">
                             <div class="col-md-8">
                                 
                                 <form method="POST" enctype="multipart/form-data">
-                                    <label class="form-label fe-semibold">Profile Photo</label>
+                                    <label class="form-label fw-semibold fs-5 text-primary">Profile Photo</label>
                                     <input type="file" name="profile_image" class="form-control mb-3" accept="image/*">
                                     <label for="class" class="form-label fw-semibold fs-5 text-primary">Class:</label>
                                     <select name="edit_class" class="form-control mb-3" required>
@@ -259,11 +247,6 @@
                                         <button type="button" class="btn btn-secondary" onclick="toggleEdit()">Cancel</button>
                                         <button type="submit" class="btn btn-success">Save</button>
                                     </div>
-                                </form>
-                            </div>
-                            <div class="col-md-4">
-                                <form action="" method="POST">
-                                    
                                 </form>
                             </div>
                         </div>
@@ -399,12 +382,11 @@
 
                 <?php endif; ?>
 
-                </div>
+
                 <!-- Edit form -->
                 
             </div>
         </div>
-
     </div>
     <script>
         const toggleBtn  = document.getElementById('toggleBtn');
