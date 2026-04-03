@@ -91,101 +91,59 @@ $profileError   = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $updates = [];
-    $params  = [];
-    $types   = "";
+    $class_id = $_POST['edit_class'] ?? '';
+    $board_id = $_POST['edit_board'] ?? '';
+    $exam_id  = $_POST['edit_exam'] ?? '';
+    $school   = trim($_POST['edit_school'] ?? '');
+    $phone    = trim($_POST['edit_phone'] ?? '');
+    $address  = trim($_POST['edit_address'] ?? '');
 
-    if(isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0){
-        $fileName = $_FILES['profile_image']['name'];
-        $tmpName = $_FILES['profile_image']['tmp_name'];
+    if ($class_id === "") {
+        $profileError = "Class cannot be empty.";
+    } elseif ($board_id === "") {
+        $profileError = "Board cannot be empty.";
+    } elseif ($exam_id === "") {
+        $profileError = "Exam cannot be empty.";
+    } elseif ($school === "") {
+        $profileError = "School cannot be empty.";
+    } elseif ($phone === "") {
+        $profileError = "Phone number cannot be empty.";
+    } elseif (!preg_match('/^[6-9][0-9]{9}$/', $phone)) {
+        $profileError = "Invalid phone number.";
+    } elseif ($address === "") {
+        $profileError = "Address cannot be empty.";
+    } else {
 
-        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowed = ['jpg', 'jpeg', 'png'];
-        if(!in_array($ext, $allowed)){
-            $profileError = "Only JPG, JPEG, PNG allowed";
-        }else{
-            $newFileName = "user_" . $_SESSION['user_id'] . "_" . time() . "." .$ext;
-            $uploadPath = __DIR__ . "/../assets/profile/" .$newFileName;
-            if (move_uploaded_file($tmpName, $uploadPath)) {
-                $stmtImg = $conn->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
-                $stmtImg->bind_param("si", $newFileName, $_SESSION['user_id']);
-                $stmtImg->execute();
-                $stmtImg->close();
-            } else {
-                $profileError = "Image upload failed.";
+        if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
+
+            $fileName = $_FILES['profile_image']['name'];
+            $tmpName  = $_FILES['profile_image']['tmp_name'];
+
+            $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $allowed = ['jpg', 'jpeg', 'png'];
+
+            if (in_array($ext, $allowed)) {
+                $newFileName = "user_" . $_SESSION['user_id'] . "_" . time() . "." . $ext;
+                $uploadPath  = __DIR__ . "/../assets/profile/" . $newFileName;
+
+                if (move_uploaded_file($tmpName, $uploadPath)) {
+                    $stmtImg = $conn->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
+                    $stmtImg->bind_param("si", $newFileName, $_SESSION['user_id']);
+                    $stmtImg->execute();
+                    $stmtImg->close();
+                }
             }
         }
-    }
-    if (isset($_POST['edit_class'])) {
-        if ($_POST['edit_class'] === "") {
-            $profileError = "Class cannot be empty.";
-        } else {
-            $updates[] = "class_id = ?";
-            $params[]  = $_POST['edit_class'];
-            $types    .= "i";
-        }
-    }
+        $stmt = $conn->prepare("
+            UPDATE students 
+            SET class_id = ?, board_id = ?, exam_id = ?, 
+                school_name = ?, parent_phone = ?, address = ?
+            WHERE user_id = ?
+        ");
 
-    if (isset($_POST['edit_board'])) {
-        if ($_POST['edit_board'] === "") {
-            $profileError = "Board cannot be empty.";
-        } else {
-            $updates[] = "board_id = ?";
-            $params[]  = $_POST['edit_board'];
-            $types    .= "i";
-        }
-    }
-
-    if (isset($_POST['edit_exam'])) {
-        if ($_POST['edit_exam'] === "") {
-            $profileError = "Exam cannot be empty.";
-        } else {
-            $updates[] = "exam_id = ?";
-            $params[]  = $_POST['edit_exam'];
-            $types    .= "i";
-        }
-    }
-
-    if (isset($_POST['edit_school'])) {
-        if (trim($_POST['edit_school']) === "") {
-            $profileError = "School cannot be empty.";
-        } else {
-            $updates[] = "school_name = ?";
-            $params[]  = trim($_POST['edit_school']);
-            $types    .= "s";
-        }
-    }
-
-    if (isset($_POST['edit_phone'])) {
-        if (trim($_POST['edit_phone']) === "") {
-            $profileError = "Phone number cannot be empty.";
-        } elseif (!preg_match('/^[6-9][0-9]{9}$/', $_POST['edit_phone'])) {
-            $profileError = "Invalid phone number.";
-        } else {
-            $updates[] = "parent_phone = ?";
-            $params[]  = trim($_POST['edit_phone']);
-            $types    .= "s"; 
-        }
-    }
-
-    if (isset($_POST['edit_address'])) {
-        if (trim($_POST['edit_address']) === "") {
-            $profileError = "Address cannot be empty.";
-        } else {
-            $updates[] = "address = ?";
-            $params[]  = trim($_POST['edit_address']);
-            $types    .= "s";
-        }
-    }
-
-    if ($profileError === "" && count($updates) > 0) {
-
-        $sql = "UPDATE students SET " . implode(", ", $updates) . " WHERE user_id = ?";
-        $params[] = $_SESSION['user_id'];
-        $types   .= "i";
-
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param($types, ...$params);
+        $stmt->bind_param(
+            "iiisssi", $class_id, $board_id, $exam_id, $school, $phone, $address, $_SESSION['user_id']
+        );
 
         if ($stmt->execute()) {
             $profileSuccess = "Profile updated successfully!";
@@ -195,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt->close();
 
-        // Refresh
+        // Refresh data
         $stmt2 = $conn->prepare("
             SELECT u.name, u.email, u.created_at, u.profile_image,
                    s.gender, s.school_name, s.parent_name, s.parent_phone, s.address,
@@ -207,14 +165,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             LEFT JOIN exams   e ON e.id = s.exam_id
             WHERE u.id = ?
         ");
+
         $stmt2->bind_param("i", $_SESSION['user_id']);
         $stmt2->execute();
         $student = $stmt2->get_result()->fetch_assoc();
         $stmt2->close();
-    }
-
-    if (count($updates) === 0 && $profileError === "") {
-        $profileError = "Please update at least one field.";
     }
 }
 

@@ -157,7 +157,6 @@ $profileError   = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // IMAGE UPLOAD
     if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
 
         $fileName = $_FILES['profile_image']['name'];
@@ -170,9 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $profileError = "Only JPG, JPEG, PNG allowed.";
         } else {
             $newFileName = "user_" . $_SESSION['user_id'] . "_" . time() . "." . $ext;
-
             $uploadPath = __DIR__ . "/../assets/profile/" . $newFileName;
-
             if (move_uploaded_file($tmpName, $uploadPath)) {
                 $stmtImg = $conn->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
                 $stmtImg->bind_param("si", $newFileName, $_SESSION['user_id']);
