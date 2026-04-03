@@ -105,7 +105,7 @@
                 </div>
             </div>
 
-            <?php elseif($page === 'profile'): ?>    
+                <?php elseif($page === 'profile'): ?>    
                 <!-- Profile -->
                 <h5 class="fw-bold text-primary mb-4">My Profile</h5>
                 <?php if ($profileSuccess): ?>
@@ -253,8 +253,8 @@
 
                 <?php endif; ?>
             </div>
-        </div>
     </div>
+</div>
 
     <script>
         const toggleBtn  = document.getElementById('toggleBtn');

@@ -380,11 +380,7 @@
 
                     <h5>Raise Complaint</h5>
 
-                <?php endif; ?>
-
-
-                <!-- Edit form -->
-                
+                <?php endif; ?>  
             </div>
         </div>
     </div>
