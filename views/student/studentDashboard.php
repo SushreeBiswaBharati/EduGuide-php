@@ -345,7 +345,7 @@
                                     <?php while($t = $tutors->fetch_assoc()): ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($t['name']); ?></td>
-                                            <td><?php echo $t['subject_name']; ?></td>
+                                            <td><?php echo $t['subject_names']; ?></td>
                                             <td><?php echo $t['board_name']; ?></td>
                                             <td><?php echo $t['experience']; ?> yrs</td>
                                             <td><?php echo $t['gender']; ?></td>

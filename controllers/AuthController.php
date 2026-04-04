@@ -77,13 +77,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 function redirectByRole($role) {
     switch ($role){
         case 'student':
-            header("Location: /EduGuide-php/controllers/studentDashboardController.php");
+            header("Location: /EduGuide-php/controllers/StudentDashboardController.php");
             break;
         case 'tutor':
-            header("Location: /EduGuide-php/controllers/tutorDashboardController.php");
+            header("Location: /EduGuide-php/controllers/TutorDashboardController.php");
             break;
         case 'admin':
-            header("Location: /EduGuide-php/controllers/adminDashboardController.php");
+            header("Location: /EduGuide-php/controllers/AdminDashboardController.php");
             break;
         default:
             header("Location: /EduGuide-php/index.php");

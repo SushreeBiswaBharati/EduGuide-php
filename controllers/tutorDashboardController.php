@@ -8,13 +8,15 @@ $stmt = $conn->prepare("
     SELECT u.name, u.email, u.created_at, u.profile_image,
            t.gender, t.qualification, t.experience,
            t.phone, t.address, t.availability,
-           s.name AS subject_name,
+           GROUP_CONCAT(s.name SEPARATOR ', ') AS subject_names,
            b.name AS board_name
     FROM users u
     JOIN tutors t ON t.user_id = u.id
-    LEFT JOIN subjects s ON s.id = t.subject_id
-    LEFT JOIN boards   b ON b.id = t.board_id
+    LEFT JOIN tutor_subjects ts ON ts.tutor_id = t.id
+    LEFT JOIN subjects s ON s.id = ts.subject_id
+    LEFT JOIN boards b ON b.id = t.board_id
     WHERE u.id = ?
+    GROUP BY u.id
 ");
 $stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
@@ -208,17 +210,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt2->close();
 
         // Refresh data
-        $stmt3 = $conn->prepare("
+       $stmt3 = $conn->prepare("
             SELECT u.name, u.email, u.created_at, u.profile_image,
-                   t.gender, t.qualification, t.experience,
-                   t.phone, t.address, t.availability,
-                   s.name AS subject_name,
-                   b.name AS board_name
+                t.gender, t.qualification, t.experience,
+                t.phone, t.address, t.availability,
+                GROUP_CONCAT(s.name SEPARATOR ', ') AS subject_names,
+                b.name AS board_name
             FROM users u
             JOIN tutors t ON t.user_id = u.id
-            LEFT JOIN subjects s ON s.id = t.subject_id
+            LEFT JOIN tutor_subjects ts ON ts.tutor_id = t.id
+            LEFT JOIN subjects s ON s.id = ts.subject_id
             LEFT JOIN boards b ON b.id = t.board_id
             WHERE u.id = ?
+            GROUP BY u.id
         ");
 
         $stmt3->bind_param("i", $_SESSION['user_id']);

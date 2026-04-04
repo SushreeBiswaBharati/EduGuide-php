@@ -29,7 +29,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $cpassword = $_POST['confirm_password'];
     $qualification = trim($_POST['qualification']);
     $experience = trim($_POST['experience']);
-    $subject_id = $_POST['subject_id'];
+    $subject_ids = $_POST['subject_ids'] ?? [];
     $board_id = $_POST['board_id'];
     $phone = trim($_POST['phone']);
     $address = trim($_POST['address']);
@@ -100,10 +100,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
  
     // Subject validation
-    if (empty($subject_id)) {
-        $subjectError = "Please select a subject";
+   if (empty($subject_ids)) {
+        $subjectError = "Please select at least one subject";
+    } elseif (count($subject_ids) > 2) {
+        $subjectError = "You can select maximum 2 subjects";
     }
- 
     // Board validation
     if (empty($board_id)) {
         $boardError = "Please select an education board";
@@ -141,13 +142,36 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $user_id = $conn->insert_id;
         $stmt->close();
  
-        // Insert into tutors table (is_verified defaults to 0)
-        $stmt2 = $conn->prepare("INSERT INTO tutors (user_id, gender, qualification, experience, subject_id, board_id, phone, address, availability) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt2->bind_param("issiiisss", $user_id, $gender, $qualification, $experience, $subject_id, $board_id, $phone, $address, $availability);
+        // Insert into tutors table
+        $stmt2 = $conn->prepare("
+            INSERT INTO tutors 
+            (user_id, gender, qualification, experience, board_id, phone, address, availability) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
+        $stmt2->bind_param( "issiisss",  $user_id,  $gender,  $qualification,  $experience,  $board_id,  $phone,  $address,  $availability);
         $stmt2->execute();
+        if ($stmt2->affected_rows > 0) {
+            $tutor_id = $stmt2->insert_id;
+            if (!empty($subject_ids)) {
+                $stmtSub = $conn->prepare("
+                    INSERT INTO tutor_subjects (tutor_id, subject_id) 
+                    VALUES (?, ?)
+                ");
+
+                foreach ($subject_ids as $sub_id) {
+                    $stmtSub->bind_param("ii", $tutor_id, $sub_id);
+                    $stmtSub->execute();
+                }
+                $stmtSub->close();
+            }
+            $formSuccess = "Registration successful! Please wait for admin verification before logging in.";
+
+        } else {
+            $formError = "Tutor registration failed. Try again.";
+        }
+
         $stmt2->close();
- 
-        $formSuccess = "Registration successful! Please wait for admin verification before logging in.";
  
         // Clear form fields
         $_POST = [];

@@ -183,11 +183,12 @@ $sort   = $_GET['sort'] ?? '';
 
 $sql = "
 SELECT t.id, u.name, t.gender, t.experience,
-       sub.name AS subject_name,
+       GROUP_CONCAT(sub.name SEPARATOR ', ') AS subject_names,
        b.name AS board_name
 FROM tutors t
 JOIN users u ON u.id = t.user_id
-LEFT JOIN subjects sub ON sub.id = t.subject_id
+LEFT JOIN tutor_subjects ts ON ts.tutor_id = t.id
+LEFT JOIN subjects sub ON sub.id = ts.subject_id
 LEFT JOIN boards b ON b.id = t.board_id
 WHERE t.is_verified = 1
 ";
@@ -205,13 +206,14 @@ if ($search !== '') {
     $types .= "ssss";
 }
 
+
 // FILTER GENDER
 if ($gender !== '') {
     $sql .= " AND t.gender = ? AND t.is_verified = 1";
     $params[] = $gender;
     $types .= "s";
 }
-
+$sql .= "GROUP BY t.id";
 // SORTING
 if ($sort === 'asc') {
     $sql .= " ORDER BY u.name ASC";

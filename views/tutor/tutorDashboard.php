@@ -161,6 +161,13 @@
                                         </tr>
 
                                         <tr>
+                                            <td class="fw-semibold text-primary">Subjects</td>
+                                            <td class="fw-semibold text-muted">
+                                                <?php echo $tutor['subject_names']?>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
                                             <td class="fw-semibold text-primary">Experience</td>
                                             <td class="fw-semibold text-muted"><?php echo $tutor['experience']; ?> yrs</td>
                                         </tr>

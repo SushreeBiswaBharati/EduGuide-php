@@ -12,6 +12,16 @@ if (!isset($nameError)) {
     <title>Tutor Registration – EduGuide</title>
     <link rel="stylesheet" href="/EduGuide-php/assets/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/EduGuide-php/assets/css/formStyle.css">
+    <style>
+        .subject-box {
+            padding: 5px;
+            max-height: 100px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px 15px;
+        }
+    </style>
 </head>
 <body>
 <section class="form-bg min-vh-100 d-flex align-items-center py-5">
@@ -113,17 +123,29 @@ if (!isset($nameError)) {
 
                         <!-- Subject -->
                         <div class="mb-3">
-                            <label class="form-label">Subject <span class="text-danger">*</span></label>
-                            <select name="subject_id" class="form-select">
-                                <option value="">-- Select Subject --</option>
+                            <label class="form-label">
+                                Subjects <span class="text-danger">*</span>
+                            </label>
+
+                            <div class="subject-box border rounded p-2">
+
                                 <?php while ($subject = $subjects_result->fetch_assoc()): ?>
-                                    <option value="<?php echo $subject['id']; ?>"
-                                        <?php echo (isset($_POST['subject_id']) && $_POST['subject_id'] == $subject['id']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($subject['name']); ?>
-                                    </option>
+                                    <div class="form-check">
+                                        <input 
+                                            class="form-check-input subject-checkbox" 
+                                            type="checkbox" 
+                                            name="subject_ids[]" 
+                                            value="<?php echo $subject['id']; ?>"
+                                        >
+                                        <label class="form-check-label">
+                                            <?php echo htmlspecialchars($subject['name']); ?>
+                                        </label>
+                                    </div>
                                 <?php endwhile; ?>
-                            </select>
-                            <small id="subjectError" class="error"><?php echo $subjectError; ?></small>
+
+                            </div>
+
+                            <small class="text-danger"><?php echo $subjectError; ?></small>
                         </div>
 
                         <!-- Board -->
@@ -195,6 +217,17 @@ if (!isset($nameError)) {
 </div>
 </section>
 
+<script>
+document.querySelectorAll('.subject-checkbox').forEach(cb => {
+    cb.addEventListener('change', function () {
+        const checked = document.querySelectorAll('.subject-checkbox:checked');
+        if (checked.length > 2) {
+            alert("You can select maximum 2 subjects");
+            this.checked = false;
+        }
+    });
+});
+</script>
 <script src="/EduGuide-php/assets/bootstrap/bootstrap.bundle.min.js"></script>
 <script src="/EduGuide-php/assets/js/tutorValidation.js"></script>
 </body>

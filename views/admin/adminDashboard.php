@@ -67,12 +67,11 @@
         <?php if ($page === 'dashboard'): ?>
             <!-- Dashboard -->
             <div class="mb-4 greet-bar rounded-4 p-4 text-white">
-                <span><?php echo $today;?></span>
+                <span><?php echo date('l, F j, Y');?></span>
                 <h4 class="fw-bold mb-1">
                     Welcome Back 👑
                 </h4>
                 <p class="fst-italic mb-3">"You do't just manage users — you shape the platform."</p>
-                <span class="badge bg-white bg-opacity-75 text-primary px-3 py-2">✅ Verified Tutor</span>
             </div>
             <!--  -->
             <div class="row g-3 mb-4">
@@ -105,6 +104,101 @@
                 </div>
 
             </div>
+            <div class="container-fluid">
+
+    <!-- Welcome -->
+    <div class="mb-4 p-3 bg-primary text-white rounded">
+        <h4 class="mb-1">Welcome Admin 👑</h4>
+        <small><?php echo date('l, F j, Y'); ?></small>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3 col-6">
+            <div class="card text-center p-3">
+                <div>Total Students</div>
+                <h5><?php echo $totalStudents; ?></h5>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-6">
+            <div class="card text-center p-3">
+                <div>Total Tutors</div>
+                <h5><?php echo $totalTutors; ?></h5>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-6">
+            <div class="card text-center p-3">
+                <div>Total Bookings</div>
+                <h5><?php echo $totalBookings; ?></h5>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-6">
+            <div class="card text-center p-3">
+                <div>Complaints</div>
+                <h5><?php echo $totalComplaints; ?></h5>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h6>Bookings Growth</h6>
+                <canvas id="bookingChart"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h6>User Registrations</h6>
+                <canvas id="userChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card p-3 mb-4">
+        <h6>Recent Activity</h6>
+        <ul class="list-group list-group-flush">
+            <?php while($a = $activities->fetch_assoc()): ?>
+                <li class="list-group-item">
+                    <?php echo $a['message']; ?>
+                    <small class="text-muted float-end"><?php echo $a['time']; ?></small>
+                </li>
+            <?php endwhile; ?>
+        </ul>
+    </div>
+
+    <!-- Top Tutors -->
+    <div class="card p-3 mb-4">
+        <h6>Top Tutors</h6>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Bookings</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while($t = $topTutors->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo $t['name']; ?></td>
+                        <td><?php echo $t['total']; ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
+
+</div>
 
                 <?php elseif ($page === 'tutor'): ?>
                     <h5>My Bookings Requests</h5>
