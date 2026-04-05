@@ -75,28 +75,28 @@
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-3 col-6">
-                        <div class="card text-center px-2 py-3 bg-warning bg-opacity-50">
+                        <div class="card1 text-center px-2 py-3 bg-warning bg-opacity-50">
                             <div class="fw-semibold">Total Bookings</div>
                             <div class="fw-bold fs-4"><?php echo $totalBookings; ?></div>
                         </div>
                     </div>
 
                     <div class="col-md-3 col-6">
-                        <div class="card text-center px-2 py-3 bg-success bg-opacity-50">
+                        <div class="card2 text-center px-2 py-3 bg-success bg-opacity-50">
                             <div class="fw-semibold">Confirmed</div>
                             <div class="fw-bold fs-4"><?php echo $confirmedBookings; ?></div>
                         </div>
                     </div>
 
                     <div class="col-md-3 col-6">
-                        <div class="card text-center px-2 py-3 bg-danger bg-opacity-50">
+                        <div class="card3 text-center px-2 py-3 bg-danger bg-opacity-50">
                             <div class="fw-semibold">Pending</div>
                             <div class="fw-bold fs-4"><?php echo $pendingBookings; ?></div>
                         </div>
                     </div>
 
                     <div class="col-md-3 col-6">
-                        <div class="card text-center px-2 py-3 bg-primary bg-opacity-50">
+                        <div class="card4 text-center px-2 py-3 bg-primary bg-opacity-50">
                             <div class="fw-semibold">Completed</div>
                             <div class="fw-bold fs-4"><?php echo $completedBookings; ?></div>
                         </div>
@@ -257,7 +257,6 @@
                 <?php elseif ($page === 'browse'): ?>
                 <h5 class="fw-bold text-primary mb-3">Browse Tutors</h5>
 
-                <!-- FULL WIDTH SEARCH -->
                 <form method="GET" class="mb-4">
                     <input type="hidden" name="page" value="browse">
 

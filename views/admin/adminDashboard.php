@@ -1,3 +1,4 @@
+<?php if (!isset($page)) $page = 'dashboard'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,7 +66,6 @@
     <!-- Main Content -->
     <div class="flex-grow-1 main-content p-4 rounded-4 shadow-sm" style="overflow-y:auto;">
         <?php if ($page === 'dashboard'): ?>
-            <!-- Dashboard -->
             <div class="mb-4 greet-bar rounded-4 p-4 text-white">
                 <span><?php echo date('l, F j, Y');?></span>
                 <h4 class="fw-bold mb-1">
@@ -76,149 +76,110 @@
             <!--  -->
             <div class="row g-3 mb-4">
                 <div class="col-md-3 col-6">
-                    <div class="card text-center p-3 shadow-sm">
+                    <div class="card1 text-center p-3 bg-warning bg-opacity-50 shadow-sm">
                         <div class="fw-semibold">Total Tutors</div>
                         <div class="fw-bold fs-4"><?php echo $totalTutors; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-                    <div class="card text-center p-3 shadow-sm">
+                    <div class="card2 text-center p-3 bg-success bg-opacity-50 shadow-sm">
                         <div class="fw-semibold">Total Students</div>
                         <div class="fw-bold fs-4"><?php echo $totalStudents; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-                    <div class="card text-center p-3 shadow-sm">
+                    <div class="card3 text-center p-3 bg-danger bg-opacity-50 shadow-sm">
                         <div class="fw-semibold">Bookings</div>
                         <div class="fw-bold fs-4"><?php echo $totalBookings; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-                    <div class="card text-center p-3 shadow-sm">
+                    <div class="card4 text-center p-3 bg-primary bg-opacity-50 shadow-sm">
                         <div class="fw-semibold">Complaints</div>
                         <div class="fw-bold fs-4"><?php echo $totalComplaints; ?></div>
                     </div>
                 </div>
 
             </div>
-            <div class="container-fluid">
+            <!-- Charts -->
+            <div class="row g-3 mb-4">
 
-    <!-- Welcome -->
-    <div class="mb-4 p-3 bg-primary text-white rounded">
-        <h4 class="mb-1">Welcome Admin 👑</h4>
-        <small><?php echo date('l, F j, Y'); ?></small>
-    </div>
+                <div class="col-md-6">
+                    <div class="card p-3">
+                        <h6>Bookings Growth</h6>
+                        <canvas id="bookingChart"></canvas>
+                    </div>
+                </div>
 
-    <!-- Stats Cards -->
-    <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="card p-3">
+                        <h6>User Registrations</h6>
+                        <canvas id="userChart"></canvas>
+                    </div>
+                </div>
 
-        <div class="col-md-3 col-6">
-            <div class="card text-center p-3">
-                <div>Total Students</div>
-                <h5><?php echo $totalStudents; ?></h5>
             </div>
-        </div>
 
-        <div class="col-md-3 col-6">
-            <div class="card text-center p-3">
-                <div>Total Tutors</div>
-                <h5><?php echo $totalTutors; ?></h5>
+            <!-- Recent Activity -->
+            <div class="card p-3 mb-4">
+                <h6>Recent Activity</h6>
+                <ul class="list-group list-group-flush">
+                    <?php while($a = $activities->fetch_assoc()): ?>
+                        <li class="list-group-item">
+                            <?php echo $a['message']; ?>
+                            <small class="text-muted float-end"><?php echo $a['time']; ?></small>
+                        </li>
+                    <?php endwhile; ?>
+                </ul>
             </div>
-        </div>
 
-        <div class="col-md-3 col-6">
-            <div class="card text-center p-3">
-                <div>Total Bookings</div>
-                <h5><?php echo $totalBookings; ?></h5>
+            <!-- Top Tutors -->
+            <div class="card p-3 mb-4">
+                <h6>Top Tutors</h6>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Bookings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while($t = $topTutors->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo $t['name']; ?></td>
+                                <td><?php echo $t['total']; ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                        </tbody>
+                </table>
             </div>
-        </div>
 
-        <div class="col-md-3 col-6">
-            <div class="card text-center p-3">
-                <div>Complaints</div>
-                <h5><?php echo $totalComplaints; ?></h5>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Charts -->
-    <div class="row g-3 mb-4">
-
-        <div class="col-md-6">
-            <div class="card p-3">
-                <h6>Bookings Growth</h6>
-                <canvas id="bookingChart"></canvas>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card p-3">
-                <h6>User Registrations</h6>
-                <canvas id="userChart"></canvas>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Recent Activity -->
-    <div class="card p-3 mb-4">
-        <h6>Recent Activity</h6>
-        <ul class="list-group list-group-flush">
-            <?php while($a = $activities->fetch_assoc()): ?>
-                <li class="list-group-item">
-                    <?php echo $a['message']; ?>
-                    <small class="text-muted float-end"><?php echo $a['time']; ?></small>
-                </li>
-            <?php endwhile; ?>
-        </ul>
-    </div>
-
-    <!-- Top Tutors -->
-    <div class="card p-3 mb-4">
-        <h6>Top Tutors</h6>
-        <table class="table table-sm">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Bookings</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while($t = $topTutors->fetch_assoc()): ?>
-                    <tr>
-                        <td><?php echo $t['name']; ?></td>
-                        <td><?php echo $t['total']; ?></td>
-                    </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
-    </div>
-
-</div>
-
-                <?php elseif ($page === 'tutor'): ?>
-                    <h5>My Bookings Requests</h5>
+            <?php elseif ($page === 'manage_tutor'): ?>
+                <h5>My Bookings Requests</h5>
+                <form action="" method="GET" class="d-flex gap-2 mb-3">
+                    <input type="text" name="search" class="form-control" placeholder="Search tutor">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
                 
-                <?php elseif ($page === 'student'): ?>
+            <?php elseif ($page === 'manage_student'): ?>
 
-                    <h5>My Bookings</h5>
+                <h5>My Bookings</h5>
 
-                <?php elseif ($page === 'booking'): ?>
+            <?php elseif ($page === 'booking'): ?>
 
-                    <h5>My Reviews</h5>
-                <?php elseif ($page === 'dropdown'): ?>
+                <h5>My Reviews</h5>
+            <?php elseif ($page === 'dropdown'): ?>
 
-                    <h5>My Reviews</h5>
+                <h5>My Reviews</h5>
 
-                <?php elseif ($page === 'complaint'): ?>
+            <?php elseif ($page === 'complaint'): ?>
 
-                    <h5>Raise Complaint</h5>
+                <h5>Raise Complaint</h5>
 
-                <?php endif; ?>
+            <?php endif; ?>
         </div>
     </div>
 

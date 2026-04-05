@@ -68,7 +68,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* gap: 6px; */
+
 }
 
 .main-content {
@@ -78,10 +78,7 @@ body {
 .greet-bar{
     background: linear-gradient(180deg, #5c8fdc, #0b48a4);
 }
-.card{
-    border: 3px solid rgb(7, 7, 77);
 
-}
 .panel{
     display: none;
 }
