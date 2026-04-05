@@ -64,6 +64,7 @@ $bookings_stmt->execute();
 $bookings = $bookings_stmt->get_result();
 $bookings_stmt->close();
 
+
 // complaint submission
 $complaintSuccess = "";
 $complaintError   = "";

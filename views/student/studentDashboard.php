@@ -351,10 +351,7 @@
                                             <td><?php echo $t['gender']; ?></td>
                                             <td><?php echo $t['rating']; ?> ⭐</td>
                                             <td>
-                                                <a href="/EduGuide-php/controllers/bookTutor.php?tutor_id=<?php echo $t['id']; ?>"
-                                                class="btn btn-sm btn-success">
-                                                Book
-                                                </a>
+                                                <button class="btn btn-primary btn-sm" onclick="openBookingModal(<?php echo $t['id']; ?>)">Book Now</button>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
@@ -384,6 +381,36 @@
             </div>
         </div>
     </div>
+
+    <!-- Booking modal -->
+    <div id="bookingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+        
+        <div style="background:#fff; width:400px; margin:100px auto; padding:20px; border-radius:10px;">
+            
+            <h5 class="text-center fw-bold mb-3">Book Tutor</h5>
+
+            <form method="POST">
+
+                <input type="hidden" name="tutor_id" id="tutor_id">
+
+                <label>Requirement</label>
+                <textarea name="requirement" class="form-control mb-2" required></textarea>
+
+                <label>Duration (Months)</label>
+                <input type="number" name="duration" class="form-control mb-2" required>
+
+                <button type="submit" name="book_tutor" class="btn btn-success w-100">
+                    Send Request
+                </button>
+
+                <button type="button" class="btn btn-secondary w-100 mt-2" onclick="closeBookingModal()">
+                    Cancel
+                </button>
+
+            </form>
+        </div>
+    </div>
+
     <script>
         const toggleBtn  = document.getElementById('toggleBtn');
         const sidebar    = document.getElementById('sidebar');
@@ -432,6 +459,16 @@
                 toggleEdit();
             <?php endif; ?>
         };
+
+     
+        function openBookingModal(tutorId){
+            document.getElementById('bookingModal').style.display = 'block';
+            document.getElementById('tutor_id').value = tutorId;
+        }
+
+        function closeBookingModal(){
+            document.getElementById('bookingModal').style.display = 'none';
+        }
     </script>
 </body>
 </html>
