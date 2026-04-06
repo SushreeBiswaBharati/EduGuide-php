@@ -206,14 +206,30 @@
 
             <?php elseif ($page === 'manage_tutor'): ?>
                 <h5>My Bookings Requests</h5>
-                <form action="" method="GET" class="d-flex gap-2 mb-3">
-                    <input type="text" name="search" class="form-control" placeholder="Search tutor">
-                    <button type="submit" class="btn btn-primary">Search</button>
+                <form method="GET" class="row g-2 mb-3">
+
+                    <div class="col-md-3">
+                        <input type="text" name="search" class="form-control" placeholder="search by name, subject..." value="<?php echo $_GET['search'] ?? ''; ?>">
+                    </div>
+                    <div class="col-md-2">
+                        <select name="status" class="form-control">
+                            <option value="">All Status</option>
+                            <option value="1">Verified</option>
+                            <option value="0">Requested</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="sort" class="form-control">
+                            <option value="">Sort</option>
+                            <option value="rating">Highest Rating</option>
+                            <option value="exp">Experience</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-success w-100">Search</button>
+                    </div>
+
                 </form>
-                <div class="">
-                    table
-                </div>
-                
             <?php elseif ($page === 'manage_student'): ?>
 
                 <h5>My Bookings</h5>
