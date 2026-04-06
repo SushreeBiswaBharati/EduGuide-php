@@ -23,10 +23,42 @@ $totalBookings = $res->fetch_assoc()['total'] ?? 0;
 $res = $conn->query("SELECT COUNT(*) AS total FROM complaints");
 $totalComplaints = $res->fetch_assoc()['total'] ?? 0;
 
+// progress bar section
 
-/* ======================
-   MANAGE TUTORS
-====================== */
+// Today's bookings
+$todayBookings = $conn->query("
+    SELECT COUNT(*) AS t FROM bookings 
+    WHERE DATE(created_at) = CURDATE()
+")->fetch_assoc()['t'];
+
+// Yesterday's bookings
+$yesterdayBookings = $conn->query("
+    SELECT COUNT(*) AS t FROM bookings 
+    WHERE DATE(created_at) = CURDATE() - INTERVAL 1 DAY
+")->fetch_assoc()['t'];
+
+// Growth %
+$bookingGrowth = 0;
+if ($yesterdayBookings > 0) {
+    $bookingGrowth = round((($todayBookings - $yesterdayBookings) / $yesterdayBookings) * 100);
+}
+
+
+$today = $conn->query("
+    SELECT COUNT(*) AS t FROM tutors 
+    WHERE DATE(created_at) = CURDATE()
+")->fetch_assoc()['t'];
+
+$yesterday = $conn->query("
+    SELECT COUNT(*) AS t FROM tutors 
+    WHERE DATE(created_at) = CURDATE() - INTERVAL 1 DAY
+")->fetch_assoc()['t'];
+
+// Growth %
+$growth = 0;
+if ($yesterday > 0) {
+    $growth = round((($today - $yesterday) / $yesterday) * 100);
+}
 
 $search = $_GET['search'] ?? '';
 

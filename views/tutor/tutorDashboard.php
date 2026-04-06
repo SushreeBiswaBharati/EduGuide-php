@@ -63,7 +63,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="flex-grow-1 main-content p-4 rounded-4 shadow-sm" style="overflow-y:auto;">
+    <div class="flex-grow-1 main-content p-4 rounded-4 shadow-sm">
         <?php if ($page === 'dashboard'): ?>
             <!-- Dashboard -->
             <div class="mb-4 greet-bar rounded-4 p-4 text-white">
@@ -77,28 +77,28 @@
             <!--  -->
             <div class="row g-3 mb-4">
                 <div class="col-md-3 col-6">
-                    <div class="card1 text-center px-2 py-3 bg-warning bg-opacity-50">
+                    <div class="cards card1 text-center px-2 py-3">
                         <div class="fw-semibold">Total Requests</div>
                         <div class="fw-bold fs-4"><?php echo $totalRequests; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-                    <div class="card2 text-center px-2 py-3 bg-success bg-opacity-50">
+                    <div class="cards card2 text-center px-2 py-3">
                         <div class="fw-semibold">Confirmed Requests</div>
                         <div class="fw-bold fs-4"><?php echo $confirmedCount; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-                    <div class="card3 text-center px-2 py-3 bg-danger bg-opacity-50">
+                    <div class="cards card3 text-center px-2 py-3">
                         <div class="fw-semibold">Pending Requests</div>
                         <div class="fw-bold fs-4"><?php echo $pendingCount; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-                    <div class="card4 text-center px-2 py-3 bg-primary bg-opacity-50">
+                    <div class="cards card4 text-center px-2 py-3">
                         <div class="fw-semibold">Completed Session</div>
                         <div class="fw-bold fs-4"><?php echo $completedCount; ?></div>
                     </div>

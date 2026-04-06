@@ -64,40 +64,40 @@
     </div>
 
     <!-- Main Content -->
-    <div class="flex-grow-1 main-content p-4 rounded-4 shadow-sm" style="overflow-y:auto;">
+    <div class="flex-grow-1 main-content p-4 rounded-4 shadow-sm">
         <?php if ($page === 'dashboard'): ?>
             <div class="mb-4 greet-bar rounded-4 p-4 text-white">
                 <span><?php echo date('l, F j, Y');?></span>
                 <h4 class="fw-bold mb-1">
-                    Welcome Back 👑
+                    Welcome Back Admin! 👑
                 </h4>
                 <p class="fst-italic mb-3">"You do't just manage users — you shape the platform."</p>
             </div>
             <!--  -->
             <div class="row g-3 mb-4">
                 <div class="col-md-3 col-6">
-                    <div class="card1 text-center p-3 bg-warning bg-opacity-50 shadow-sm">
+                    <div class="cards card1 text-center px-2 py-3">
                         <div class="fw-semibold">Total Tutors</div>
                         <div class="fw-bold fs-4"><?php echo $totalTutors; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-                    <div class="card2 text-center p-3 bg-success bg-opacity-50 shadow-sm">
+                    <div class="cards card2 text-center px-2 py-3 ">
                         <div class="fw-semibold">Total Students</div>
                         <div class="fw-bold fs-4"><?php echo $totalStudents; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-                    <div class="card3 text-center p-3 bg-danger bg-opacity-50 shadow-sm">
+                    <div class="cards card3 text-center px-2 py-3 ">
                         <div class="fw-semibold">Bookings</div>
                         <div class="fw-bold fs-4"><?php echo $totalBookings; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-                    <div class="card4 text-center p-3 bg-primary bg-opacity-50 shadow-sm">
+                    <div class="cards card4 text-center px-2 py-3 ">
                         <div class="fw-semibold">Complaints</div>
                         <div class="fw-bold fs-4"><?php echo $totalComplaints; ?></div>
                     </div>
@@ -109,31 +109,78 @@
 
                 <div class="col-md-6">
                     <div class="card p-3">
-                        <h6>Bookings Growth</h6>
-                        <canvas id="bookingChart"></canvas>
+                        <h5 class="mb-3 text-center fw-bold">Bookings Growth</h5>
+
+                        <div class="mb-2">
+                            <small class="fw-semibold">Today (<?php echo $todayBookings; ?>)</small>
+                            <div class="progress" role="progressbar" aria-label="Default striped example" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar bg-success progress-bar-striped"
+                                    style="width: <?php echo $todayBookings * 10; ?>%">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <small class="fw-semibold">Yesterday (<?php echo $yesterdayBookings; ?>)</small>
+                            <div class="progress" role="progressbar" aria-label="Default striped example" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar bg-success progress-bar-striped"
+                                    style="width: <?php echo $yesterdayBookings * 10; ?>%">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-2">
+                            <small class="fs-6 fw-semibold">Growth:
+                                <span class="<?php echo $bookingGrowth >= 0 ? 'text-success' : 'text-danger'; ?>">
+                                    <?php echo $bookingGrowth; ?>%
+                                </span>
+                            </small>
+                        </div>
+
+                        <small class="text-muted mt-2 fw-semibold fs-6">
+                            <?php echo $todayBookings > $yesterdayBookings ? '📈 Increasing bookings' : '📉 Drop in bookings'; ?>
+                        </small>
+                        
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="card p-3">
-                        <h6>User Registrations</h6>
-                        <canvas id="userChart"></canvas>
+
+                        <h5 class="mb-3 text-center fw-bold">Tutor Registration</h5>
+                        <!-- Today -->
+                        <div class="mb-2">
+                            <small class="fw-semibold">Today (<?php echo $today; ?>)</small>
+                            <div class="progress" role="progressbar" aria-label="Default striped example" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar bg-success progress-bar-striped"
+                                    style="width: <?php echo $today * 10; ?>%">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Yesterday -->
+                        <div class="mb-2">
+                            <small class="fw-semibold">Yesterday (<?php echo $yesterday; ?>)</small>
+                            <div class="progress" role="progressbar" aria-label="Default striped example" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar bg-warning progress-bar-striped"
+                                    style="width: <?php echo $yesterday * 10; ?>%">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Growth -->
+                        <div class="mt-2">
+                            <small class="fs-6 fw-semibold">Growth:
+                                <span class="<?php echo $growth >= 0 ? 'text-success' : 'text-danger'; ?>">
+                                    <?php echo $growth; ?>%
+                                </span>
+                            </small>
+                        </div>
+                        <small class="text-muted mt-2 fw-semibold fs-6">
+                            <?php echo $today > $yesterday ? '📈 Increasing registration' : '📉 Drop in registration'; ?>
+                        </small>
                     </div>
                 </div>
-
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="card p-3 mb-4">
-                <h6>Recent Activity</h6>
-                <ul class="list-group list-group-flush">
-                    <?php while($a = $activities->fetch_assoc()): ?>
-                        <li class="list-group-item">
-                            <?php echo $a['message']; ?>
-                            <small class="text-muted float-end"><?php echo $a['time']; ?></small>
-                        </li>
-                    <?php endwhile; ?>
-                </ul>
             </div>
 
             <!-- Top Tutors -->
@@ -163,6 +210,9 @@
                     <input type="text" name="search" class="form-control" placeholder="Search tutor">
                     <button type="submit" class="btn btn-primary">Search</button>
                 </form>
+                <div class="">
+                    table
+                </div>
                 
             <?php elseif ($page === 'manage_student'): ?>
 
