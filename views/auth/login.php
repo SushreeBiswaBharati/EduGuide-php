@@ -15,8 +15,8 @@ if (!isset($emailError)) {
 </head>
 <body>
     <section class="form-bg min-vh-100 d-flex align-items-center">
-        <div class="container py-3">
-            <div class="row align-items-center">
+        <div class="container py-4">
+            <div class="row align-items-center g-2">
 
                 <!-- Illustration -->
                 <div class="col-md-6 text-center mb-4 mb-md-0">

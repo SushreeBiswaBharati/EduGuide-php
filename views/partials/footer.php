@@ -2,7 +2,9 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6 mb-3">
-                <h5 class="fw-bold">🎓 EduGuide</h5>
+                <h5 class="fw-bold">
+                <img src="assets/images/logo.png" alt="EduGuide Logo" height="70" width="70" class="d-inline-block">    
+                EduGuide</h5>
                 <p class="text-white-50 small mb-0">
                     Connecting students with verified local tutors for 
                     personalized home tuition across Odisha.

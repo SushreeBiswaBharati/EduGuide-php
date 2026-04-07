@@ -9,6 +9,9 @@
 .success { color: green; font-size: 13px; } 
 
 .login-illustration {
-    max-width: 380px;
+    max-width: 90%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
 }
  

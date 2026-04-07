@@ -2,10 +2,11 @@
 session_start(); 
 ?>
 
-<nav class="navbar navbar-expand-lg navbar-light shadow-lg py-2 py-lg-3">
+<nav class="navbar navbar-expand-lg navbar-light shadow-lg py-1 py-lg-2">
     <div class="container">
 
         <!-- LOGO -->
+        <img src="assets/images/logo.png" alt="EduGuide Logo" height="70" width="70" class="d-inline-block">
         <a class="navbar-brand fw-bold fs-4 text-primary" href="index.php">
             <span class="d-block d-lg-inline">Edu<span class="text-dark">Guide - </span></span>
             Guidance Beyond Textbook

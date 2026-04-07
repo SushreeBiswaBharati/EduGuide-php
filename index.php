@@ -22,8 +22,8 @@
                     <span class="badge-trust">🎓 Trusted by Students across Odisha</span>
     
                     <h1>Find the Right Tutor <br> for Home Tuition</h1>
-                    <h5 class="text-muted fw-semibold mt-2">Personalized Learning Starts with the Right Guidance</h5>
-                    <p class="mt-3">
+                    <h5 class="text-muted fw-semibold mt-4">Personalized Learning Starts with the Right Guidance</h5>
+                    <p class="mt-4">
                         Connect with verified local tutors for personalized home tuition
                         at your doorstep. Learn at your own pace, in your own space.
                     </p>
