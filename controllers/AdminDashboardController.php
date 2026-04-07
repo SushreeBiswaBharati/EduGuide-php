@@ -100,6 +100,7 @@ $stmt->execute();
 $tutors = $stmt->get_result();
 $stmt->close();
 
+
 $page = $_GET['page'] ?? 'dashboard';
 require_once '../views/admin/adminDashboard.php';
 ?>

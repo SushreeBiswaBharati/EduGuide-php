@@ -205,7 +205,8 @@
             </div>
 
             <?php elseif ($page === 'manage_tutor'): ?>
-                <h5>My Bookings Requests</h5>
+                <h5 class="fw-bold text-primary mb-3">Manage Tutors</h5>
+
                 <form method="GET" class="row g-2 mb-3">
 
                     <div class="col-md-3">
@@ -230,20 +231,62 @@
                     </div>
 
                 </form>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <?php if($tutors->num_rows > 0): ?>
+                                <?php while($t = $tutors->fetch_assoc()): ?>
+                                    <tr style="cursor:pointer" onclick="openModal(<?php htmlspecialchars(json_encode($t)); ?>">
+                                        <td>
+                                            <?php if($t['is_verified']): ?>
+                                                <span class="badge bg-success">Verified</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-warning text-dark">Requested</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">No tutor found</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- modal to show tutor details -->
+                <div class="modal fade" id="tutorModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content p-3">
+                            <div id="modalContent"></div>
+                        </div>
+                    </div>
+                </div>
+
             <?php elseif ($page === 'manage_student'): ?>
 
-                <h5>My Bookings</h5>
+                <h5 class="fw-bold text-primary mb-3">Manage Students</h5>
 
             <?php elseif ($page === 'booking'): ?>
 
-                <h5>My Reviews</h5>
+                <h5 class="fw-bold text-primary mb-3">Bookiing Details</h5>
             <?php elseif ($page === 'dropdown'): ?>
 
-                <h5>My Reviews</h5>
+                <h5 class="fw-bold text-primary mb-3">Manage Dropdowns</h5>
 
             <?php elseif ($page === 'complaint'): ?>
 
-                <h5>Raise Complaint</h5>
+                <h5 class="fw-bold text-primary mb-3">Check Complaints</h5>
 
             <?php endif; ?>
         </div>
@@ -279,6 +322,18 @@
                 logoutSpan.style.display = 'inline';
             }
         });
+
+        // open modal
+        function openModal(tutor){
+            let buttons = '';
+            if(tutor.is_verified == 0){
+                buttons = `
+                    <button class="btn btn-success">Accept</button>
+                    <button class="btn btn-danger">Reject</button>
+                `;
+            }
+
+        }
     </script>
 </body>
 </html>

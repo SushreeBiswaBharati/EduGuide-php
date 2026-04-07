@@ -13,7 +13,7 @@
     <?php include_once 'views/partials/navbar.php'; ?>
 
     <section id="hero">
-        <div class="container">
+        <div class="container mb-2">
             <div class="row align-items-center g-4">
     
                 <!-- Left: Text -->
