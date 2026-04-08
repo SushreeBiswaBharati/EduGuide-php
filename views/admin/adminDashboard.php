@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tutor Dashboard – EduGuide</title>
+    <title>Admin Dashboard – EduGuide</title>
     <link rel="stylesheet" href="/EduGuide-php/assets/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/EduGuide-php/assets/css/dashboard.css?v=1.1">
     
@@ -18,7 +18,7 @@
         <div class="p-3 border-bottom border-white border-opacity-25 d-flex align-items-center justify-content-between">
             <div>
                 <div class="fw-bold fs-5 brand-title">EduGuide</div>
-                <small class="brand-subtitle" style="opacity:0.75;">Tutor Panel</small>
+                <small class="brand-subtitle" style="opacity:0.75;">Admin Panel</small>
             </div>
             <button class="hamburger-btn" id="toggleBtn">
                 <img src="/EduGuide-php/assets/icons/list.svg" alt="menu">
@@ -276,6 +276,7 @@
             <?php elseif ($page === 'manage_student'): ?>
 
                 <h5 class="fw-bold text-primary mb-3">Manage Students</h5>
+                
 
             <?php elseif ($page === 'booking'): ?>
 
