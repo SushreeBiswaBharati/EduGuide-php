@@ -1,0 +1,9 @@
+# Database connection (contains password)
+database/dbconnection.php
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
