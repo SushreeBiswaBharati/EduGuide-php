@@ -1,0 +1,17 @@
+.form-bg{
+    background: linear-gradient(135deg, #a9c8e4 0%, #6ab4f5 100%);
+} 
+.form-label{
+    font-weight: 500;
+    font-size: 17px;
+}
+.error   { color: red;   font-size: 13px; }
+.success { color: green; font-size: 13px; } 
+
+.login-illustration {
+    max-width: 90%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+ 
