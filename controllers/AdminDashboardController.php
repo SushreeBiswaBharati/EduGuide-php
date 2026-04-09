@@ -93,16 +93,9 @@ $sort = $_GET['sort'] ?? '';
 
 $sql = "
 SELECT 
-    t.id, 
-    u.name, 
-    u.email, 
-    t.phone,
-    t.address,
-    t.experience,
-    t.rating,
-    t.is_verified,
-    u.profile_image,
-    GROUP_CONCAT(s.name SEPARATOR ', ') AS subjects
+    t.id, u.name, u.email, t.phone,
+    t.address, t.experience, t.rating, t.is_verified,
+    u.profile_image, GROUP_CONCAT(s.name SEPARATOR ', ') AS subjects
 FROM tutors t
 JOIN users u ON u.id = t.user_id
 LEFT JOIN tutor_subjects ts ON ts.tutor_id = t.id
