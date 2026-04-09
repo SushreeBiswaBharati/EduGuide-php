@@ -139,31 +139,36 @@
                     <div class="card p-3">
                         <h5 class="mb-3 text-center fw-bold">Tutor Registration</h5>
                         <div class="mb-2">
-                            <small class="fw-semibold">Today (<?php echo $today; ?>)</small>
-                            <div class="progress">
-                                <div class="progress-bar bg-success progress-bar-striped"
-                                    style="width: <?php echo $today * 10; ?>%">
+                            <?php
+                                $todayRegs     = $todayRegs ?? 0;
+                                $yesterdayRegs = $yesterdayRegs ?? 0;
+                                $growth        = $growth ?? 0;
+                                ?>
+                                <small class="fw-semibold">Today (<?php echo $todayRegs; ?>)</small>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success progress-bar-striped"
+                                        style="width: <?php echo $todayRegs * 10; ?>%">
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <small class="fw-semibold">Yesterday (<?php echo $yesterday; ?>)</small>
-                            <div class="progress">
-                                <div class="progress-bar bg-warning progress-bar-striped"
-                                    style="width: <?php echo $yesterday * 10; ?>%">
+
+                                <small class="fw-semibold">Yesterday (<?php echo $yesterdayRegs; ?>)</small>
+                                <div class="progress">
+                                    <div class="progress-bar bg-warning progress-bar-striped"
+                                        style="width: <?php echo $yesterdayRegs * 10; ?>%">
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="mt-2">
-                            <small class="fs-6 fw-semibold">Growth:
-                                <span class="<?php echo $growth >= 0 ? 'text-success' : 'text-danger'; ?>">
-                                    <?php echo $growth; ?>%
-                                </span>
-                            </small>
-                        </div>
-                        <small class="text-muted mt-2 fw-semibold fs-6">
-                            <?php echo $today > $yesterday ? '📈 Increasing registration' : '📉 Drop in registration'; ?>
-                        </small>
+
+                                <div class="mt-2">
+                                    <small class="fs-6 fw-semibold">Growth:
+                                        <span class="<?php echo $growth >= 0 ? 'text-success' : 'text-danger'; ?>">
+                                            <?php echo round($growth, 2); ?>%
+                                        </span>
+                                    </small>
+                                </div>
+
+                                <small class="text-muted mt-2 fw-semibold fs-6">
+                                    <?php echo $todayRegs > $yesterdayRegs ? '📈 Increasing registration' : '📉 Drop in registration'; ?>
+                                </small>
                     </div>
                 </div>
             </div>
@@ -200,8 +205,9 @@
                 <div class="col-md-2">
                     <select name="status" class="form-control">
                         <option value="">All Status</option>
-                        <option value="1">Verified</option>
                         <option value="0">Requested</option>
+                        <option value="1">Verified</option>
+                        <option value="2">Rejected</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -227,68 +233,66 @@
                     </thead>
 
                     <tbody>
-                        <?php if($tutors->num_rows > 0): ?>
-                            <?php while($t = $tutors->fetch_assoc()): ?>
-                                <?php
-                                $photo = '/EduGuide-php/assets/default-user.png'; // default fallback
-                                if (!empty($t['profile_image'])) {
-                                    $profilePath =  '/EduGuide-php/assets/profile/' . $t['profile_image'];
-                                    if (file_exists($profilePath)) {
-                                        $photo = '/EduGuide-php/assets/profile/' . $t['profile_image'];
-                                    }
-                                }
-                                ?>
-                                <tr class="tutor-row"
-                                    data-id="<?php echo $t['id']; ?>"
-                                    data-name="<?php echo htmlspecialchars($t['name']); ?>"
-                                    data-email="<?php echo htmlspecialchars($t['email']); ?>"
-                                    data-phone="<?php echo $t['phone']; ?>"
-                                    data-subjects="<?php echo $t['subjects']; ?>"
-                                    data-experience="<?php echo $t['experience']; ?>"
-                                    data-rating="<?php echo $t['rating']; ?>"
-                                    data-address="<?php echo htmlspecialchars($t['address']); ?>"
-                                    data-verified="<?php echo $t['is_verified']; ?>"
-                                    data-photo="<?php echo $photo; ?>"
-                                    onclick="openModal(this)">
+                       <?php if($tutors->num_rows > 0): ?>
+                    <?php while($t = $tutors->fetch_assoc()): ?>
 
-                                    <td><?php echo htmlspecialchars($t['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($t['email']); ?></td>
-                                    <td>
-                                        <?php if($t['is_verified']): ?>
-                                            <span class="badge bg-success">Verified</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-warning text-dark">Requested</span>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="3" class="text-center text-muted py-4">No tutor found</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                        <?php
+                        // Ensure safe profile image path
+                        $photo = '/EduGuide-php/assets/default-user.png';
+                        if (!empty($t['profile_image'])) {
+                            $profilePath = $_SERVER['DOCUMENT_ROOT'] . '/EduGuide-php/assets/profile/' . $t['profile_image'];
+                            if (file_exists($profilePath)) {
+                                $photo = '/EduGuide-php/assets/profile/' . $t['profile_image'];
+                            }
+                        }
+                        ?>
 
-            <!-- Tutor Modal -->
-            <div class="modal fade" id="tutorModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content p-3">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Tutor Details</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body" id="modalContent"></div>
-                        <div class="modal-footer" id="modalFooter"></div>
+                        <tr class="tutor-row"
+                            data-id="<?php echo $row['id']; ?>"
+                            data-name="<?php echo htmlspecialchars($row['name'], ENT_QUOTES); ?>"
+                            data-email="<?php echo htmlspecialchars($row['email'], ENT_QUOTES); ?>"
+                            data-phone="<?php echo htmlspecialchars($row['phone'], ENT_QUOTES); ?>"
+                            data-address="<?php echo htmlspecialchars($row['address'], ENT_QUOTES); ?>"
+                            data-verified="<?php echo $row['verified']; ?>"
+                            data-photo="<?php echo htmlspecialchars($photoPath, ENT_QUOTES); ?>"
+                            onclick="openModal(this)">
+                            <td><?= htmlspecialchars($t['name']) ?></td>
+                            <td><?= htmlspecialchars($t['email']) ?></td>
+                            <td>
+                                <?php if($t['is_verified']): ?>
+                                    <span class="badge bg-success">Verified</span>
+                                <?php else: ?>
+                                    <span class="badge bg-warning text-dark">Requested</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+
+                    <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-4">No tutor found</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tutor Modal -->
+        <div class="modal fade" id="tutorModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content p-3">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Tutor Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
+                    <div class="modal-body" id="modalContent"></div>
+                    <div class="modal-footer" id="modalFooter"></div>
                 </div>
             </div>
+        </div>
 
         <?php elseif ($page === 'manage_student'): ?>
             <h5 class="fw-bold text-primary mb-3">Manage Students</h5>
-
-<<<<<<< HEAD
             <table class="table table-hover">
                 <thead class="table-dark">
                     <tr>
@@ -444,13 +448,6 @@
                 </tbody>
             </table>
         </div>
-=======
-        <?php elseif ($page === 'booking'): ?>
-            <h5 class="fw-bold text-primary mb-3">Booking Details</h5>
-
-        <?php elseif ($page === 'dropdown'): ?>
-            <h5 class="fw-bold text-primary mb-3">Manage Dropdowns</h5>
->>>>>>> 1e6023ad6511607255b4ac3a2d01971df3bc67ad
 
         <?php elseif ($page === 'complaint'): ?>
             <h5 class="fw-bold text-primary mb-3">Check Complaints</h5>
@@ -665,7 +662,7 @@ function deleteComplaint(id) {
         }
     });
 }
-<<<<<<< HEAD
+
     function deleteStudent(id) {
         if (!confirm("Are you sure you want to delete this student?")) return;
 
@@ -710,8 +707,4 @@ function deleteComplaint(id) {
 </script>
 </body>
 </html>
-=======
-</script>
-        </body>
-        </html>
->>>>>>> 1e6023ad6511607255b4ac3a2d01971df3bc67ad
+
