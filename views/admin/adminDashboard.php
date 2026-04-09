@@ -1,44 +1,9 @@
-<?php
-if (!isset($page)) $page = 'dashboard';
-require_once '../middleware/auth.php';
-requireRole('admin');
-require_once '../database/dbconnection.php';
-
-// ---------- Handle Accept / Reject inside same page ----------
-if (isset($_POST['action']) && isset($_POST['id'])) {
-    $id = intval($_POST['id']);
-
-    // Tutor actions
-    if ($_POST['action'] === 'verify') {
-        $conn->query("UPDATE tutors SET is_verified = 1 WHERE id = $id");
-        echo "success"; 
-        exit;
-    }
-    if ($_POST['action'] === 'reject') {
-        $conn->query("UPDATE tutors SET is_verified = 0 WHERE id = $id");
-        echo "success"; 
-        exit;
-    }
-
-    // Complaint actions
-    if ($_POST['action'] === 'resolve') {
-        $conn->query("UPDATE complaints SET status = 1 WHERE id = $id");
-        echo "success"; 
-        exit;
-    }
-    if ($_POST['action'] === 'delete') {
-        $conn->query("DELETE FROM complaints WHERE id = $id");
-        echo "success"; 
-        exit;
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tutor Dashboard – EduGuide</title>
+    <title>Admin Dashboard – EduGuide</title>
     <link rel="stylesheet" href="/EduGuide-php/assets/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/EduGuide-php/assets/css/dashboard.css?v=1.1">
 </head>
@@ -51,7 +16,7 @@ if (isset($_POST['action']) && isset($_POST['id'])) {
         <div class="p-3 border-bottom border-white border-opacity-25 d-flex align-items-center justify-content-between">
             <div>
                 <div class="fw-bold fs-5 brand-title">EduGuide</div>
-                <small class="brand-subtitle" style="opacity:0.75;">Tutor Panel</small>
+                <small class="brand-subtitle" style="opacity:0.75;">Admin Panel</small>
             </div>
             <button class="hamburger-btn" id="toggleBtn">
                 <img src="/EduGuide-php/assets/icons/list.svg" alt="menu">

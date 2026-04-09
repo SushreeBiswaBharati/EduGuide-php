@@ -3,6 +3,31 @@ require_once '../middleware/auth.php';
 requireRole('admin');
 require_once '../database/dbconnection.php';
 
+if (isset($_POST['action']) && isset($_POST['id'])) {
+    $id = intval($_POST['id']);
+
+    if ($_POST['action'] === 'verify') {
+        $conn->query("UPDATE tutors SET is_verified = 1 WHERE id = $id");
+        echo "success";
+        exit;
+    }
+    if ($_POST['action'] === 'reject') {
+        $conn->query("UPDATE tutors SET is_verified = 0 WHERE id = $id");
+        echo "success";
+        exit;
+    }
+    if ($_POST['action'] === 'resolve') {
+        $conn->query("UPDATE complaints SET status = 'Resolved' WHERE id = $id");
+        echo "success";
+        exit;
+    }
+    if ($_POST['action'] === 'delete') {
+        $conn->query("DELETE FROM complaints WHERE id = $id");
+        echo "success";
+        exit;
+    }
+}
+
 $res = $conn->query("SELECT COUNT(*) AS total FROM tutors");
 $totalTutors = $res->fetch_assoc()['total'] ?? 0;
 
