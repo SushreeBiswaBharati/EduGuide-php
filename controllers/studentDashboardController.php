@@ -183,11 +183,7 @@ $gender = $_GET['gender'] ?? '';
 $sort   = $_GET['sort'] ?? '';
 
 $sql = "
-<<<<<<< HEAD
-SELECT t.id, u.name, t.gender, t.experience,
-=======
 SELECT t.id,u.profile_image, u.name, t.gender, t.experience,
->>>>>>> 1e6023ad6511607255b4ac3a2d01971df3bc67ad
        GROUP_CONCAT(sub.name SEPARATOR ', ') AS subject_names,
        b.name AS board_name
 FROM tutors t
@@ -218,11 +214,7 @@ if ($gender !== '') {
     $params[] = $gender;
     $types .= "s";
 }
-<<<<<<< HEAD
-$sql .= "GROUP BY t.id";
-=======
 $sql .= " GROUP BY t.id";
->>>>>>> 1e6023ad6511607255b4ac3a2d01971df3bc67ad
 // SORTING
 if ($sort === 'asc') {
     $sql .= " ORDER BY u.name ASC";
