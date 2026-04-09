@@ -15,6 +15,19 @@ $totalBookings = $res->fetch_assoc()['total'] ?? 0;
 $res = $conn->query("SELECT COUNT(*) AS total FROM complaints");
 $totalComplaints = $res->fetch_assoc()['total'] ?? 0;
 
+if ($page === 'complaint') {
+    $complaintsRes = $conn->query("
+        SELECT c.id, c.student_id, c.tutor_id, c.message, c.status, c.created_at,
+               s.name AS student_name,
+               t.name AS tutor_name
+        FROM complaints c
+        LEFT JOIN students s ON c.student_id = s.id
+        LEFT JOIN tutors t ON c.tutor_id = t.id
+        ORDER BY c.created_at DESC
+    ");
+    $complaints = $complaintsRes;
+}
+
 // progress bar section
 
 $todayBookings = $conn->query("
@@ -54,8 +67,17 @@ $status = $_GET['status'] ?? '';
 $sort = $_GET['sort'] ?? '';
 
 $sql = "
-SELECT t.id, u.name, u.email, t.is_verified, t.experience,
-       GROUP_CONCAT(s.name SEPARATOR ', ') AS subjects
+SELECT 
+    t.id, 
+    u.name, 
+    u.email, 
+    t.phone,
+    t.address,
+    t.experience,
+    t.rating,
+    t.is_verified,
+    u.profile_image,
+    GROUP_CONCAT(s.name SEPARATOR ', ') AS subjects
 FROM tutors t
 JOIN users u ON u.id = t.user_id
 LEFT JOIN tutor_subjects ts ON ts.tutor_id = t.id
@@ -64,6 +86,7 @@ WHERE 1
 ";
 $params = [];
 $types  = "";
+
 
 // Search
 if ($search !== ''){
@@ -76,12 +99,12 @@ if ($search !== ''){
 
 // status
 if($status !== ''){
-    $sql .= "AND t.is_verified = ?";
-    $params[] = $status;
+    $sql .= " AND t.is_verified = ?";
+    $params[] = (int)$status;
     $types .= "i";
 }
 
-$sql .= "GROUP BY t.id";
+$sql .= " GROUP BY t.id";
 // sort
 if($sort === 'rating'){
     $sql .=" ORDER BY t.rating DESC";

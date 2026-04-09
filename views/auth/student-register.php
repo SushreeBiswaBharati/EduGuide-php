@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Registration – EduGuide</title>
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/formStyle.css">
 
 </head>
@@ -23,7 +24,7 @@
                     <?php if (!empty($formSuccess)): ?>
                         <div class="alert alert-success text-center">
                             <?php echo $formSuccess; ?>
-                            <a href="../../controllers/AuthController.php">Click here to Login</a>
+                            <a href="<?php echo BASE_URL; ?>views/auth/login.php">Click here to Login</a>
                         </div>
                     <?php endif; ?>
 
@@ -49,18 +50,28 @@
 
                         <!-- Password -->
                         <div class="mb-3">
-                            <label class="form-label">Password <span class="text-danger">*</span></label>
-                            <input type="password" name="password" class="form-control"
-                                placeholder="Min 6 characters">
-                            <small id="passwordError"   class="error">  <?php echo $passwordError;   ?></small>
+                            <label class="form-label">Password <span class="text-danger">*</span></label>                           
+                            <div class="input-group">
+                                <input type="password" id="password" name="password" class="form-control"
+                                    placeholder="Min 6 characters">                    
+                                <button type="button" class="btn btn-light border" onclick="togglePassword('password', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <small id="passwordError" class="error"><?php echo $passwordError; ?></small>
                         </div>
 
                         <!-- Confirm password -->
                         <div class="mb-3">
-                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                            <input type="password" name="cpassword" class="form-control"
-                                placeholder="Re-enter your password">
-                            <small id="cpasswordError"   class="error">  <?php echo $cpasswordError;   ?></small>
+                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>                           
+                            <div class="input-group">
+                                <input type="password" id="cpassword" name="cpassword" class="form-control"
+                                    placeholder="Re-enter your password">                                
+                                <button type="button" class="btn btn-light border" onclick="togglePassword('cpassword', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <small id="cpasswordError" class="error"><?php echo $cpasswordError; ?></small>
                         </div>
 
                         <!-- Gender -->
@@ -173,7 +184,7 @@
                     <hr>
                     <div class="text-center small">
                         Already have an account?
-                        <a href="/EduGuide-php/controllers/AuthController.php">Login here</a>
+                        <a href="/EduGuide-php/views/auth/login.php">Login here</a>
                     </div>
                     <div class="text-center small mt-2">
                         Are you a tutor?

@@ -11,6 +11,7 @@ if (!isset($nameError)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tutor Registration – EduGuide</title>
     <link rel="stylesheet" href="/EduGuide-php/assets/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/EduGuide-php/assets/css/formStyle.css">
     <style>
         .subject-box {
@@ -90,16 +91,28 @@ if (!isset($nameError)) {
                         <!-- Password -->
                         <div class="mb-3">
                             <label class="form-label">Password <span class="text-danger">*</span></label>
-                            <input type="password" name="password" class="form-control"
-                                placeholder="Min 8 chars, 1 upper, 1 lower, 1 number, 1 special">
+                            <div class="input-group">
+                                <input type="password" id="password" name="password" class="form-control"
+                                    placeholder="Min 8 chars, 1 upper, 1 lower, 1 number, 1 special">
+                                <button type="button" class="btn btn-light border"
+                                    onclick="togglePassword('password', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                             <small id="passwordError" class="error"><?php echo $passwordError; ?></small>
                         </div>
 
                         <!-- Confirm password -->
                         <div class="mb-3">
                             <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                            <input type="password" name="confirm_password" class="form-control"
-                                placeholder="Re-enter your password">
+                            <div class="input-group">
+                                <input type="password" id="cpassword" name="cpassword" class="form-control"
+                                    placeholder="Re-enter your password">
+                                <button type="button" class="btn btn-light border"
+                                    onclick="togglePassword('cpassword', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                             <small id="cpasswordError" class="error"><?php echo $cpasswordError; ?></small>
                         </div>
 
@@ -229,6 +242,6 @@ document.querySelectorAll('.subject-checkbox').forEach(cb => {
 });
 </script>
 <script src="/EduGuide-php/assets/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/EduGuide-php/assets/js/tutorValidation.js"></script>
+<script src="/EduGuide-php/assets/js/validation.js"></script>
 </body>
 </html>

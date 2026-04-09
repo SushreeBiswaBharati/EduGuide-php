@@ -26,7 +26,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $gender = $_POST['gender'];
     $email = trim($_POST['email']);
     $password = $_POST['password'];
-    $cpassword = $_POST['confirm_password'];
+    $cpassword = $_POST['cpassword'];
     $qualification = trim($_POST['qualification']);
     $experience = trim($_POST['experience']);
     $subject_ids = $_POST['subject_ids'] ?? [];
