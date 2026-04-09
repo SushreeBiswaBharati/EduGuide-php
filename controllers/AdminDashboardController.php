@@ -3,195 +3,261 @@ require_once '../middleware/auth.php';
 requireRole('admin');
 require_once '../database/dbconnection.php';
 
-// ✅ define page FIRST
 $page = $_GET['page'] ?? 'dashboard';
 
-
-// =====================================================
-// 🔥 HANDLE ALL ACTIONS (AJAX)
-// =====================================================
+/* ==========================
+   HANDLE ACTIONS (AJAX)
+========================== */
 if (isset($_POST['action']) && isset($_POST['id'])) {
+
     $id = intval($_POST['id']);
 
-    // Tutor verify
     if ($_POST['action'] === 'verify') {
         $conn->query("UPDATE tutors SET is_verified = 1 WHERE id = $id");
         echo "success";
         exit;
     }
 
-    // Tutor reject
     if ($_POST['action'] === 'reject') {
         $conn->query("UPDATE tutors SET is_verified = 0 WHERE id = $id");
         echo "success";
         exit;
     }
 
-    // Resolve complaint
-    if ($_POST['action'] === 'resolve') {
-        $conn->query("UPDATE complaints SET status = 1 WHERE id = $id");
+    if ($_POST['action'] === 'delete_student') {
+
+        $stmt = $conn->prepare("SELECT user_id FROM students WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $data = $res->fetch_assoc();
+
+        if ($data) {
+            $user_id = $data['user_id'];
+
+            $conn->query("DELETE FROM students WHERE id = $id");
+            $conn->query("DELETE FROM users WHERE id = $user_id");
+
+            echo "success";
+            exit;
+        }
+
+        echo "not_found";
+        exit;
+    }
+
+    if ($_POST['action'] === 'delete_subject') {
+
+        $check = $conn->prepare("SELECT COUNT(*) as total FROM tutor_subjects WHERE subject_id = ?");
+        $check->bind_param("i", $id);
+        $check->execute();
+        $result = $check->get_result()->fetch_assoc();
+
+        if ($result['total'] > 0) {
+            echo "in_use";
+            exit;
+        }
+
+        $del = $conn->prepare("DELETE FROM subjects WHERE id = ?");
+        $del->bind_param("i", $id);
+        $del->execute();
+
         echo "success";
         exit;
     }
 
-    // Delete complaint
     if ($_POST['action'] === 'delete') {
         $conn->query("DELETE FROM complaints WHERE id = $id");
         echo "success";
         exit;
     }
 
-    // ✅ DELETE STUDENT (NEW)
-    if ($_POST['action'] === 'delete_student') {
-        $conn->query("DELETE FROM students WHERE id = $id");
+    if ($_POST['action'] === 'resolve') {
+        $conn->query("UPDATE complaints SET status = 1 WHERE id = $id");
         echo "success";
         exit;
     }
 
-    // ❌ IMPORTANT: STOP dropdown delete conflict
     if ($_POST['action'] === 'delete_dropdown') {
-        // handled below separately
+
+        $stmt = $conn->prepare("SELECT type, value FROM dropdowns WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $data = $stmt->get_result()->fetch_assoc();
+
+        if ($data) {
+
+            $type = $data['type'];
+            $value = $data['value'];
+
+            $del = $conn->prepare("DELETE FROM dropdowns WHERE id = ?");
+            $del->bind_param("i", $id);
+            $del->execute();
+
+            if ($type === 'subject') {
+                $conn->query("DELETE FROM subjects WHERE name = '$value'");
+            }
+
+            if ($type === 'class') {
+                $conn->query("DELETE FROM classes WHERE name = '$value'");
+            }
+
+            echo "success";
+            exit;
+        }
+
+        echo "not_found";
+        exit;
     }
 }
 
-
-// =====================================================
-// 🔥 DROPDOWN HANDLING (ADD / DELETE / FETCH)
-// =====================================================
-
-// ADD dropdown
+/* ==========================
+   ADD DROPDOWN
+========================== */
 if ($page === 'dropdown' && isset($_POST['type'], $_POST['value'])) {
-    $type  = $_POST['type'];
+
+    $type = $_POST['type'];
     $value = trim($_POST['value']);
 
     if (!empty($value)) {
+
         $stmt = $conn->prepare("INSERT INTO dropdowns (type, value) VALUES (?, ?)");
         $stmt->bind_param("ss", $type, $value);
         $stmt->execute();
+
+        if ($type === 'subject') {
+            $conn->query("INSERT IGNORE INTO subjects (name) VALUES ('$value')");
+        }
+
+        if ($type === 'class') {
+            $conn->query("INSERT IGNORE INTO classes (name) VALUES ('$value')");
+        }
     }
 
     header("Location: AdminDashboardController.php?page=dropdown");
     exit;
 }
 
-// DELETE dropdown
-if ($page === 'dropdown' && isset($_POST['action']) && $_POST['action'] === 'delete_dropdown') {
-    $id = intval($_POST['id']);
-    $conn->query("DELETE FROM dropdowns WHERE id = $id");
-    echo "success";
-    exit;
-}
-
-// FETCH dropdowns
+/* ==========================
+   DROPDOWNS
+========================== */
 if ($page === 'dropdown') {
     $dropdowns = $conn->query("SELECT * FROM dropdowns ORDER BY type ASC");
 }
 
+/* ==========================
+   SUBJECTS
+========================== */
+$subjects = $conn->query("
+    SELECT s.id, s.name,
+           COUNT(ts.tutor_id) AS tutor_count
+    FROM subjects s
+    LEFT JOIN tutor_subjects ts ON ts.subject_id = s.id
+    GROUP BY s.id
+    ORDER BY s.name ASC
+");
 
-// =====================================================
-// 📊 DASHBOARD COUNTS
-// =====================================================
+/* ==========================
+   COUNTS
+========================== */
 $totalTutors = $conn->query("SELECT COUNT(*) AS total FROM tutors")->fetch_assoc()['total'] ?? 0;
 $totalStudents = $conn->query("SELECT COUNT(*) AS total FROM students")->fetch_assoc()['total'] ?? 0;
 $totalBookings = $conn->query("SELECT COUNT(*) AS total FROM bookings")->fetch_assoc()['total'] ?? 0;
 $totalComplaints = $conn->query("SELECT COUNT(*) AS total FROM complaints")->fetch_assoc()['total'] ?? 0;
 
+/* ==========================
+   SAFE DEFAULTS (IMPORTANT FIX)
+========================== */
+$todayBookings = 0;
+$yesterdayBookings = 0;
+$bookingGrowth = 0;
 
-// =====================================================
-// 📢 COMPLAINTS SECTION
-// =====================================================
+$today = 0;
+$yesterday = 0;
+$growth = 0;
+
+$topTutors = $conn->query("
+    SELECT u.name, COUNT(b.id) AS total
+    FROM tutors t
+    JOIN users u ON u.id = t.user_id
+    LEFT JOIN bookings b ON b.tutor_id = t.id
+    GROUP BY t.id
+    ORDER BY total DESC
+    LIMIT 5
+");
+
+/* ==========================
+   BOOKING STATS
+========================== */
+$todayBookings = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM bookings
+    WHERE DATE(created_at) = CURDATE()
+")->fetch_assoc()['total'] ?? 0;
+
+$yesterdayBookings = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM bookings
+    WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+")->fetch_assoc()['total'] ?? 0;
+
+$bookingGrowth = ($yesterdayBookings > 0)
+    ? (($todayBookings - $yesterdayBookings) / $yesterdayBookings) * 100
+    : ($todayBookings > 0 ? 100 : 0);
+
+/* ==========================
+   TUTOR REGISTRATION STATS
+========================== */
+$today = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM tutors
+    WHERE DATE(created_at) = CURDATE()
+")->fetch_assoc()['total'] ?? 0;
+
+$yesterday = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM tutors
+    WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+")->fetch_assoc()['total'] ?? 0;
+
+$growth = ($yesterday > 0)
+    ? (($today - $yesterday) / $yesterday) * 100
+    : ($today > 0 ? 100 : 0);
+
+/* ==========================
+   OTHER PAGES
+========================== */
 if ($page === 'complaint') {
-    $complaints = $conn->query("
-        SELECT * FROM complaints 
-        ORDER BY created_at DESC
-    ");
+    $complaints = $conn->query("SELECT * FROM complaints ORDER BY created_at DESC");
 }
 
-
-// =====================================================
-// 👨‍🎓 MANAGE STUDENTS (NEW)
-// =====================================================
 if ($page === 'manage_student') {
     $students = $conn->query("
         SELECT s.id, u.name, u.email
         FROM students s
-        JOIN users u ON u.id = s.user_id 
-        ORDER BY id DESC
+        JOIN users u ON u.id = s.user_id
     ");
 }
-
-
-// =====================================================
-// 📅 BOOKINGS SECTION (NEW)
-// =====================================================
-$bookings = null; 
 
 if ($page === 'booking') {
     $bookings = $conn->query("
         SELECT b.*, u.name AS student_name
         FROM bookings b
         JOIN users u ON u.id = b.student_id
-        ORDER BY b.created_at DESC
     ");
 }
 
-
-// =====================================================
-// 📈 BOOKINGS PROGRESS
-// =====================================================
-$todayBookings = $conn->query("
-    SELECT COUNT(*) AS t FROM bookings 
-    WHERE DATE(created_at) = CURDATE()
-")->fetch_assoc()['t'];
-
-$yesterdayBookings = $conn->query("
-    SELECT COUNT(*) AS t FROM bookings 
-    WHERE DATE(created_at) = CURDATE() - INTERVAL 1 DAY
-")->fetch_assoc()['t'];
-
-$bookingGrowth = 0;
-if ($yesterdayBookings > 0) {
-    $bookingGrowth = round((($todayBookings - $yesterdayBookings) / $yesterdayBookings) * 100);
-}
-
-
-// =====================================================
-// 📈 TUTOR GROWTH
-// =====================================================
-$today = $conn->query("
-    SELECT COUNT(*) AS t FROM tutors 
-    WHERE DATE(created_at) = CURDATE()
-")->fetch_assoc()['t'];
-
-$yesterday = $conn->query("
-    SELECT COUNT(*) AS t FROM tutors 
-    WHERE DATE(created_at) = CURDATE() - INTERVAL 1 DAY
-")->fetch_assoc()['t'];
-
-$growth = 0;
-if ($yesterday > 0) {
-    $growth = round((($today - $yesterday) / $yesterday) * 100);
-}
-
-
-// =====================================================
-// 🔍 TUTOR FILTER + SEARCH + SORT
-// =====================================================
+/* ==========================
+   TUTORS LIST
+========================== */
 $search = $_GET['search'] ?? '';
 $status = $_GET['status'] ?? '';
 $sort   = $_GET['sort'] ?? '';
 
 $sql = "
 SELECT 
-    t.id, 
-    u.name, 
-    u.email, 
-    t.phone,
-    t.address,
-    t.experience,
-    t.rating,
-    t.is_verified,
-    u.profile_image,
+    t.id, u.name, u.email, t.phone, t.address,
+    t.experience, t.rating, t.is_verified,
     GROUP_CONCAT(s.name SEPARATOR ', ') AS subjects
 FROM tutors t
 JOIN users u ON u.id = t.user_id
@@ -201,9 +267,8 @@ WHERE 1
 ";
 
 $params = [];
-$types  = "";
+$types = "";
 
-// Search
 if ($search !== '') {
     $sql .= " AND (u.name LIKE ? OR s.name LIKE ?)";
     $term = "%$search%";
@@ -212,7 +277,6 @@ if ($search !== '') {
     $types .= "ss";
 }
 
-// Status filter
 if ($status !== '') {
     $sql .= " AND t.is_verified = ?";
     $params[] = (int)$status;
@@ -221,14 +285,12 @@ if ($status !== '') {
 
 $sql .= " GROUP BY t.id";
 
-// Sorting
 if ($sort === 'rating') {
     $sql .= " ORDER BY t.rating DESC";
 } elseif ($sort === 'exp') {
     $sql .= " ORDER BY t.experience DESC";
 }
 
-// Execute
 $stmt = $conn->prepare($sql);
 
 if (!empty($params)) {
@@ -239,9 +301,8 @@ $stmt->execute();
 $tutors = $stmt->get_result();
 $stmt->close();
 
-
-// =====================================================
-// 📄 LOAD VIEW
-// =====================================================
+/* ==========================
+   LOAD VIEW
+========================== */
 require_once '../views/admin/adminDashboard.php';
 ?>

@@ -357,9 +357,9 @@
     <form method="POST" action="AdminDashboardController.php?page=dropdown" class="row g-2 mb-3">
         <div class="col-md-4">
             <select name="type" class="form-control">
+                <option value="type">Type</option>
                 <option value="subject">Subject</option>
                 <option value="class">Class</option>
-                <option value="city">City</option>
             </select>
         </div>
         <div class="col-md-6">
@@ -400,6 +400,49 @@
                 <?php endif; ?>
             </tbody>
         </table>
+        <!-- ✅ ADD THIS HERE (IMPORTANT POSITION) -->
+        <div class="card p-3 mb-3">
+            <h5 class="fw-bold text-primary">Manage Subjects</h5>
+
+            <table class="table table-hover mt-2">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Subject</th>
+                        <th>Used By Tutors</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <?php if ($subjects->num_rows > 0): ?>
+                        <?php while ($s = $subjects->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($s['name']); ?></td>
+
+                                <td>
+                                    <span class="badge bg-info">
+                                        <?php echo $s['tutor_count']; ?>
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <button class="btn btn-danger btn-sm"
+                                        onclick="deleteStudent(<?php echo $s['id']; ?>)">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">
+                                No subjects found
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
 
         <?php elseif ($page === 'complaint'): ?>
             <h5 class="fw-bold text-primary mb-3">Check Complaints</h5>
@@ -614,37 +657,47 @@ function deleteComplaint(id) {
         }
     });
 }
-function deleteStudent(id) {
-    if (!confirm("Delete this student?")) return;
+    function deleteStudent(id) {
+        if (!confirm("Are you sure you want to delete this student?")) return;
 
-    fetch("/EduGuide-php/controllers/AdminDashboardController.php?page=manage_student", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=delete_student&id=" + id
-    })
-    .then(res => res.text())
-    .then(data => {
-        if (data.trim() === "success") {
-            alert("Student deleted");
-            location.reload();
-        }
-    });
-}
+        fetch("/EduGuide-php/controllers/AdminDashboardController.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "action=delete_student&id=" + id
+        })
+        .then(res => res.text())
+        .then(data => {
+            console.log("Delete response:", data);
 
-function deleteDropdown(id) {
-    fetch("/EduGuide-php/controllers/AdminDashboardController.php?page=dropdown", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=delete_dropdown&id=" + id
-    })
-    .then(res => res.text())
-    .then(data => {
-        if (data.trim() === "success") {
-            alert("Deleted");
-            location.reload();
-        }
-    });
-}
+            if (data.trim() === "success") {
+                alert("Student deleted successfully");
+                location.reload();
+            } else {
+                alert("Delete failed: " + data);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Server error");
+        });
+    }
+
+    function deleteDropdown(id) {
+        fetch("/EduGuide-php/controllers/AdminDashboardController.php?page=dropdown", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "action=delete_dropdown&id=" + id
+        })
+        .then(res => res.text())
+        .then(data => {
+            if (data.trim() === "success") {
+                alert("Deleted");
+                location.reload();
+            }
+        });
+    }
 </script>
-        </body>
-        </html>
+</body>
+</html>
