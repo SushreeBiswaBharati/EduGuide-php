@@ -103,6 +103,30 @@
                     </div>
                 </div>
 
+<<<<<<< HEAD
+=======
+                <!-- Top Tutors Table -->
+                <div class="card p-3 mb-4">
+                    <h6>Top Tutors</h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Bookings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while($t = $topTutors->fetch_assoc()): ?>
+                                <tr>
+                                    <td><?php echo $t['name']; ?></td>
+                                    <td><?php echo $t['total']; ?></td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+>>>>>>> 1e6023ad6511607255b4ac3a2d01971df3bc67ad
                 <?php elseif ($page === 'profile'): ?>
                     <!-- Profile -->
                     <h5 class="fw-bold text-primary mb-4">👤 My Profile</h5>
@@ -326,9 +350,16 @@
                 <!-- TABLE -->
                 <div class="d-flex justidy-content-center">
                     <div class="table-responsive w-100">
+<<<<<<< HEAD
                         <table class="table table-bordered table-hover bg-white shadow-sm">
                             <thead class="table-primary">
                                 <tr>
+=======
+                        <table class="table table-bordered table-hover bg-white shadow-sm text-center">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Photo</th>
+>>>>>>> 1e6023ad6511607255b4ac3a2d01971df3bc67ad
                                     <th>Name</th>
                                     <th>Subject</th>
                                     <th>Board</th>
@@ -343,6 +374,16 @@
                                 <?php if ($tutors->num_rows > 0): ?>
                                     <?php while($t = $tutors->fetch_assoc()): ?>
                                         <tr>
+<<<<<<< HEAD
+=======
+                                            <td>
+                                                <?php 
+                                                    $img = !empty($t['profile_image']) ? "/EduGuide-php/assets/profile/" . $t['profile_image'] : "/EduGuide-php/assets/default.png";
+                                                ?>
+                                                <img src="<?php echo $img; ?>" class="rounded-circle" width="70" height="70"
+                                                style="object-fit:cover;" alt="profie image">
+                                            </td>
+>>>>>>> 1e6023ad6511607255b4ac3a2d01971df3bc67ad
                                             <td><?php echo htmlspecialchars($t['name']); ?></td>
                                             <td><?php echo $t['subject_names']; ?></td>
                                             <td><?php echo $t['board_name']; ?></td>

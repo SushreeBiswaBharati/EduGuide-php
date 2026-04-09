@@ -288,6 +288,7 @@
         <?php elseif ($page === 'manage_student'): ?>
             <h5 class="fw-bold text-primary mb-3">Manage Students</h5>
 
+<<<<<<< HEAD
             <table class="table table-hover">
                 <thead class="table-dark">
                     <tr>
@@ -443,6 +444,13 @@
                 </tbody>
             </table>
         </div>
+=======
+        <?php elseif ($page === 'booking'): ?>
+            <h5 class="fw-bold text-primary mb-3">Booking Details</h5>
+
+        <?php elseif ($page === 'dropdown'): ?>
+            <h5 class="fw-bold text-primary mb-3">Manage Dropdowns</h5>
+>>>>>>> 1e6023ad6511607255b4ac3a2d01971df3bc67ad
 
         <?php elseif ($page === 'complaint'): ?>
             <h5 class="fw-bold text-primary mb-3">Check Complaints</h5>
@@ -657,6 +665,7 @@ function deleteComplaint(id) {
         }
     });
 }
+<<<<<<< HEAD
     function deleteStudent(id) {
         if (!confirm("Are you sure you want to delete this student?")) return;
 
@@ -701,3 +710,8 @@ function deleteComplaint(id) {
 </script>
 </body>
 </html>
+=======
+</script>
+        </body>
+        </html>
+>>>>>>> 1e6023ad6511607255b4ac3a2d01971df3bc67ad
