@@ -21,11 +21,7 @@ $stmt->execute();
 $student = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-<<<<<<< HEAD
 // Get student_id from students table
-=======
-// Get student_id
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
 $sid_stmt = $conn->prepare("SELECT id FROM students WHERE user_id = ?");
 $sid_stmt->bind_param("i", $_SESSION['user_id']);
 $sid_stmt->execute();
@@ -33,11 +29,7 @@ $sid_row    = $sid_stmt->get_result()->fetch_assoc();
 $sid_stmt->close();
 $student_id = $sid_row['id'] ?? 0;
 
-<<<<<<< HEAD
 // Booking counts for dashboard cards
-=======
-// Booking counts
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
 $totalBookings     = 0;
 $confirmedBookings = 0;
 $pendingBookings   = 0;
@@ -49,7 +41,6 @@ $count_stmt->execute();
 $count_result = $count_stmt->get_result();
 while ($row = $count_result->fetch_assoc()) {
     $totalBookings += $row['cnt'];
-<<<<<<< HEAD
     if ($row['status'] === 'Confirmed') $confirmedBookings = $row['cnt'];
     if ($row['status'] === 'Pending')   $pendingBookings   = $row['cnt'];
     if ($row['status'] === 'Completed') $completedBookings = $row['cnt'];
@@ -64,22 +55,6 @@ $bookings_stmt = $conn->prepare("
     FROM bookings bk
     JOIN tutors   t   ON t.id = bk.tutor_id
     JOIN users    u   ON u.id = t.user_id
-=======
-    if (strtolower($row['status']) === 'confirmed')  $confirmedBookings  = $row['cnt'];
-    if (strtolower($row['status']) === 'pending')    $pendingBookings    = $row['cnt'];
-    if (strtolower($row['status']) === 'completed')  $completedBookings  = $row['cnt'];
-}
-$count_stmt->close();
-
-// Booking history
-$bookings_stmt = $conn->prepare("
-    SELECT bk.id, bk.status, bk.created_at,
-           u.name   AS tutor_name,
-           sub.name AS subject_name
-    FROM bookings bk
-    JOIN tutors   t   ON t.id  = bk.tutor_id
-    JOIN users    u   ON u.id  = t.user_id
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
     LEFT JOIN subjects sub ON sub.id = bk.subject_id
     WHERE bk.student_id = ?
     ORDER BY bk.created_at DESC
@@ -89,7 +64,6 @@ $bookings_stmt->execute();
 $bookings = $bookings_stmt->get_result();
 $bookings_stmt->close();
 
-<<<<<<< HEAD
 // ============================================================
 //  BOOK TUTOR
 // ============================================================
@@ -199,18 +173,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject']))
     if ($cSubject !== '' && $cMessage !== '') {
         $cstmt = $conn->prepare("INSERT INTO complaints (user_id, subject, message) VALUES (?, ?, ?)");
         $cstmt->bind_param("iss", $_SESSION['user_id'], $cSubject, $cMessage);
-=======
-
-// complaint submission
-$complaintSuccess = "";
-$complaintError   = "";
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject'])) {
-    $subject = trim($_POST['complaint_subject']);
-    $message = trim($_POST['complaint_message']);
-    if ($subject !== '' && $message !== '') {
-        $cstmt = $conn->prepare("INSERT INTO complaints (user_id, subject, message) VALUES (?, ?, ?)");
-        $cstmt->bind_param("iss", $_SESSION['user_id'], $subject, $message);
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
         $cstmt->execute();
         $cstmt->close();
         $complaintSuccess = "Your complaint has been submitted successfully!";
@@ -219,7 +181,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject']))
     }
 }
 
-<<<<<<< HEAD
 // ============================================================
 //  EDIT PROFILE
 // ============================================================
@@ -246,62 +207,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_class'])) {
     } elseif (!preg_match('/^[6-9][0-9]{9}$/', $phone)) {
         $profileError = "Please enter a valid 10-digit phone number.";
     } elseif ($address === '') {
-=======
-$classes = $conn->query("SELECT id, name FROM classes");
-$boards  = $conn->query("SELECT id, name FROM boards");
-$exams   = $conn->query("SELECT id, name FROM exams");
-
-// Edit profile
-$profileSuccess = "";
-$profileError   = "";
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    $class_id = $_POST['edit_class'] ?? '';
-    $board_id = $_POST['edit_board'] ?? '';
-    $exam_id  = $_POST['edit_exam'] ?? '';
-    $school   = trim($_POST['edit_school'] ?? '');
-    $phone    = trim($_POST['edit_phone'] ?? '');
-    $address  = trim($_POST['edit_address'] ?? '');
-
-    if ($class_id === "") {
-        $profileError = "Class cannot be empty.";
-    } elseif ($board_id === "") {
-        $profileError = "Board cannot be empty.";
-    } elseif ($exam_id === "") {
-        $profileError = "Exam cannot be empty.";
-    } elseif ($school === "") {
-        $profileError = "School cannot be empty.";
-    } elseif ($phone === "") {
-        $profileError = "Phone number cannot be empty.";
-    } elseif (!preg_match('/^[6-9][0-9]{9}$/', $phone)) {
-        $profileError = "Invalid phone number.";
-    } elseif ($address === "") {
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
         $profileError = "Address cannot be empty.";
     } else {
 
         if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
-<<<<<<< HEAD
             $fileName = $_FILES['profile_image']['name'];
             $tmpName  = $_FILES['profile_image']['tmp_name'];
             $ext      = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
             if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
                 $newFileName = "user_" . $_SESSION['user_id'] . "_" . time() . "." . $ext;
                 $uploadPath  = __DIR__ . "/../assets/profile/" . $newFileName;
-=======
-
-            $fileName = $_FILES['profile_image']['name'];
-            $tmpName  = $_FILES['profile_image']['tmp_name'];
-
-            $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            $allowed = ['jpg', 'jpeg', 'png'];
-
-            if (in_array($ext, $allowed)) {
-                $newFileName = "user_" . $_SESSION['user_id'] . "_" . time() . "." . $ext;
-                $uploadPath  = __DIR__ . "/../assets/profile/" . $newFileName;
-
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                 if (move_uploaded_file($tmpName, $uploadPath)) {
                     $stmtImg = $conn->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
                     $stmtImg->bind_param("si", $newFileName, $_SESSION['user_id']);
@@ -310,7 +225,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
-<<<<<<< HEAD
 
         $stmt = $conn->prepare("
             UPDATE students
@@ -319,36 +233,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             WHERE user_id = ?
         ");
         $stmt->bind_param("iiisssi", $class_id, $board_id, $exam_id, $school, $phone, $address, $_SESSION['user_id']);
-=======
-        $stmt = $conn->prepare("
-            UPDATE students 
-            SET class_id = ?, board_id = ?, exam_id = ?, 
-                school_name = ?, parent_phone = ?, address = ?
-            WHERE user_id = ?
-        ");
-
-        $stmt->bind_param(
-            "iiisssi", $class_id, $board_id, $exam_id, $school, $phone, $address, $_SESSION['user_id']
-        );
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
 
         if ($stmt->execute()) {
             $profileSuccess = "Profile updated successfully!";
         } else {
-<<<<<<< HEAD
             $profileError = "Update failed. Please try again.";
         }
         $stmt->close();
 
         // Refresh student data after update
-=======
-            $profileError = "Update failed.";
-        }
-
-        $stmt->close();
-
-        // Refresh data
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
         $stmt2 = $conn->prepare("
             SELECT u.name, u.email, u.created_at, u.profile_image,
                    s.gender, s.school_name, s.parent_name, s.parent_phone, s.address,
@@ -360,10 +253,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             LEFT JOIN exams   e ON e.id = s.exam_id
             WHERE u.id = ?
         ");
-<<<<<<< HEAD
-=======
-
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
         $stmt2->bind_param("i", $_SESSION['user_id']);
         $stmt2->execute();
         $student = $stmt2->get_result()->fetch_assoc();
@@ -371,7 +260,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-<<<<<<< HEAD
 // Dropdowns for profile edit
 $classes = $conn->query("SELECT id, name FROM classes WHERE is_active = 1 ORDER BY id ASC");
 $boards  = $conn->query("SELECT id, name FROM boards  WHERE is_active = 1 ORDER BY name ASC");
@@ -397,31 +285,10 @@ $sql = "
     LEFT JOIN subjects sub ON sub.id = ts.subject_id
     LEFT JOIN boards b ON b.id = t.board_id
     WHERE t.is_verified = 1
-=======
-// Browse tutors
-$subjects = $conn->query("SELECT id, name FROM subjects");
-$browseBoards = $conn->query("SELECT id, name FROM boards");
-
-$search = $_GET['search'] ?? '';
-$gender = $_GET['gender'] ?? '';
-$sort   = $_GET['sort'] ?? '';
-
-$sql = "
-SELECT t.id,u.profile_image, u.name, t.gender, t.experience,
-       GROUP_CONCAT(sub.name SEPARATOR ', ') AS subject_names,
-       b.name AS board_name
-FROM tutors t
-JOIN users u ON u.id = t.user_id
-LEFT JOIN tutor_subjects ts ON ts.tutor_id = t.id
-LEFT JOIN subjects sub ON sub.id = ts.subject_id
-LEFT JOIN boards b ON b.id = t.board_id
-WHERE t.is_verified = 1
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
 ";
 $params = [];
 $types  = "";
 
-<<<<<<< HEAD
 if ($search !== '') {
     $sql .= " AND (u.name LIKE ? OR sub.name LIKE ? OR b.name LIKE ? OR t.address LIKE ?)";
     $term     = "%{$search}%";
@@ -446,48 +313,10 @@ $stmt = $conn->prepare($sql);
 if (!empty($params)) {
     $stmt->bind_param($types, ...$params);
 }
-=======
-// SEARCH
-if ($search !== '') {
-    $sql .= " AND (u.name LIKE ? OR sub.name LIKE ? OR b.name LIKE ? OR t.address LIKE ?)";
-    $searchTerm = "%$search%";
-    $params[] = $searchTerm;
-    $params[] = $searchTerm;
-    $params[] = $searchTerm;
-    $params[] = $searchTerm;
-    $types .= "ssss";
-}
-
-
-// FILTER GENDER
-if ($gender !== '') {
-    $sql .= " AND t.gender = ? AND t.is_verified = 1";
-    $params[] = $gender;
-    $types .= "s";
-}
-$sql .= " GROUP BY t.id";
-// SORTING
-if ($sort === 'asc') {
-    $sql .= " ORDER BY u.name ASC";
-} elseif ($sort === 'desc') {
-    $sql .= " ORDER BY u.name DESC";
-} elseif ($sort === 'exp') {
-    $sql .= " ORDER BY t.experience DESC";
-} 
-
-// EXECUTE
-$stmt = $conn->prepare($sql);
-
-if (!empty($params)) {
-    $stmt->bind_param($types, ...$params);
-}
-
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
 $stmt->execute();
 $tutors = $stmt->get_result();
 $stmt->close();
 
-<<<<<<< HEAD
 // ============================================================
 //  TOP TUTORS (dashboard widget)
 // ============================================================
@@ -506,9 +335,6 @@ $topTutors = $conn->query("
 $modalSubjects = $conn->query("SELECT id, name FROM subjects WHERE is_active = 1 ORDER BY name ASC");
 
 // Misc vars
-=======
-// created_at
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
 $registeredDate = isset($student['created_at'])
     ? date('F j, Y', strtotime($student['created_at']))
     : 'N/A';

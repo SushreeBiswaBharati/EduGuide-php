@@ -28,11 +28,7 @@
         <nav class="flex-grow-1 px-3 py-3 d-flex flex-column gap-2 fw-semibold">
 
             <a href="?page=dashboard" class="nav-link active">
-<<<<<<< HEAD
                 <small>🏡</small> <span>Home</span>
-=======
-                <small>🏡</small> <span>Dashboard</span>
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
             </a>
 
             <a href="?page=profile" class="nav-link">
@@ -81,44 +77,28 @@
             <!--  -->
             <div class="row g-3 mb-4">
                 <div class="col-md-3 col-6">
-<<<<<<< HEAD
                     <div class="cards text-center px-2 py-3">
-=======
-                    <div class="cards card1 text-center px-2 py-3">
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                         <div class="fw-semibold">Total Requests</div>
                         <div class="fw-bold fs-4"><?php echo $totalRequests; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-<<<<<<< HEAD
                     <div class="cards text-center px-2 py-3">
-=======
-                    <div class="cards card2 text-center px-2 py-3">
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                         <div class="fw-semibold">Confirmed Requests</div>
                         <div class="fw-bold fs-4"><?php echo $confirmedCount; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-<<<<<<< HEAD
                     <div class="cards text-center px-2 py-3">
-=======
-                    <div class="cards card3 text-center px-2 py-3">
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                         <div class="fw-semibold">Pending Requests</div>
                         <div class="fw-bold fs-4"><?php echo $pendingCount; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-<<<<<<< HEAD
                     <div class="cards text-center px-2 py-3">
-=======
-                    <div class="cards card4 text-center px-2 py-3">
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                         <div class="fw-semibold">Completed Session</div>
                         <div class="fw-bold fs-4"><?php echo $completedCount; ?></div>
                     </div>
@@ -264,7 +244,6 @@
                 </div>
 
                 <?php elseif ($page === 'requests'): ?>
-<<<<<<< HEAD
                     <h5 class="fw-bold text-primary mb-4">📋 Booking Requests</h5>
 
                     <?php if ($requests->num_rows === 0): ?>
@@ -330,9 +309,6 @@
                             </table>
                         </div>
                     <?php endif; ?>
-=======
-                    <h5>My Bookings Requests</h5>
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                 
                 <?php elseif ($page === 'schedules'): ?>
 
