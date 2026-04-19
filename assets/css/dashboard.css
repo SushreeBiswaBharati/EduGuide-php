@@ -79,40 +79,15 @@ body {
     background: linear-gradient(180deg, #5c8fdc, #0b48a4);
 }
 
-<<<<<<< HEAD
 .cards {
     border: 2px solid rgb(6, 8, 73);
     border-radius: 10px;
     overflow-x: hidden;
     box-shadow: 0 4px 10px rgba(22, 6, 93, 0.2);
-=======
-.cards{
-    border-radius: 10px;
-    overflow-x: hidden;
-}
-
-.card1{
-    background: linear-gradient(8deg,rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233, 1) 100%);
-}
-
-.card2{
-    background: radial-gradient(circle,rgba(174, 229, 238, 1) 0%, rgba(148, 165, 233, 1) 100%);
-
-}
-
-.card3{
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
     background: linear-gradient(351deg,rgba(219, 174, 238, 1) 0%, rgba(148, 233, 213, 1) 100%);
 
 }
 
-<<<<<<< HEAD
-=======
-.card4{
-    background: linear-gradient(217deg,rgba(169, 190, 232, 1) 0%, rgba(158, 124, 191, 1) 100%);
-}
-
->>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
 .panel{
     display: none;
 }
