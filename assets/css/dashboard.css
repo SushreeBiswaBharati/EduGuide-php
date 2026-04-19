@@ -1,0 +1,133 @@
+body {
+    background: linear-gradient(135deg, #e0f0ff 0%, #6ab4f5 100% )!important;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+}
+.sidebar{
+    width: 300px;
+    background: linear-gradient(100deg, #5c8fdc, #0b48a4);
+    color: white;
+    transition: width 0.3s ease;
+
+}
+
+.sidebar small{
+    font-size: larger;
+    
+}
+.sidebar .nav-link {
+    font-size: larger;
+    border-radius: 8px;
+    padding: 8px 10px;
+    white-space: nowrap;
+    display: flex;          
+    align-items: center;   
+    gap: 8px;               
+}
+
+.sidebar .nav-link:hover{
+    background: rgba(255,255,255,0.18);
+    color: white;
+}
+
+.sidebar.collapsed .nav-link {
+    justify-content: center;  
+    padding: 8px 0;
+}
+
+.sidebar.collapsed .px-3 {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
+/* Hamburge Menu */
+.hamburger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 15px;
+    border-radius: 6px;
+    line-height: 1;
+}
+
+.hamburger-btn:hover {
+    background: rgba(255,255,255,0.18);
+}
+
+/* This forces the SVG icon to appear white */
+.hamburger-btn img {
+    width: 32px;
+    filter: brightness(0) invert(1);
+}
+
+.logout{
+    color: white;
+    background-color: #08244f;
+    white-space: nowrap;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.main-content {
+    background: linear-gradient(120deg, white,rgb(133, 210, 241));
+    overflow-y: auto;
+}
+.greet-bar{
+    background: linear-gradient(180deg, #5c8fdc, #0b48a4);
+}
+
+.cards {
+    border: 2px solid rgb(6, 8, 73);
+    border-radius: 10px;
+    overflow-x: hidden;
+    box-shadow: 0 4px 10px rgba(22, 6, 93, 0.2);
+    background: linear-gradient(351deg,rgba(219, 174, 238, 1) 0%, rgba(148, 233, 213, 1) 100%);
+
+}
+
+.panel{
+    display: none;
+}
+.panel.active{
+    display: block;
+}
+#edit-form{
+    display: none;
+}
+
+.profile-img-wrapper {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 3px solid #ddd;
+}
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+@media (min-width: 768px) {
+    .profile-img-wrapper {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .profile-img-wrapper {
+        width: 170px;
+        height: 170px;
+    }
+}
+
+.table td {
+    padding: 10px !important;
+}
