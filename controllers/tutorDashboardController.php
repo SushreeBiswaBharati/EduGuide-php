@@ -57,7 +57,10 @@ $count_stmt->close();
 // All booking requests
 $req_stmt = $conn->prepare("
     SELECT bk.id, bk.status, bk.created_at,
+<<<<<<< HEAD
            bk.requirement, bk.duration_months,
+=======
+>>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
            u.name   AS student_name,
            sub.name AS subject_name
     FROM bookings bk

@@ -26,7 +26,11 @@
             <nav class="flex-grow-1 px-3 py-3 d-flex flex-column gap-2 fw-semibold">
 
                 <a href="?page=dashboard" class="nav-link active">
+<<<<<<< HEAD
                     <small>🏡</small> <span>Home</span>
+=======
+                    <small>🏡</small> <span>Dashboard</span>
+>>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                 </a>
 
                 <a href="?page=profile" class="nav-link">
@@ -75,28 +79,44 @@
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-3 col-6">
+<<<<<<< HEAD
                         <div class="cards text-center px-2 py-3 ">
+=======
+                        <div class="cards card1 text-center px-2 py-3 ">
+>>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                             <div class="fw-semibold">Total Bookings</div>
                             <div class="fw-bold fs-4"><?php echo $totalBookings; ?></div>
                         </div>
                     </div>
 
                     <div class="col-md-3 col-6">
+<<<<<<< HEAD
                         <div class="cards text-center px-2 py-3 ">
+=======
+                        <div class="cards card2 text-center px-2 py-3 ">
+>>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                             <div class="fw-semibold">Confirmed</div>
                             <div class="fw-bold fs-4"><?php echo $confirmedBookings; ?></div>
                         </div>
                     </div>
 
                     <div class="col-md-3 col-6">
+<<<<<<< HEAD
                         <div class="cards text-center px-2 py-3 ">
+=======
+                        <div class="cards card3 text-center px-2 py-3 ">
+>>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                             <div class="fw-semibold">Pending</div>
                             <div class="fw-bold fs-4"><?php echo $pendingBookings; ?></div>
                         </div>
                     </div>
 
                     <div class="col-md-3 col-6">
+<<<<<<< HEAD
                         <div class="cards text-center px-2 py-3 ">
+=======
+                        <div class="cards card4 text-center px-2 py-3 ">
+>>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                             <div class="fw-semibold">Completed</div>
                             <div class="fw-bold fs-4"><?php echo $completedBookings; ?></div>
                         </div>
@@ -279,6 +299,7 @@
                 <?php elseif ($page === 'browse'): ?>
                 <h5 class="fw-bold text-primary mb-3">Browse Tutors</h5>
 
+<<<<<<< HEAD
                 <?php if ($bookingSuccess): ?>
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         ✅ <?php echo $bookingSuccess; ?>
@@ -286,6 +307,8 @@
                     </div>
                 <?php endif; ?>
 
+=======
+>>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                 <form method="GET" class="mb-4">
                     <input type="hidden" name="page" value="browse">
 
@@ -387,10 +410,14 @@
                                             <td><?php echo $t['gender']; ?></td>
                                             <td><?php echo $t['rating']; ?> ⭐</td>
                                             <td>
+<<<<<<< HEAD
                                                 <button class="btn btn-primary btn-sm"
                                                     onclick="openBookingModal(<?php echo $t['id']; ?>, '<?php echo addslashes(htmlspecialchars($t['name'])); ?>')">
                                                     Book Now
                                                 </button>
+=======
+                                                <button class="btn btn-primary btn-sm" onclick="openBookingModal(<?php echo $t['id']; ?>)">Book Now</button>
+>>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
@@ -421,6 +448,7 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <!-- Booking Modal -->
     <div id="bookingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:1050; overflow-y:auto;">
         <div style="background:#fff; width:480px; max-width:95%; margin:60px auto; padding:28px 32px; border-radius:14px; box-shadow:0 8px 32px rgba(0,0,0,0.18);">
@@ -471,6 +499,33 @@
                         ✉️ Send Request
                     </button>
                 </div>
+=======
+    <!-- Booking modal -->
+    <div id="bookingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+        
+        <div style="background:#fff; width:400px; margin:100px auto; padding:20px; border-radius:10px;">
+            
+            <h5 class="text-center fw-bold mb-3">Book Tutor</h5>
+
+            <form method="POST">
+
+                <input type="hidden" name="tutor_id" id="tutor_id">
+
+                <label>Requirement</label>
+                <textarea name="requirement" class="form-control mb-2" required></textarea>
+
+                <label>Duration (Months)</label>
+                <input type="number" name="duration" class="form-control mb-2" required>
+
+                <button type="submit" name="book_tutor" class="btn btn-success w-100">
+                    Send Request
+                </button>
+
+                <button type="button" class="btn btn-secondary w-100 mt-2" onclick="closeBookingModal()">
+                    Cancel
+                </button>
+
+>>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
             </form>
         </div>
     </div>
@@ -525,6 +580,7 @@
         };
 
      
+<<<<<<< HEAD
         function openBookingModal(tutorId, tutorName) {
             document.getElementById('bookingModal').style.display = 'block';
             document.getElementById('tutor_id').value = tutorId;
@@ -546,6 +602,16 @@
                 <?php endif; ?>
             });
         <?php endif; ?>
+=======
+        function openBookingModal(tutorId){
+            document.getElementById('bookingModal').style.display = 'block';
+            document.getElementById('tutor_id').value = tutorId;
+        }
+
+        function closeBookingModal(){
+            document.getElementById('bookingModal').style.display = 'none';
+        }
+>>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
     </script>
 </body>
 </html>

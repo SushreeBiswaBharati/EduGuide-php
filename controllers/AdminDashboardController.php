@@ -191,9 +191,24 @@ $search = $_GET['search'] ?? '';
 $sort   = $_GET['sort'] ?? '';
 
 $query = "
+<<<<<<< HEAD
     SELECT  t.id, u.name, u.email, u.profile_image,
         t.phone, t.address, t.experience, t.gender, t.is_verified,
         t.created_at, GROUP_CONCAT(s.name SEPARATOR ', ') AS subjects
+=======
+    SELECT 
+        t.id,
+        u.name,
+        u.email,
+        u.profile_image,
+        t.phone,
+        t.address,
+        t.experience,
+        t.gender,
+        t.is_verified,
+        t.created_at,
+        GROUP_CONCAT(s.name SEPARATOR ', ') AS subjects
+>>>>>>> 2cbfdbf27a69848fd91a8c3b75067845067a4540
     FROM tutors t
     JOIN users u ON t.user_id = u.id
     LEFT JOIN tutor_subjects ts ON ts.tutor_id = t.id
