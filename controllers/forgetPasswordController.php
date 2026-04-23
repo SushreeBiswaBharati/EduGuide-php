@@ -79,9 +79,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['step']) && $_POST['ste
     }
 }
  
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_SESSION['reset_user_id'])) {
-    $step = 2;
+if($_SERVER['REQUEST_METHOD'] === 'GET'){
+    unset($_SESSION['reset_user_id']);
+    unset($_SESSION['reset_email']);
+    $step = 1;
 }
- 
+
 require_once '../views/auth/forgetPassword.php';
 ?>

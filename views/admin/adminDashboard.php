@@ -74,28 +74,28 @@
             <!-- Dashboard Cards -->
             <div class="row g-3 mb-4">
                 <div class="col-md-3 col-6">
-                    <div class="cards text-center px-2 py-3">
+                    <div class="cards card1 text-center px-2 py-3">
                         <div class="fw-semibold">Total Tutors</div>
                         <div class="fw-bold fs-4"><?php echo $totalTutors; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-                    <div class="cards text-center px-2 py-3 ">
+                    <div class="cards card2 text-center px-2 py-3 ">
                         <div class="fw-semibold">Total Students</div>
                         <div class="fw-bold fs-4"><?php echo $totalStudents; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-                    <div class="cards text-center px-2 py-3 ">
+                    <div class="cards card3 text-center px-2 py-3 ">
                         <div class="fw-semibold">Bookings</div>
                         <div class="fw-bold fs-4"><?php echo $totalBookings; ?></div>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-6">
-                    <div class="cards text-center px-2 py-3 ">
+                    <div class="cards card4 text-center px-2 py-3 ">
                         <div class="fw-semibold">Complaints</div>
                         <div class="fw-bold fs-4"><?php echo $totalComplaints; ?></div>
                     </div>
@@ -501,10 +501,10 @@
     </div>
 </div>
 
-<!-- Bootstrap JS -->
+
 <script src="/EduGuide-php/assets/bootstrap/bootstrap.bundle.min.js"></script>
 <script>
-    // =================== SIDEBAR TOGGLE ===================
+
     const toggleBtn  = document.getElementById('toggleBtn');
     const sidebar    = document.getElementById('sidebar');
     const navSpans   = sidebar.querySelectorAll('nav .nav-link span');
@@ -531,7 +531,7 @@
         }
     });
 
-    // =================== OPEN TUTOR MODAL ===================
+    // Tutor Modal
     function openModal(row) {
     const tutor = {
         id: row.dataset.id,

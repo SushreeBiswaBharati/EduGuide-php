@@ -64,9 +64,7 @@ $bookings_stmt->execute();
 $bookings = $bookings_stmt->get_result();
 $bookings_stmt->close();
 
-// ============================================================
 //  BOOK TUTOR
-// ============================================================
 $bookingSuccess = "";
 $bookingError   = "";
 
@@ -162,9 +160,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_tutor'])) {
     }
 }
 
-// ============================================================
+//  CANCEL BOOKING (student cancels their own Pending booking)
+$cancelSuccess = "";
+$cancelError   = "";
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_booking_id'])) {
+    $cancel_id = intval($_POST['cancel_booking_id']);
+
+    // Verify the booking belongs to this student and is still Pending
+    $chk = $conn->prepare("
+        SELECT id FROM bookings
+        WHERE id = ? AND student_id = ? AND status = 'Pending'
+    ");
+    $chk->bind_param("ii", $cancel_id, $student_id);
+    $chk->execute();
+    $chk->store_result();
+
+    if ($chk->num_rows === 0) {
+        $cancelError = "Booking not found or cannot be cancelled.";
+    } else {
+        $upd = $conn->prepare("UPDATE bookings SET status = 'Cancelled' WHERE id = ?");
+        $upd->bind_param("i", $cancel_id);
+        if ($upd->execute()) {
+            $cancelSuccess = "Booking cancelled successfully.";
+        } else {
+            $cancelError = "Failed to cancel. Please try again.";
+        }
+        $upd->close();
+    }
+    $chk->close();
+
+    // Refresh booking counts after cancel
+    $totalBookings = $confirmedBookings = $pendingBookings = $completedBookings = 0;
+    $count_stmt2 = $conn->prepare("SELECT status, COUNT(*) AS cnt FROM bookings WHERE student_id = ? GROUP BY status");
+    $count_stmt2->bind_param("i", $student_id);
+    $count_stmt2->execute();
+    $cr2 = $count_stmt2->get_result();
+    while ($row = $cr2->fetch_assoc()) {
+        $totalBookings += $row['cnt'];
+        if ($row['status'] === 'Confirmed') $confirmedBookings = $row['cnt'];
+        if ($row['status'] === 'Pending')   $pendingBookings   = $row['cnt'];
+        if ($row['status'] === 'Completed') $completedBookings = $row['cnt'];
+    }
+    $count_stmt2->close();
+
+    // Re-fetch bookings list
+    $bookings_stmt2 = $conn->prepare("
+        SELECT bk.id, bk.status, bk.created_at, bk.requirement, bk.duration_months,
+               u.name   AS tutor_name,
+               sub.name AS subject_name
+        FROM bookings bk
+        JOIN tutors   t   ON t.id = bk.tutor_id
+        JOIN users    u   ON u.id = t.user_id
+        LEFT JOIN subjects sub ON sub.id = bk.subject_id
+        WHERE bk.student_id = ?
+        ORDER BY bk.created_at DESC
+    ");
+    $bookings_stmt2->bind_param("i", $student_id);
+    $bookings_stmt2->execute();
+    $bookings = $bookings_stmt2->get_result();
+    $bookings_stmt2->close();
+}
+
 //  COMPLAINT SUBMISSION
-// ============================================================
 $complaintSuccess = "";
 $complaintError   = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject'])) {
@@ -181,9 +239,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject']))
     }
 }
 
-// ============================================================
 //  EDIT PROFILE
-// ============================================================
 $profileSuccess = "";
 $profileError   = "";
 
@@ -265,9 +321,7 @@ $classes = $conn->query("SELECT id, name FROM classes WHERE is_active = 1 ORDER 
 $boards  = $conn->query("SELECT id, name FROM boards  WHERE is_active = 1 ORDER BY name ASC");
 $exams   = $conn->query("SELECT id, name FROM exams   WHERE is_active = 1 ORDER BY name ASC");
 
-// ============================================================
 //  BROWSE TUTORS
-// ============================================================
 $subjects     = $conn->query("SELECT id, name FROM subjects WHERE is_active = 1 ORDER BY name ASC");
 $browseBoards = $conn->query("SELECT id, name FROM boards   WHERE is_active = 1 ORDER BY name ASC");
 
@@ -317,9 +371,7 @@ $stmt->execute();
 $tutors = $stmt->get_result();
 $stmt->close();
 
-// ============================================================
 //  TOP TUTORS (dashboard widget)
-// ============================================================
 $topTutors = $conn->query("
     SELECT u.name, IFNULL(COUNT(b.id), 0) AS total
     FROM tutors t

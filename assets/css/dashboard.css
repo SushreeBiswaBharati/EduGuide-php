@@ -84,8 +84,24 @@ body {
     border-radius: 10px;
     overflow-x: hidden;
     box-shadow: 0 4px 10px rgba(22, 6, 93, 0.2);
-    background: linear-gradient(351deg,rgba(219, 174, 238, 1) 0%, rgba(148, 233, 213, 1) 100%);
+    border-radius:10px;
 
+}
+
+.card1{
+    background:linear-gradient(135deg,#a9c8f5,#5c8fdc);
+}
+
+.card2{
+    background:linear-gradient(135deg,#fff3cd,#ffc107); 
+}
+
+.card3{
+    background:linear-gradient(135deg,#d1e7dd,#198754);
+}
+
+.card4{
+    background:linear-gradient(135deg,#cfe2ff,#0d6efd); 
 }
 
 .panel{

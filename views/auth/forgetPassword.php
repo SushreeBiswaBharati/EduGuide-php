@@ -6,13 +6,24 @@
     <title>Forgot Password – EduGuide</title>
     <link rel="stylesheet" href="/EduGuide-php/assets/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/EduGuide-php/assets/css/formStyle.css ? v=1.1">
+
+    <style>
+       .form-bg {
+            background-image: url('/EduGuide-php/assets/images/login-back.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+    </style>
 </head>
+
 <body>
 <div class="form-bg d-flex justify-content-center align-items-center min-vh-100">
     <div class="col-md-5 col-lg-4">
         <div class="text-center mb-4">
             <h3 class="fw-bold ">EduGuide</h3>
-            <p class="text-muted">
+            <p class="text-muted fw-bold">
                 <?= $step === 1 ? 'Enter your registered email to reset password' : 'Set your new password' ?>
             </p>
         </div>
