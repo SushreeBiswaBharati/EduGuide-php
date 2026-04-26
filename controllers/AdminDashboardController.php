@@ -6,9 +6,7 @@ require_once '../database/dbconnection.php';
 $page    = $_GET['page'] ?? 'dashboard';
 $message = '';
 
-// =====================================================
-// MANAGE TUTORS — Verify / Revoke
-// =====================================================
+// manage tutor(verified / rejected)
 if ($page === 'manage_tutor' && isset($_POST['tutor_action'])) {
     $tutor_id = intval($_POST['tutor_id']);
 
@@ -23,9 +21,7 @@ if ($page === 'manage_tutor' && isset($_POST['tutor_action'])) {
     }
 }
 
-// =====================================================
-// MANAGE STUDENTS — Delete
-// =====================================================
+// manage student(delete)
 if ($page === 'manage_student' && isset($_POST['delete_student_id'])) {
     $sid = intval($_POST['delete_student_id']);
 
@@ -43,9 +39,7 @@ if ($page === 'manage_student' && isset($_POST['delete_student_id'])) {
     }
 }
 
-// =====================================================
-// MANAGE DROPDOWNS — Add / Delete (classes, boards, exams, subjects)
-// =====================================================
+// Academic Settings
 $allowedTables = [
     'class'   => 'classes',
     'board'   => 'boards',
@@ -112,9 +106,7 @@ if ($page === 'dropdown') {
     }
 }
 
-// =====================================================
-// COMPLAINTS — Resolve / Delete
-// =====================================================
+// Compplaints resolve or revoke
 if ($page === 'complaint') {
 
     if (isset($_POST['resolve_id'])) {
@@ -130,23 +122,32 @@ if ($page === 'complaint') {
     }
 }
 
-// =====================================================
-// FETCH DATA FOR EACH PAGE
-// =====================================================
-
 // --- Dashboard counts ---
 $totalTutors    = $conn->query("SELECT COUNT(*) AS c FROM tutors")->fetch_assoc()['c'];
 $totalStudents  = $conn->query("SELECT COUNT(*) AS c FROM students")->fetch_assoc()['c'];
 $totalBookings  = $conn->query("SELECT COUNT(*) AS c FROM bookings")->fetch_assoc()['c'];
 $totalComplaints= $conn->query("SELECT COUNT(*) AS c FROM complaints")->fetch_assoc()['c'];
 
-$todayBookings     = $conn->query("SELECT COUNT(*) AS c FROM bookings WHERE DATE(created_at) = CURDATE()")->fetch_assoc()['c'];
-$yesterdayBookings = $conn->query("SELECT COUNT(*) AS c FROM bookings WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)")->fetch_assoc()['c'];
-$bookingGrowth     = ($yesterdayBookings == 0) ? 100 : round((($todayBookings - $yesterdayBookings) / $yesterdayBookings) * 100, 1);
+// Bookings per month (last 3 months)
+$monthlyBookings = [];
+for ($i = 2; $i >= 0; $i--) {
+    $row = $conn->query("
+        SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL $i MONTH), '%b %Y') AS month_label,
+               COUNT(*) AS total
+        FROM bookings
+        WHERE YEAR(created_at)  = YEAR(DATE_SUB(CURDATE(),  INTERVAL $i MONTH))
+          AND MONTH(created_at) = MONTH(DATE_SUB(CURDATE(), INTERVAL $i MONTH))
+    ")->fetch_assoc();
+    $monthlyBookings[] = $row;
+}
+$maxMonthlyBookings = max(array_column($monthlyBookings, 'total') ?: [1]);
 
-$todayRegs     = $conn->query("SELECT COUNT(*) AS c FROM tutors WHERE DATE(created_at) = CURDATE()")->fetch_assoc()['c'];
-$yesterdayRegs = $conn->query("SELECT COUNT(*) AS c FROM tutors WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)")->fetch_assoc()['c'];
-$tutorGrowth   = ($yesterdayRegs == 0) ? 100 : round((($todayRegs - $yesterdayRegs) / $yesterdayRegs) * 100, 1);
+// Tutor verified vs pending
+$totalVerifiedTutors = $conn->query("SELECT COUNT(*) AS c FROM tutors WHERE is_verified = 1")->fetch_assoc()['c'];
+$totalPendingTutors  = $conn->query("SELECT COUNT(*) AS c FROM tutors WHERE is_verified = 0")->fetch_assoc()['c'];
+$totalTutorsForChart = $totalVerifiedTutors + $totalPendingTutors;
+$verifiedPct = $totalTutorsForChart > 0 ? round(($totalVerifiedTutors / $totalTutorsForChart) * 100) : 0;
+$pendingPct  = $totalTutorsForChart > 0 ? round(($totalPendingTutors  / $totalTutorsForChart) * 100) : 0;
 
 $topTutors = $conn->query("
     SELECT u.name, COUNT(b.id) AS total
@@ -158,7 +159,7 @@ $topTutors = $conn->query("
     LIMIT 5
 ");
 
-// --- Manage Tutors ---
+// Manage Tutors
 $search_t = trim($_GET['search'] ?? '');
 $status_t = $_GET['status'] ?? '';
 $sort_t   = $_GET['sort']   ?? '';
@@ -183,8 +184,8 @@ if ($status_t !== '') {
 }
 
 $tutorQuery .= " GROUP BY t.id, u.name, u.email, t.phone, t.address,
-                           t.experience, t.rating, t.gender, t.qualification,
-                           t.is_verified, t.created_at ";
+                t.experience, t.rating, t.gender, t.qualification,
+                t.is_verified, t.created_at ";
 
 if ($search_t !== '') {
     $safe        = $conn->real_escape_string($search_t);
@@ -197,7 +198,7 @@ else                          $tutorQuery .= " ORDER BY t.id DESC";
 
 $tutors = $conn->query($tutorQuery);
 
-// --- Manage Students ---
+// Manage Students
 $students = $conn->query("
     SELECT s.id, u.name, u.email
     FROM students s
@@ -205,7 +206,7 @@ $students = $conn->query("
     ORDER BY s.id DESC
 ");
 
-// --- Bookings ---
+// Bookings 
 $bookings = $conn->query("
     SELECT b.id, b.status, b.created_at, b.requirement, b.duration_months,
            su.name AS student_name,
@@ -220,13 +221,13 @@ $bookings = $conn->query("
     ORDER BY b.id DESC
 ");
 
-// --- Dropdown lists ---
+// Dropdown lists 
 $dd_classes  = $conn->query("SELECT id, name FROM classes  ORDER BY name ASC");
 $dd_boards   = $conn->query("SELECT id, name FROM boards   ORDER BY name ASC");
 $dd_exams    = $conn->query("SELECT id, name FROM exams    ORDER BY name ASC");
 $dd_subjects = $conn->query("SELECT id, name FROM subjects ORDER BY name ASC");
 
-// --- Complaints ---
+// Complaints 
 $complaints = $conn->query("
     SELECT c.id, c.subject, c.message, c.status, c.created_at,
            u.name AS submitted_by

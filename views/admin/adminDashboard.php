@@ -94,49 +94,106 @@
 
             <!-- Growth Charts -->
             <div class="row g-3 mb-4">
+ 
+                <!-- Monthly Bookings Bar Chart -->
                 <div class="col-md-6">
-                    <div class="card p-3">
-                        <h6 class="fw-bold text-center mb-3">Bookings Growth</h6>
-                        <small class="fw-semibold">Today (<?php echo $todayBookings; ?>)</small>
-                        <div class="progress mb-2">
-                            <div class="progress-bar bg-success progress-bar-striped"
-                                 style="width:<?php echo min($todayBookings * 10, 100); ?>%"></div>
-                        </div>
-                        <small class="fw-semibold">Yesterday (<?php echo $yesterdayBookings; ?>)</small>
-                        <div class="progress mb-2">
-                            <div class="progress-bar bg-info progress-bar-striped"
-                                 style="width:<?php echo min($yesterdayBookings * 10, 100); ?>%"></div>
-                        </div>
-                        <small class="<?php echo $bookingGrowth >= 0 ? 'text-success' : 'text-danger'; ?> fw-semibold">
-                            <?php echo $bookingGrowth >= 0 ? '📈' : '📉'; ?> Growth: <?php echo $bookingGrowth; ?>%
+                    <div class="card border-2 border-black shadow-sm p-3 h-100">
+                        <h6 class="fw-bold text-center mb-3">📅 Bookings — Last 3 Months</h6>
+                        <?php foreach ($monthlyBookings as $mb):
+                            $barWidth = $maxMonthlyBookings > 0
+                                ? round(($mb['total'] / $maxMonthlyBookings) * 100)
+                                : 0;
+                        ?>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div style="width:68px; color:#0b48a4; flex-shrink:0;">
+                                    <?php echo $mb['month_label']; ?>
+                                </div>
+                                <div class="progress flex-grow-1" style="height:20px; border-radius:6px;">
+                                    <div class="progress-bar progress-bar"
+                                         style="width:<?php echo $barWidth; ?>%;
+                                                background:linear-gradient(90deg,#5c8fdc,#0b48a4);
+                                                border-radius:6px; font-size:.72rem; line-height:20px;">
+                                        <?php if ($mb['total'] > 0) echo $mb['total']; ?>
+                                    </div>
+                                </div>
+                                <div style="width:22px; text-align:right; font-weight:600; color:#0b48a4; flex-shrink:0;">
+                                    <?php echo $mb['total']; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                        <small class="text-muted fw-bold mt-2 d-block" >
+                            Total: <strong><?php echo array_sum(array_column($monthlyBookings, 'total')); ?></strong> bookings in 3 months
                         </small>
                     </div>
                 </div>
-
+ 
+                <!-- Tutor Verified vs Pending -->
                 <div class="col-md-6">
-                    <div class="card p-3">
-                        <h6 class="fw-bold text-center mb-3">Tutor Registrations</h6>
-                        <small class="fw-semibold">Today (<?php echo $todayRegs; ?>)</small>
-                        <div class="progress mb-2">
-                            <div class="progress-bar bg-success progress-bar-striped"
-                                 style="width:<?php echo min($todayRegs * 10, 100); ?>%"></div>
+                    <div class="card border-2 border-black shadow-sm p-3 h-100">
+                        <h6 class="fw-bold text-center mb-3">🧑🏻‍🏫 Tutor Verification Status</h6>
+ 
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="fw-semibold text-success">✔ Verified</small>
+                                <small class="fw-bold"><?php echo $totalVerifiedTutors; ?> tutors (<?php echo $verifiedPct; ?>%)</small>
+                            </div>
+                            <div class="progress" style="height:22px; border-radius:8px;">
+                                <div class="progress-bar progress-bar-striped"
+                                     style="width:<?php echo $verifiedPct; ?>%;
+                                            background:linear-gradient(90deg,#198754,#20c997);
+                                            border-radius:8px; font-size:.78rem; line-height:22px;">
+                                    <?php if ($verifiedPct > 10) echo $verifiedPct . '%'; ?>
+                                </div>
+                            </div>
                         </div>
-                        <small class="fw-semibold">Yesterday (<?php echo $yesterdayRegs; ?>)</small>
-                        <div class="progress mb-2">
-                            <div class="progress-bar bg-warning progress-bar-striped"
-                                 style="width:<?php echo min($yesterdayRegs * 10, 100); ?>%"></div>
+ 
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="fw-semibold text-warning">⏳ Pending</small>
+                                <small class="fw-bold"><?php echo $totalPendingTutors; ?> tutors (<?php echo $pendingPct; ?>%)</small>
+                            </div>
+                            <div class="progress" style="height:22px; border-radius:8px;">
+                                <div class="progress-bar progress-bar-striped"
+                                     style="width:<?php echo $pendingPct; ?>%;
+                                            background:linear-gradient(90deg,#ffc107,#fd7e14);
+                                            border-radius:8px; font-size:.78rem; line-height:22px; color:#333;">
+                                    <?php if ($pendingPct > 10) echo $pendingPct . '%'; ?>
+                                </div>
+                            </div>
                         </div>
-                        <small class="<?php echo $tutorGrowth >= 0 ? 'text-success' : 'text-danger'; ?> fw-semibold">
-                            <?php echo $tutorGrowth >= 0 ? '📈' : '📉'; ?> Growth: <?php echo $tutorGrowth; ?>%
-                        </small>
+ 
+                        <div class="d-flex gap-2 justify-content-center flex-wrap">
+                            <div class="text-center py-2 rounded-3 flex-fill" style="background:#d1e7dd; min-width:70px;">
+                                <div class="fw-bold fs-5 text-success"><?php echo $totalVerifiedTutors; ?></div>
+                                <div style="font-size:.75rem; color:#0f5132;">Verified</div>
+                            </div>
+                            <div class="text-center py-2 rounded-3 flex-fill" style="background:#fff3cd; min-width:70px;">
+                                <div class="fw-bold fs-5" style="color:#664d03;"><?php echo $totalPendingTutors; ?></div>
+                                <div style="font-size:.75rem; color:#664d03;">Pending</div>
+                            </div>
+                            <div class="text-center py-2 rounded-3 flex-fill" style="background:#e0f0ff; min-width:70px;">
+                                <div class="fw-bold fs-5" style="color:#0b48a4;"><?php echo $totalTutorsForChart; ?></div>
+                                <div style="font-size:.75rem; color:#0b48a4;">Total</div>
+                            </div>
+                        </div>
+ 
+                        <?php if ($totalPendingTutors > 0): ?>
+                            <div class="text-center mt-3">
+                                <a href="?page=manage_tutor&status=0"
+                                   class="btn btn-sm btn-warning fw-semibold px-3">
+                                    View <?php echo $totalPendingTutors; ?> Pending →
+                                </a>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
-
+ 
             <!-- Top Tutors -->
-            <div class="card p-3">
+            <div class="card border-2 border-black shadow-sm p-3">
                 <h6 class="fw-bold mb-2">🏆 Top Tutors by Bookings</h6>
-                <table class="table table-sm table-hover">
+                <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
                     <thead class="table-dark">
                         <tr><th>#</th><th>Name</th><th>Total Bookings</th></tr>
                     </thead>
@@ -150,6 +207,7 @@
                         <?php endwhile; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
 
         <!-- Manage Tutors -->
@@ -366,7 +424,7 @@
                 </table>
             </div>
 
-        <!-- Manage Dropdowns -->
+        <!-- Academic Settings -->
         <?php elseif ($page === 'dropdown'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">

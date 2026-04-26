@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['booking_action'], $_P
     $booking_id = intval($_POST['booking_id']);
 
     // Only allow valid statuses
-    if (in_array($action, ['Confirmed', 'Cancelled'])) {
+    if (in_array($action, ['Confirmed', 'Cancelled', 'Completed'])) {
         $upd = $conn->prepare("
             UPDATE bookings SET status = ?
             WHERE id = ? AND tutor_id = ?

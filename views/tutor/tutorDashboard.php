@@ -28,7 +28,7 @@
         <nav class="flex-grow-1 px-3 py-3 d-flex flex-column gap-2 fw-semibold">
 
             <a href="?page=dashboard" class="nav-link active">
-                <small>🏡</small> <span>Home</span>
+                <small>🏡</small> <span>Dashboard</span>
             </a>
 
             <a href="?page=profile" class="nav-link">
@@ -67,47 +67,48 @@
         <?php if ($page === 'dashboard'): ?>
             <!-- Dashboard -->
             <div class="mb-4 greet-bar rounded-4 p-4 text-white">
-                <span><?php echo $today;?></span>
-                <h4 class="fw-bold mb-1">
-                    Welcome Back <?php echo htmlspecialchars($tutor['name'] ?? 'Tutor') ?>! 👨‍🏫
-                </h4>
+                <span><?php echo $today; ?></span>
+                <h4 class="fw-bold mb-1">Welcome Back, <?php echo htmlspecialchars($tutor['name'] ?? 'Tutor'); ?>! 👨‍🏫</h4>
                 <p class="fst-italic mb-3">"Teaching is the greatest act of optimism."</p>
                 <span class="badge bg-white bg-opacity-75 text-primary px-3 py-2">✅ Verified Tutor</span>
             </div>
-            <!--  -->
+
             <div class="row g-3 mb-4">
                 <div class="col-md-3 col-6">
                     <div class="cards card1 text-center px-2 py-3">
                         <div class="fw-semibold">Total Requests</div>
                         <div class="fw-bold fs-4"><?php echo $totalRequests; ?></div>
+                        <div style="font-size:.8rem;">All Bookings</div>
                     </div>
                 </div>
-
                 <div class="col-md-3 col-6">
                     <div class="cards card2 text-center px-2 py-3">
-                        <div class="fw-semibold">Confirmed Requests</div>
-                        <div class="fw-bold fs-4"><?php echo $confirmedCount; ?></div>
+                        <div class="fw-semibold">Pending</div>
+                        <div class="fw-bold fs-4"><?php echo $pendingCount; ?></div>
+                        <div style="font-size:.8rem;">Awaiting Action</div>
                     </div>
                 </div>
-
                 <div class="col-md-3 col-6">
                     <div class="cards card3 text-center px-2 py-3">
-                        <div class="fw-semibold">Pending Requests</div>
-                        <div class="fw-bold fs-4"><?php echo $pendingCount; ?></div>
+                        <div class="fw-semibold">Confirmed</div>
+                        <div class="fw-bold fs-4"><?php echo $confirmedCount; ?></div>
+                        <div style="font-size:.8rem;">Active Sessions</div>
                     </div>
                 </div>
-
                 <div class="col-md-3 col-6">
                     <div class="cards card4 text-center px-2 py-3">
-                        <div class="fw-semibold">Completed Session</div>
+                        <div class="fw-semibold">Completed</div>
                         <div class="fw-bold fs-4"><?php echo $completedCount; ?></div>
+                        <div style="font-size:.8rem;">Sessions Done</div>
                     </div>
                 </div>
             </div>
 
-                <?php elseif($page === 'profile'): ?>    
-                <!-- Profile -->
-                <h5 class="fw-bold text-primary mb-4">My Profile</h5>
+                <?php elseif ($page === 'profile'): ?>
+                <div class="mb-4 greet-bar rounded-4 p-3 text-white">
+                    <h5 class="fw-bold mb-0">👤 My Profile</h5>
+                    <small style="opacity:.85;">View and update your tutor information</small>
+                </div>
                 <?php if ($profileSuccess): ?>
                     <div class="alert alert-success"><?php echo $profileSuccess; ?></div>
                 <?php endif; ?>
@@ -244,7 +245,17 @@
                 </div>
 
                 <?php elseif ($page === 'requests'): ?>
-                    <h5 class="fw-bold text-primary mb-4">📋 Booking Requests</h5>
+                    <div class="mb-4 greet-bar rounded-4 p-3 text-white d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div>
+                            <h5 class="fw-bold mb-0">📋 Booking Requests</h5>
+                            <small style="opacity:.85;">Accept, reject or complete your student session requests</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-white text-warning">⏳ Pending: <?php echo $pendingCount; ?></span>
+                            <span class="badge bg-white text-success">✔ Confirmed: <?php echo $confirmedCount; ?></span>
+                            <span class="badge bg-white text-primary">🎓 Completed: <?php echo $completedCount; ?></span>
+                        </div>
+                    </div>
 
                     <?php if ($requests->num_rows === 0): ?>
                         <div class="text-center py-5 text-muted">
@@ -299,6 +310,12 @@
                                                             <button type="submit" class="btn btn-danger btn-sm">✘ Reject</button>
                                                         </form>
                                                     </div>
+                                                <?php elseif ($req['status'] === 'Confirmed'): ?>
+                                                    <form method="POST" onsubmit="return confirm('Mark this session as Completed? This cannot be undone.')">
+                                                        <input type="hidden" name="booking_id" value="<?php echo $req['id']; ?>">
+                                                        <input type="hidden" name="booking_action" value="Completed">
+                                                        <button type="submit" class="btn btn-primary btn-sm">🎓 Mark Complete</button>
+                                                    </form>
                                                 <?php else: ?>
                                                     <span class="text-muted small">—</span>
                                                 <?php endif; ?>
