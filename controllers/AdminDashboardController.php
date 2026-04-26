@@ -6,22 +6,69 @@ require_once '../database/dbconnection.php';
 $page    = $_GET['page'] ?? 'dashboard';
 $message = '';
 
-// manage tutor(verified / rejected)
+// =====================================================
+// MANAGE TUTORS — Verify / Revoke
+// =====================================================
 if ($page === 'manage_tutor' && isset($_POST['tutor_action'])) {
     $tutor_id = intval($_POST['tutor_id']);
 
+    // Fetch tutor name + email for notification
+    $tInfo = $conn->prepare("
+        SELECT u.name, u.email
+        FROM tutors t
+        JOIN users u ON u.id = t.user_id
+        WHERE t.id = ?
+    ");
+    $tInfo->bind_param("i", $tutor_id);
+    $tInfo->execute();
+    $tRow = $tInfo->get_result()->fetch_assoc();
+    $tInfo->close();
+
+    $tutorName  = $tRow['name']  ?? 'Tutor';
+    $tutorEmail = $tRow['email'] ?? '';
+
     if ($_POST['tutor_action'] === 'verify') {
         $conn->query("UPDATE tutors SET is_verified = 1 WHERE id = $tutor_id");
-        $message = "Tutor verified successfully.";
+        $message = "✅ Tutor <strong>" . htmlspecialchars($tutorName) . "</strong> has been verified successfully.";
+
+        // Email to tutor — profile approved
+        if ($tutorEmail !== '') {
+            $subject  = "🎉 Your EduGuide Tutor Profile Has Been Approved!";
+            $body     = "Dear {$tutorName},\r\n\r\n";
+            $body    .= "Congratulations! Your tutor profile on EduGuide has been reviewed and approved by our admin team.\r\n\r\n";
+            $body    .= "You can now log in to your Tutor Dashboard and start receiving student booking requests.\r\n\r\n";
+            $body    .= "Dashboard: http://localhost/EduGuide-php/controllers/TutorDashboardController.php\r\n\r\n";
+            $body    .= "If you have any questions, feel free to contact us.\r\n\r\n";
+            $body    .= "Best regards,\r\nEduGuide Admin Team\r\n";
+            $headers  = "From: no-reply@eduguide.com\r\n";
+            $headers .= "Reply-To: no-reply@eduguide.com\r\n";
+            $headers .= "X-Mailer: PHP/" . phpversion();
+            @mail($tutorEmail, $subject, $body, $headers);
+        }
     }
 
     if ($_POST['tutor_action'] === 'revoke') {
         $conn->query("UPDATE tutors SET is_verified = 0 WHERE id = $tutor_id");
-        $message = "Tutor access revoked.";
+        $message = "⚠️ Tutor <strong>" . htmlspecialchars($tutorName) . "</strong>'s access has been revoked.";
+
+        // Email to tutor — profile revoked
+        if ($tutorEmail !== '') {
+            $subject  = "EduGuide — Tutor Profile Access Revoked";
+            $body     = "Dear {$tutorName},\r\n\r\n";
+            $body    .= "We're writing to inform you that your tutor profile on EduGuide has been temporarily revoked by our admin team.\r\n\r\n";
+            $body    .= "This may be due to a policy review or incomplete information. Please contact our support team for more details.\r\n\r\n";
+            $body    .= "Best regards,\r\nEduGuide Admin Team\r\n";
+            $headers  = "From: no-reply@eduguide.com\r\n";
+            $headers .= "Reply-To: no-reply@eduguide.com\r\n";
+            $headers .= "X-Mailer: PHP/" . phpversion();
+            @mail($tutorEmail, $subject, $body, $headers);
+        }
     }
 }
 
-// manage student(delete)
+// =====================================================
+// MANAGE STUDENTS — Delete
+// =====================================================
 if ($page === 'manage_student' && isset($_POST['delete_student_id'])) {
     $sid = intval($_POST['delete_student_id']);
 
@@ -39,7 +86,9 @@ if ($page === 'manage_student' && isset($_POST['delete_student_id'])) {
     }
 }
 
-// Academic Settings
+// =====================================================
+// MANAGE DROPDOWNS — Add / Delete (classes, boards, exams, subjects)
+// =====================================================
 $allowedTables = [
     'class'   => 'classes',
     'board'   => 'boards',
@@ -106,7 +155,9 @@ if ($page === 'dropdown') {
     }
 }
 
-// Compplaints resolve or revoke
+// =====================================================
+// COMPLAINTS — Resolve / Delete
+// =====================================================
 if ($page === 'complaint') {
 
     if (isset($_POST['resolve_id'])) {
@@ -121,6 +172,10 @@ if ($page === 'complaint') {
         $message = "Complaint deleted.";
     }
 }
+
+// =====================================================
+// FETCH DATA FOR EACH PAGE
+// =====================================================
 
 // --- Dashboard counts ---
 $totalTutors    = $conn->query("SELECT COUNT(*) AS c FROM tutors")->fetch_assoc()['c'];
@@ -159,7 +214,7 @@ $topTutors = $conn->query("
     LIMIT 5
 ");
 
-// Manage Tutors
+// --- Manage Tutors ---
 $search_t = trim($_GET['search'] ?? '');
 $status_t = $_GET['status'] ?? '';
 $sort_t   = $_GET['sort']   ?? '';
@@ -198,7 +253,7 @@ else                          $tutorQuery .= " ORDER BY t.id DESC";
 
 $tutors = $conn->query($tutorQuery);
 
-// Manage Students
+// --- Manage Students ---
 $students = $conn->query("
     SELECT s.id, u.name, u.email
     FROM students s
@@ -206,7 +261,7 @@ $students = $conn->query("
     ORDER BY s.id DESC
 ");
 
-// Bookings 
+// --- Bookings ---
 $bookings = $conn->query("
     SELECT b.id, b.status, b.created_at, b.requirement, b.duration_months,
            su.name AS student_name,
@@ -221,13 +276,13 @@ $bookings = $conn->query("
     ORDER BY b.id DESC
 ");
 
-// Dropdown lists 
+// --- Dropdown lists ---
 $dd_classes  = $conn->query("SELECT id, name FROM classes  ORDER BY name ASC");
 $dd_boards   = $conn->query("SELECT id, name FROM boards   ORDER BY name ASC");
 $dd_exams    = $conn->query("SELECT id, name FROM exams    ORDER BY name ASC");
 $dd_subjects = $conn->query("SELECT id, name FROM subjects ORDER BY name ASC");
 
-// Complaints 
+// --- Complaints ---
 $complaints = $conn->query("
     SELECT c.id, c.subject, c.message, c.status, c.created_at,
            u.name AS submitted_by

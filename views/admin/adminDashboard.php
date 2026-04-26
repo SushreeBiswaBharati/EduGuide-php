@@ -10,8 +10,8 @@
 <body>
 <div class="d-flex p-3 gap-3 vh-100">
 
-
-<div class="sidebar d-flex flex-column justify-content-between p-0 rounded-4" id="sidebar">
+    <!-- ===================== SIDEBAR ===================== -->
+    <div class="sidebar d-flex flex-column justify-content-between p-0 rounded-4" id="sidebar">
 
         <div class="p-3 border-bottom border-white border-opacity-25 d-flex align-items-center justify-content-between">
             <div>
@@ -24,14 +24,13 @@
         </div>
 
         <nav class="flex-grow-1 px-3 py-3 d-flex flex-column gap-2 fw-semibold">
-            <a href="?page=dashboard" class="nav-link"><small>🏡</small> <span>Home</span></a>
-            <a href="?page=manage_tutor"  class="nav-link"><small>🧑🏻‍🏫</small> <span>Manage Tutors</span></a>
+            <a href="?page=dashboard"      class="nav-link"><small>🏡</small> <span>Home</span></a>
+            <a href="?page=manage_tutor"   class="nav-link"><small>🧑🏻‍🏫</small> <span>Manage Tutors</span></a>
             <a href="?page=manage_student" class="nav-link"><small>🧑🏻‍🎓</small> <span>Manage Students</span></a>
-            <a href="?page=booking" class="nav-link"><small>📅</small> <span>View Bookings</span></a>
-            <a href="?page=dropdown" class="nav-link"><small>⚙️</small> <span>Academic Settings</span></a>
-            <a href="?page=complaint" class="nav-link"><small>📢</small> <span>User Complaints </span></a>
+            <a href="?page=booking"        class="nav-link"><small>📅</small> <span>View Bookings</span></a>
+            <a href="?page=dropdown"       class="nav-link"><small>⚙️</small> <span>Academic Settings</span></a>
+            <a href="?page=complaint"      class="nav-link"><small>📢</small> <span>Handle Complaints</span></a>
         </nav>
-
 
         <div class="pb-3 px-2 mb-3 d-flex justify-content-center">
             <a href="/EduGuide-php/views/auth/logout.php"
@@ -47,12 +46,12 @@
 
         <?php if (!empty($message)): ?>
             <div class="alert alert-info alert-dismissible fade show py-2 mb-3">
-                <?php echo htmlspecialchars($message); ?>
+                <?php echo $message; ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
 
-
+        <!-- Dashboard -->
         <?php if ($page === 'dashboard'): ?>
 
             <div class="mb-4 greet-bar rounded-4 p-4 text-white">
@@ -69,21 +68,18 @@
                         <div class="fw-bold fs-4"><?php echo $totalTutors; ?></div>
                     </div>
                 </div>
-
                 <div class="col-md-3 col-6">
                     <div class="cards card2 text-center px-2 py-3">
                         <div class="fw-semibold">Total Students</div>
                         <div class="fw-bold fs-4"><?php echo $totalStudents; ?></div>
                     </div>
                 </div>
-
                 <div class="col-md-3 col-6">
                     <div class="cards card3 text-center px-2 py-3">
                         <div class="fw-semibold">Bookings</div>
                         <div class="fw-bold fs-4"><?php echo $totalBookings; ?></div>
                     </div>
                 </div>
-
                 <div class="col-md-3 col-6">
                     <div class="cards card4 text-center px-2 py-3">
                         <div class="fw-semibold">Complaints</div>
@@ -94,10 +90,10 @@
 
             <!-- Growth Charts -->
             <div class="row g-3 mb-4">
- 
+
                 <!-- Monthly Bookings Bar Chart -->
                 <div class="col-md-6">
-                    <div class="card border-2 border-black shadow-sm p-3 h-100">
+                    <div class="card p-3 h-100">
                         <h6 class="fw-bold text-center mb-3">📅 Bookings — Last 3 Months</h6>
                         <?php foreach ($monthlyBookings as $mb):
                             $barWidth = $maxMonthlyBookings > 0
@@ -109,36 +105,36 @@
                                     <?php echo $mb['month_label']; ?>
                                 </div>
                                 <div class="progress flex-grow-1" style="height:20px; border-radius:6px;">
-                                    <div class="progress-bar progress-bar"
+                                    <div class="progress-bar progress-bar-striped"
                                          style="width:<?php echo $barWidth; ?>%;
                                                 background:linear-gradient(90deg,#5c8fdc,#0b48a4);
                                                 border-radius:6px; font-size:.72rem; line-height:20px;">
                                         <?php if ($mb['total'] > 0) echo $mb['total']; ?>
                                     </div>
                                 </div>
-                                <div style="width:22px; text-align:right; font-weight:600; color:#0b48a4; flex-shrink:0;">
+                                <div style="width:22px; text-align:right;  font-weight:600; color:#0b48a4; flex-shrink:0;">
                                     <?php echo $mb['total']; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
-                        <small class="text-muted fw-bold mt-2 d-block" >
+                        <small class="text-muted mt-2 d-block">
                             Total: <strong><?php echo array_sum(array_column($monthlyBookings, 'total')); ?></strong> bookings in 3 months
                         </small>
                     </div>
                 </div>
- 
+
                 <!-- Tutor Verified vs Pending -->
                 <div class="col-md-6">
-                    <div class="card border-2 border-black shadow-sm p-3 h-100">
+                    <div class="card p-3 h-100">
                         <h6 class="fw-bold text-center mb-3">🧑🏻‍🏫 Tutor Verification Status</h6>
- 
+
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
                                 <small class="fw-semibold text-success">✔ Verified</small>
                                 <small class="fw-bold"><?php echo $totalVerifiedTutors; ?> tutors (<?php echo $verifiedPct; ?>%)</small>
                             </div>
                             <div class="progress" style="height:22px; border-radius:8px;">
-                                <div class="progress-bar progress-bar-striped"
+                                <div class="progress-bar progress-bar"
                                      style="width:<?php echo $verifiedPct; ?>%;
                                             background:linear-gradient(90deg,#198754,#20c997);
                                             border-radius:8px; font-size:.78rem; line-height:22px;">
@@ -146,14 +142,14 @@
                                 </div>
                             </div>
                         </div>
- 
+
                         <div class="mb-4">
                             <div class="d-flex justify-content-between mb-1">
                                 <small class="fw-semibold text-warning">⏳ Pending</small>
                                 <small class="fw-bold"><?php echo $totalPendingTutors; ?> tutors (<?php echo $pendingPct; ?>%)</small>
                             </div>
                             <div class="progress" style="height:22px; border-radius:8px;">
-                                <div class="progress-bar progress-bar-striped"
+                                <div class="progress-bar progress-bar"
                                      style="width:<?php echo $pendingPct; ?>%;
                                             background:linear-gradient(90deg,#ffc107,#fd7e14);
                                             border-radius:8px; font-size:.78rem; line-height:22px; color:#333;">
@@ -161,7 +157,7 @@
                                 </div>
                             </div>
                         </div>
- 
+
                         <div class="d-flex gap-2 justify-content-center flex-wrap">
                             <div class="text-center py-2 rounded-3 flex-fill" style="background:#d1e7dd; min-width:70px;">
                                 <div class="fw-bold fs-5 text-success"><?php echo $totalVerifiedTutors; ?></div>
@@ -176,7 +172,7 @@
                                 <div style="font-size:.75rem; color:#0b48a4;">Total</div>
                             </div>
                         </div>
- 
+
                         <?php if ($totalPendingTutors > 0): ?>
                             <div class="text-center mt-3">
                                 <a href="?page=manage_tutor&status=0"
@@ -188,9 +184,9 @@
                     </div>
                 </div>
             </div>
- 
+
             <!-- Top Tutors -->
-            <div class="card border-2 border-black shadow-sm p-3">
+            <div class="card p-3">
                 <h6 class="fw-bold mb-2">🏆 Top Tutors by Bookings</h6>
                 <div class="table-responsive">
                 <table class="table table-sm table-hover mb-0">
@@ -210,7 +206,7 @@
                 </div>
             </div>
 
-        <!-- Manage Tutors -->
+        <!-- ==================== MANAGE TUTORS ==================== -->
         <?php elseif ($page === 'manage_tutor'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -254,11 +250,11 @@
             $totalPending  = $conn->query("SELECT COUNT(*) AS c FROM tutors WHERE is_verified = 0")->fetch_assoc()['c'];
             ?>
             <div class="d-flex gap-2 mb-3 flex-wrap">
-                <span class="badge bg-secondary px-4 py-2">Total: <?php echo $totalAll; ?></span>
-                <span class="badge bg-success px-4 py-2">Verified: <?php echo $totalVerified; ?></span>
+                <span class="badge bg-secondary px-3 py-2">Total: <?php echo $totalAll; ?></span>
+                <span class="badge bg-success px-3 py-2">Verified: <?php echo $totalVerified; ?></span>
                 <span class="badge bg-warning text-dark px-3 py-2">Pending: <?php echo $totalPending; ?></span>
                 <?php if ($tutors->num_rows != $totalAll): ?>
-                    <span class="badge bg-info text-dark px-4 py-2">Showing: <?php echo $tutors->num_rows; ?></span>
+                    <span class="badge bg-info text-dark px-3 py-2">Showing: <?php echo $tutors->num_rows; ?></span>
                 <?php endif; ?>
             </div>
 
@@ -327,7 +323,7 @@
                 </table>
             </div>
 
-        <!-- Manage Students-->
+        <!-- ==================== MANAGE STUDENTS ==================== -->
         <?php elseif ($page === 'manage_student'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -366,7 +362,7 @@
                 </table>
             </div>
 
-        <!-- View Books -->
+        <!-- ==================== VIEW BOOKINGS ==================== -->
         <?php elseif ($page === 'booking'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -424,7 +420,7 @@
                 </table>
             </div>
 
-        <!-- Academic Settings -->
+        <!-- ==================== MANAGE DROPDOWNS ==================== -->
         <?php elseif ($page === 'dropdown'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -432,15 +428,14 @@
             </div>
 
             <?php
-
-                function showSection($title, $icon, $type, $rows) {
+            // Helper function — renders one section card
+            function showSection($title, $icon, $type, $rows) {
                 $totalRows = $rows ? $rows->num_rows : 0;
             ?>
             <div class="card shadow-sm mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center"
-                     style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
+                <div class="card-header py-2 d-flex justify-content-between align-items-center" style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
                     <span class="fw-bold text-white"><?php echo $icon . ' ' . $title; ?></span>
-                    <span class="badge bg-white text-primary py-2 fs-6"><?php echo $totalRows; ?> entries</span>
+                    <span class="badge bg-white text-primary fs-6"><?php echo $totalRows; ?> entries</span>
                 </div>
                 <div class="card-body p-3">
 
@@ -485,17 +480,17 @@
             <?php } ?>
 
             <div class="row g-3">
-                <div class="col-md-6"><?php showSection('Classes',  '📚', 'class',   $dd_classes);  ?></div>
-                <div class="col-md-6"><?php showSection('Exams',    '📝', 'exam',    $dd_exams);    ?></div>
-                <div class="col-md-6"><?php showSection('Subjects', '🔬', 'subject', $dd_subjects); ?></div>
                 <div class="col-md-6"><?php showSection('Boards',   '🏫', 'board',   $dd_boards);   ?></div>
+                <div class="col-md-6"><?php showSection('Exams',    '📝', 'exam',    $dd_exams);    ?></div>
+                <div class="col-md-6"><?php showSection('Classes',  '📚', 'class',   $dd_classes);  ?></div>
+                <div class="col-md-6"><?php showSection('Subjects', '🔬', 'subject', $dd_subjects); ?></div>
             </div>
 
-        <!-- handle Complaints -->
+        <!-- HANDLE COMPLAINTS  -->
         <?php elseif ($page === 'complaint'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
-                <h5 class="fw-bold mb-0">📢 User Complaints</h5>
+                <h5 class="fw-bold mb-0">📢 Handle Complaints</h5>
             </div>
 
             <div class="table-responsive">
@@ -557,7 +552,7 @@
 
 <script src="/EduGuide-php/assets/bootstrap/bootstrap.bundle.min.js"></script>
 <script>
-
+    // Sidebar toggle
     const toggleBtn  = document.getElementById('toggleBtn');
     const sidebar    = document.getElementById('sidebar');
     const navSpans   = sidebar.querySelectorAll('nav .nav-link span');
@@ -569,7 +564,7 @@
     toggleBtn.addEventListener('click', function () {
         isCollapsed = !isCollapsed;
         if (isCollapsed) {
-            sidebar.style.width = '70px';
+            sidebar.style.width = '100px';
             navSpans.forEach(s => s.style.display = 'none');
             brandTitle.style.display = 'none';
             subTitle.style.display   = 'none';
