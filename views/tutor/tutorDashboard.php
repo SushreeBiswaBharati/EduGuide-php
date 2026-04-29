@@ -31,7 +31,7 @@
 <body>
 <div class="d-flex p-3 gap-3 vh-100">
 
-    <!-- Sidebar -->
+    <!-- ===================== SIDEBAR ===================== -->
     <div class="sidebar d-flex flex-column justify-content-between p-0 rounded-4" id="sidebar">
 
         <div class="p-3 border-bottom border-white border-opacity-25 d-flex align-items-center justify-content-between">
@@ -62,10 +62,10 @@
         </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- ===================== MAIN CONTENT ===================== -->
     <div class="flex-grow-1 main-content p-4 rounded-4 shadow-sm" style="overflow-y:auto;">
 
-        <!-- Home -->
+        <!-- ==================== DASHBOARD ==================== -->
         <?php if ($page === 'dashboard'): ?>
 
             <div class="mb-4 greet-bar rounded-4 p-4 text-white">
@@ -144,7 +144,7 @@
                 </div>
             </div>
 
-        <!-- My Profile -->
+        <!-- ==================== MY PROFILE ==================== -->
         <?php elseif ($page === 'profile'): ?>
 
             <div class="mb-4 greet-bar rounded-4 p-3 text-white">
@@ -265,6 +265,26 @@
                                     <option value="No"  <?php echo $tutor['availability'] === 'No'  ? 'selected' : ''; ?>>No</option>
                                 </select>
 
+                                <!-- Subjects -->
+                                <label class="form-label fw-semibold text-primary">Subjects <span class="text-danger">*</span></label>
+                                <div class="border rounded-3 p-3 mb-4" style="background:#f8f9fa; max-height:200px; overflow-y:auto;">
+                                    <?php if ($allSubjects && $allSubjects->num_rows > 0):
+                                        while ($sub = $allSubjects->fetch_assoc()): ?>
+                                        <div class="form-check mb-1">
+                                            <input class="form-check-input" type="checkbox"
+                                                   name="edit_subjects[]"
+                                                   value="<?php echo $sub['id']; ?>"
+                                                   id="sub_<?php echo $sub['id']; ?>"
+                                                   <?php echo in_array($sub['id'], $mySubjectIds) ? 'checked' : ''; ?>>
+                                            <label class="form-check-label" for="sub_<?php echo $sub['id']; ?>">
+                                                <?php echo htmlspecialchars($sub['name']); ?>
+                                            </label>
+                                        </div>
+                                    <?php endwhile; else: ?>
+                                        <small class="text-muted">No subjects available.</small>
+                                    <?php endif; ?>
+                                </div>
+
                                 <div class="d-flex gap-2">
                                     <button type="button" class="btn btn-secondary flex-fill" onclick="toggleEdit()">Cancel</button>
                                     <button type="submit" class="btn btn-success flex-fill fw-semibold">💾 Save Changes</button>
@@ -275,7 +295,7 @@
                 </div>
             </div>
 
-        <!-- Student Requests -->
+        <!-- ==================== STUDENT REQUESTS ==================== -->
         <?php elseif ($page === 'requests'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -322,14 +342,15 @@
                     <table class="table table-bordered table-hover bg-white shadow-sm align-middle" id="requestsTable">
                         <thead class="text-center" style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
                             <tr>
-                                <th class="text-white">#</th>
-                                <th class="text-white">Student</th>
-                                <th class="text-white">Subject</th>
-                                <th class="text-white">Requirement</th>
-                                <th class="text-white">Duration</th>
-                                <th class="text-white">Date</th>
-                                <th class="text-white">Status</th>
-                                <th class="text-white">Action</th>
+                                <th class="text-black">#</th>
+                                <th class="text-black">Student</th>
+                                <th class="text-black">Subject</th>
+                                <th class="text-black">Requirement</th>
+                                <th class="text-black">Duration</th>
+                                <th class="text-black">Date</th>
+                                <th class="text-black">Status</th>
+                                <th class="text-black">Details</th>
+                                <th class="text-black">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -338,7 +359,6 @@
                             $sno = 1;
                             while ($req = $requests->fetch_assoc()):
                                 $bc = $statusBadge[$req['status']] ?? 'bg-secondary';
-                                // Left border accent color per status
                                 $rowBorder = match($req['status']) {
                                     'Pending'   => '#ffc107',
                                     'Confirmed' => '#198754',
@@ -346,18 +366,36 @@
                                     'Cancelled' => '#dc3545',
                                     default     => '#5c8fdc'
                                 };
+                                // Encode all student data as JSON for the modal
+                                $studentData = json_encode([
+                                    'booking_id'    => $req['id'],
+                                    'name'          => $req['student_name'],
+                                    'email'         => $req['student_email'],
+                                    'photo'         => $req['student_photo'],
+                                    'gender'        => $req['student_gender'],
+                                    'class'         => $req['class_name']   ?? '—',
+                                    'board'         => $req['board_name']   ?? '—',
+                                    'exam'          => $req['exam_name']    ?? '—',
+                                    'school'        => $req['school_name']  ?? '—',
+                                    'parent_name'   => $req['parent_name']  ?? '—',
+                                    'parent_phone'  => $req['parent_phone'] ?? '—',
+                                    'address'       => $req['student_address'] ?? '—',
+                                    'subject'       => $req['subject_name'] ?? '—',
+                                    'requirement'   => $req['requirement']  ?? '—',
+                                    'duration'      => $req['duration_months'] ?? '—',
+                                    'date'          => date('d M Y', strtotime($req['created_at'])),
+                                    'status'        => $req['status'],
+                                ]);
                             ?>
                                 <tr class="request-row" data-status="<?php echo $req['status']; ?>"
                                     style="border-left: 4px solid <?php echo $rowBorder; ?>;">
                                     <td class="text-center fw-semibold"><?php echo $sno++; ?></td>
                                     <td class="fw-semibold"><?php echo htmlspecialchars($req['student_name']); ?></td>
                                     <td><?php echo htmlspecialchars($req['subject_name'] ?? '—'); ?></td>
-                                    <td style="max-width:200px; font-size:.85rem;">
+                                    <td style="max-width:180px; font-size:.85rem;">
                                         <?php
                                         $req_text = $req['requirement'] ?? '—';
-                                        echo nl2br(htmlspecialchars(
-                                            strlen($req_text) > 70 ? substr($req_text, 0, 70) . '…' : $req_text
-                                        ));
+                                        echo htmlspecialchars(strlen($req_text) > 60 ? substr($req_text, 0, 60) . '…' : $req_text);
                                         ?>
                                     </td>
                                     <td class="text-center"><?php echo $req['duration_months'] ?? '—'; ?> mo</td>
@@ -370,24 +408,31 @@
                                         </span>
                                     </td>
                                     <td class="text-center">
+                                        <button type="button" class="btn btn-sm fw-semibold view-student-btn"
+                                            style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff; border:none; border-radius:7px;"
+                                            data-student='<?php echo htmlspecialchars($studentData, ENT_QUOTES, 'UTF-8'); ?>'>
+                                            👁 View
+                                        </button>
+                                    </td>
+                                    <td class="text-center">
                                         <?php if ($req['status'] === 'Pending'): ?>
                                             <div class="d-flex gap-1 justify-content-center">
                                                 <form method="POST" onsubmit="return confirm('Accept this booking?')">
                                                     <input type="hidden" name="booking_id"     value="<?php echo $req['id']; ?>">
                                                     <input type="hidden" name="booking_action" value="Confirmed">
-                                                    <button type="submit" class="btn btn-success btn-sm fw-semibold px-2">✔ Accept</button>
+                                                    <button type="submit" class="btn btn-success btn-sm fw-semibold">✔ Accept</button>
                                                 </form>
                                                 <form method="POST" onsubmit="return confirm('Reject this booking?')">
                                                     <input type="hidden" name="booking_id"     value="<?php echo $req['id']; ?>">
                                                     <input type="hidden" name="booking_action" value="Cancelled">
-                                                    <button type="submit" class="btn btn-danger btn-sm fw-semibold px-2">✘ Reject</button>
+                                                    <button type="submit" class="btn btn-danger btn-sm fw-semibold">✘ Reject</button>
                                                 </form>
                                             </div>
                                         <?php elseif ($req['status'] === 'Confirmed'): ?>
                                             <form method="POST" onsubmit="return confirm('Mark as Completed? This cannot be undone.')">
                                                 <input type="hidden" name="booking_id"     value="<?php echo $req['id']; ?>">
                                                 <input type="hidden" name="booking_action" value="Completed">
-                                                <button type="submit" class="btn btn-primary btn-sm fw-semibold px-2">🎓 Complete</button>
+                                                <button type="submit" class="btn btn-primary btn-sm fw-semibold">🎓 Complete</button>
                                             </form>
                                         <?php else: ?>
                                             <span class="text-muted small">—</span>
@@ -404,7 +449,104 @@
                 </div>
             <?php endif; ?>
 
-        <!-- My schedule -->
+            <!-- ── Student Detail Popup Modal ── -->
+            <div id="studentModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:1080; overflow-y:auto;">
+                <div style="background:#fff; width:520px; max-width:96%; margin:50px auto; border-radius:18px; box-shadow:0 12px 48px rgba(11,72,164,.25); overflow:hidden;">
+
+                    <!-- Modal Header -->
+                    <div style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); padding:18px 24px;" class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <img id="modal-photo" src="" alt="Student"
+                                 style="width:52px; height:52px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,.6);">
+                            <div>
+                                <div class="fw-bold text-white fs-6" id="modal-name"></div>
+                                <small class="text-white" style="opacity:.85;" id="modal-email"></small>
+                            </div>
+                        </div>
+                        <button onclick="closeStudentModal()"
+                            style="background:rgba(255,255,255,.2); border:none; border-radius:50%; width:32px; height:32px; color:#fff; font-size:1.1rem; cursor:pointer; line-height:1;">✕</button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div style="padding:20px 24px;">
+
+                        <!-- Booking Request Info -->
+                        <div class="mb-3 p-3 rounded-3" style="background:#f0f6ff; border-left:4px solid #5c8fdc;">
+                            <div class="fw-bold mb-2" style="color:#0b48a4; font-size:.85rem; text-transform:uppercase; letter-spacing:.05em;">📋 Booking Request</div>
+                            <div class="row g-2" style="font-size:.88rem;">
+                                <div class="col-6">
+                                    <span class="text-muted">Subject:</span>
+                                    <span class="fw-semibold ms-1" id="modal-subject"></span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted">Duration:</span>
+                                    <span class="fw-semibold ms-1" id="modal-duration"></span>
+                                </div>
+                                <div class="col-12">
+                                    <span class="text-muted">Status:</span>
+                                    <span class="ms-1" id="modal-status-badge"></span>
+                                </div>
+                                <div class="col-12">
+                                    <span class="text-muted">Requirement:</span>
+                                    <div class="fw-semibold mt-1" id="modal-requirement"
+                                         style="background:#fff; border-radius:6px; padding:8px 10px; font-style:italic; border:.5px solid #dee2e6; font-size:.85rem;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Student Info -->
+                        <div class="mb-3 p-3 rounded-3" style="background:#f8f9fa; border-left:4px solid #198754;">
+                            <div class="fw-bold mb-2" style="color:#0f5132; font-size:.85rem; text-transform:uppercase; letter-spacing:.05em;">🎓 Student Details</div>
+                            <div class="row g-2" style="font-size:.88rem;">
+                                <div class="col-6">
+                                    <span class="text-muted">Gender:</span>
+                                    <span class="fw-semibold ms-1" id="modal-gender"></span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted">Class:</span>
+                                    <span class="fw-semibold ms-1" id="modal-class"></span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted">Board:</span>
+                                    <span class="fw-semibold ms-1" id="modal-board"></span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted">Exam:</span>
+                                    <span class="fw-semibold ms-1" id="modal-exam"></span>
+                                </div>
+                                <div class="col-12">
+                                    <span class="text-muted">School:</span>
+                                    <span class="fw-semibold ms-1" id="modal-school"></span>
+                                </div>
+                                <div class="col-12">
+                                    <span class="text-muted">Address:</span>
+                                    <span class="fw-semibold ms-1" id="modal-address"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Parent Info -->
+                        <div class="mb-4 p-3 rounded-3" style="background:#fff8e1; border-left:4px solid #ffc107;">
+                            <div class="fw-bold mb-2" style="color:#664d03; font-size:.85rem; text-transform:uppercase; letter-spacing:.05em;">👨‍👩‍👧 Parent Details</div>
+                            <div class="row g-2" style="font-size:.88rem;">
+                                <div class="col-6">
+                                    <span class="text-muted">Parent Name:</span>
+                                    <span class="fw-semibold ms-1" id="modal-parent-name"></span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted">Phone:</span>
+                                    <span class="fw-semibold ms-1" id="modal-parent-phone"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action buttons inside modal -->
+                        <div id="modal-actions" class="d-flex gap-2"></div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- ==================== MY SCHEDULES ==================== -->
         <?php elseif ($page === 'schedules'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -445,7 +587,7 @@
                 </table>
             </div>
 
-        <!-- My Reviews -->
+        <!-- ==================== MY REVIEWS ==================== -->
         <?php elseif ($page === 'reviews'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -495,7 +637,7 @@
                 </div>
             <?php endif; ?>
 
-        <!-- Raise Complaints -->
+        <!-- ==================== RAISE COMPLAINT ==================== -->
         <?php elseif ($page === 'complaint'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -539,35 +681,31 @@
 
 <script src="/EduGuide-php/assets/bootstrap/bootstrap.bundle.min.js"></script>
 <script>
+    // ── Sidebar toggle ──
     const toggleBtn  = document.getElementById('toggleBtn');
-        const sidebar    = document.getElementById('sidebar');
-        const navSpans   = sidebar.querySelectorAll('nav .nav-link span');
-        const brandTitle = sidebar.querySelector('.brand-title');
-        const subTitle   = sidebar.querySelector('.brand-subtitle');
-        const logoutSpan = sidebar.querySelector('.logout-span');
+    const sidebar    = document.getElementById('sidebar');
+    const navSpans   = sidebar.querySelectorAll('nav .nav-link span');
+    const brandTitle = sidebar.querySelector('.brand-title');
+    const subTitle   = sidebar.querySelector('.brand-subtitle');
+    const logoutSpan = sidebar.querySelector('.logout-span');
+    let isCollapsed  = false;
 
-        let isCollapsed = false;
-
-        toggleBtn.addEventListener('click', function () {
-            isCollapsed = !isCollapsed;
-
-            if (isCollapsed) {
-                sidebar.style.width = '100px';
-                sidebar.classList.add('collapsed');      
-                navSpans.forEach(s => s.style.display = 'none');
-                brandTitle.style.display = 'none';
-                subTitle.style.display   = 'none';
-                logoutSpan.style.display = 'none';
-
-            } else {
-                sidebar.style.width = '300px';
-                sidebar.classList.remove('collapsed');   
-                navSpans.forEach(s => s.style.display = 'inline');
-                brandTitle.style.display = 'block';
-                subTitle.style.display   = 'block';
-                logoutSpan.style.display = 'inline';
-            }
-        });
+    toggleBtn.addEventListener('click', function () {
+        isCollapsed = !isCollapsed;
+        if (isCollapsed) {
+            sidebar.style.width = '100px';
+            navSpans.forEach(s => s.style.display = 'none');
+            brandTitle.style.display = 'none';
+            subTitle.style.display   = 'none';
+            logoutSpan.style.display = 'none';
+        } else {
+            sidebar.style.width = '300px';
+            navSpans.forEach(s => s.style.display = 'inline');
+            brandTitle.style.display = 'block';
+            subTitle.style.display   = 'block';
+            logoutSpan.style.display = 'inline';
+        }
+    });
 
     // ── Profile edit toggle ──
     function toggleEdit() {
@@ -585,8 +723,86 @@
         window.addEventListener('DOMContentLoaded', toggleEdit);
     <?php endif; ?>
 
-    // ── Filter badges on requests page ──
-    function filterRequests(btn, filter) {
+    // ── Student detail popup modal ──
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.view-student-btn');
+        if (btn) {
+            const data = JSON.parse(btn.getAttribute('data-student'));
+            openStudentModal(data);
+        }
+    });
+
+    function openStudentModal(data) {
+        const defaultPhoto = '/EduGuide-php/assets/default-user.png';
+
+        document.getElementById('modal-photo').src =
+            data.photo ? '/EduGuide-php/assets/profile/' + data.photo : defaultPhoto;
+        document.getElementById('modal-name').textContent         = data.name;
+        document.getElementById('modal-email').textContent        = data.email;
+        document.getElementById('modal-subject').textContent      = data.subject;
+        document.getElementById('modal-duration').textContent     = data.duration + ' month(s)';
+        document.getElementById('modal-requirement').textContent  = data.requirement;
+        document.getElementById('modal-gender').textContent       = data.gender;
+        document.getElementById('modal-class').textContent        = data.class;
+        document.getElementById('modal-board').textContent        = data.board;
+        document.getElementById('modal-exam').textContent         = data.exam;
+        document.getElementById('modal-school').textContent       = data.school;
+        document.getElementById('modal-address').textContent      = data.address;
+        document.getElementById('modal-parent-name').textContent  = data.parent_name;
+        document.getElementById('modal-parent-phone').textContent = data.parent_phone;
+
+        // Status badge
+        const statusColors = {
+            'Pending':   'bg-warning text-dark',
+            'Confirmed': 'bg-success text-white',
+            'Completed': 'bg-primary text-white',
+            'Cancelled': 'bg-danger text-white'
+        };
+        const badgeCls = statusColors[data.status] || 'bg-secondary text-white';
+        document.getElementById('modal-status-badge').innerHTML =
+            '<span class="badge rounded-pill ' + badgeCls + '">' + data.status + '</span>';
+
+        // Action buttons inside modal
+        const actionsDiv = document.getElementById('modal-actions');
+        actionsDiv.innerHTML = '';
+
+        if (data.status === 'Pending') {
+            actionsDiv.innerHTML = `
+                <form method="POST" style="flex:1;" onsubmit="return confirm('Accept this booking?')">
+                    <input type="hidden" name="booking_id"     value="${data.booking_id}">
+                    <input type="hidden" name="booking_action" value="Confirmed">
+                    <button type="submit" class="btn btn-success fw-semibold w-100">✔ Accept Request</button>
+                </form>
+                <form method="POST" style="flex:1;" onsubmit="return confirm('Reject this booking?')">
+                    <input type="hidden" name="booking_id"     value="${data.booking_id}">
+                    <input type="hidden" name="booking_action" value="Cancelled">
+                    <button type="submit" class="btn btn-danger fw-semibold w-100">✘ Reject Request</button>
+                </form>`;
+        } else if (data.status === 'Confirmed') {
+            actionsDiv.innerHTML = `
+                <form method="POST" style="flex:1;" onsubmit="return confirm('Mark as Completed?')">
+                    <input type="hidden" name="booking_id"     value="${data.booking_id}">
+                    <input type="hidden" name="booking_action" value="Completed">
+                    <button type="submit" class="btn btn-primary fw-semibold w-100">🎓 Mark as Completed</button>
+                </form>`;
+        }
+
+        // Close button at bottom
+        actionsDiv.innerHTML += `
+            <button type="button" class="btn btn-secondary fw-semibold"
+                    style="flex:1;" onclick="closeStudentModal()">Close</button>`;
+
+        document.getElementById('studentModal').style.display = 'block';
+    }
+
+    function closeStudentModal() {
+        document.getElementById('studentModal').style.display = 'none';
+    }
+
+    // Close modal clicking outside
+    document.getElementById('studentModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeStudentModal();
+    });
         // Update active badge style
         document.querySelectorAll('.filter-badge').forEach(b => {
             b.classList.remove('active');
@@ -606,7 +822,6 @@
 
         const noMsg = document.getElementById('noFilterMsg');
         if (noMsg) noMsg.style.display = visible === 0 ? 'block' : 'none';
-    }
 </script>
 </body>
 </html>

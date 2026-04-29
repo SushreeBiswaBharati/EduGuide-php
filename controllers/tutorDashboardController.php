@@ -54,15 +54,28 @@ while ($row = $count_result->fetch_assoc()) {
 }
 $count_stmt->close();
 
-// All booking requests
+// All booking requests — with full student details for popup
 $req_stmt = $conn->prepare("
     SELECT bk.id, bk.status, bk.created_at,
            bk.requirement, bk.duration_months,
-           u.name   AS student_name,
-           sub.name AS subject_name
+           u.name          AS student_name,
+           u.email         AS student_email,
+           u.profile_image AS student_photo,
+           st.gender       AS student_gender,
+           st.school_name,
+           st.parent_name,
+           st.parent_phone,
+           st.address      AS student_address,
+           c.name          AS class_name,
+           bd.name         AS board_name,
+           e.name          AS exam_name,
+           sub.name        AS subject_name
     FROM bookings bk
     JOIN students  st  ON st.id  = bk.student_id
     JOIN users     u   ON u.id   = st.user_id
+    LEFT JOIN classes  c   ON c.id   = st.class_id
+    LEFT JOIN boards   bd  ON bd.id  = st.board_id
+    LEFT JOIN exams    e   ON e.id   = st.exam_id
     LEFT JOIN subjects sub ON sub.id = bk.subject_id
     WHERE bk.tutor_id = ?
     ORDER BY bk.created_at DESC
@@ -204,6 +217,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($stmt2->execute()) {
             $profileSuccess = "Profile updated successfully!";
+
+            // Update subjects — delete old ones, insert new selections
+            $delSub = $conn->prepare("DELETE FROM tutor_subjects WHERE tutor_id = ?");
+            $delSub->bind_param("i", $tutor_id);
+            $delSub->execute();
+            $delSub->close();
+
+            if (!empty($_POST['edit_subjects']) && is_array($_POST['edit_subjects'])) {
+                $insSub = $conn->prepare("INSERT INTO tutor_subjects (tutor_id, subject_id) VALUES (?, ?)");
+                foreach ($_POST['edit_subjects'] as $sid) {
+                    $sid = intval($sid);
+                    if ($sid > 0) {
+                        $insSub->bind_param("ii", $tutor_id, $sid);
+                        $insSub->execute();
+                    }
+                }
+                $insSub->close();
+            }
+
         } else {
             $profileError = "Update failed.";
         }
@@ -238,6 +270,20 @@ $registeredDate = isset($tutor['created_at'])
     ? date('F j, Y', strtotime($tutor['created_at']))
     : 'N/A';
 $today = date('F j, Y');
+
+// All available subjects (for edit form checkboxes)
+$allSubjects = $conn->query("SELECT id, name FROM subjects WHERE is_active = 1 ORDER BY name ASC");
+
+// Tutor's currently assigned subject IDs
+$mySubjectIds = [];
+$mysub_stmt = $conn->prepare("SELECT subject_id FROM tutor_subjects WHERE tutor_id = ?");
+$mysub_stmt->bind_param("i", $tutor_id);
+$mysub_stmt->execute();
+$mysub_result = $mysub_stmt->get_result();
+while ($row = $mysub_result->fetch_assoc()) {
+    $mySubjectIds[] = $row['subject_id'];
+}
+$mysub_stmt->close();
 
 $statusBadge = [
     'Pending'   => 'bg-warning text-dark',
