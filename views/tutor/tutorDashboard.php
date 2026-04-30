@@ -342,15 +342,15 @@
                     <table class="table table-bordered table-hover bg-white shadow-sm align-middle" id="requestsTable">
                         <thead class="text-center" style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
                             <tr>
-                                <th class="text-black">#</th>
-                                <th class="text-black">Student</th>
-                                <th class="text-black">Subject</th>
-                                <th class="text-black">Requirement</th>
-                                <th class="text-black">Duration</th>
-                                <th class="text-black">Date</th>
-                                <th class="text-black">Status</th>
-                                <th class="text-black">Details</th>
-                                <th class="text-black">Action</th>
+                                <th class="text-white">#</th>
+                                <th class="text-white">Student</th>
+                                <th class="text-white">Subject</th>
+                                <th class="text-white">Requirement</th>
+                                <th class="text-white">Duration</th>
+                                <th class="text-white">Date</th>
+                                <th class="text-white">Status</th>
+                                <th class="text-white">Details</th>
+                                <th class="text-white">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -590,50 +590,132 @@
         <!-- ==================== MY REVIEWS ==================== -->
         <?php elseif ($page === 'reviews'): ?>
 
-            <div class="mb-3 greet-bar rounded-4 p-3 text-white d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="mb-4 greet-bar rounded-4 p-3 text-white d-flex align-items-center justify-content-between flex-wrap gap-2">
                 <div>
                     <h5 class="fw-bold mb-0">⭐ My Reviews</h5>
-                    <small style="opacity:.85;">What students say about you</small>
+                    <small style="opacity:.85;">What your students say about you</small>
                 </div>
                 <div class="d-flex gap-2">
                     <div class="text-center px-3 py-1 rounded-3" style="background:rgba(255,255,255,.2);">
-                        <div class="fw-bold fs-5">⭐ <?php echo $avgRating; ?></div>
+                        <div class="fw-bold fs-4">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <span style="color:<?php echo $i <= round($avgRating) ? '#ffc107' : 'rgba(255,255,255,.3)'; ?>; font-size:.9rem;">★</span>
+                            <?php endfor; ?>
+                            <span class="ms-1" style="font-size:1rem;"><?php echo $avgRating; ?></span>
+                        </div>
                         <div style="font-size:.75rem; opacity:.85;">Avg Rating</div>
                     </div>
                     <div class="text-center px-3 py-1 rounded-3" style="background:rgba(255,255,255,.2);">
-                        <div class="fw-bold fs-5"><?php echo $totalReviews; ?></div>
+                        <div class="fw-bold fs-4"><?php echo $totalReviews; ?></div>
                         <div style="font-size:.75rem; opacity:.85;">Total Reviews</div>
                     </div>
                 </div>
             </div>
 
-            <?php if ($reviews && $reviews->num_rows > 0): ?>
-                <div class="row g-3">
-                    <?php while ($rv = $reviews->fetch_assoc()): ?>
-                        <div class="col-md-6">
-                            <div class="card shadow-sm p-3 h-100" style="border-left:4px solid #ffc107;">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div class="fw-bold" style="color:#0b48a4;">
-                                        <?php echo htmlspecialchars($rv['student_name']); ?>
-                                    </div>
-                                    <div>
-                                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                                            <span style="color:<?php echo $i <= $rv['rating'] ? '#ffc107' : '#dee2e6'; ?>; font-size:1rem;">★</span>
-                                        <?php endfor; ?>
-                                    </div>
+            <?php if ($reviews && $reviews->num_rows > 0):
+                $reviews->data_seek(0);
+                $allReviews = [];
+                while ($rv = $reviews->fetch_assoc()) $allReviews[] = $rv;
+
+                // Count per star
+                $starCounts = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+                foreach ($allReviews as $rv) $starCounts[intval($rv['rating'])]++;
+            ?>
+
+            <!-- Rating Breakdown -->
+            <div class="card shadow-sm p-4 mb-4">
+                <h6 class="fw-bold mb-3" style="color:#0b48a4;">📊 Rating Breakdown</h6>
+                <div class="row align-items-center g-3">
+                    <div class="col-md-3 text-center">
+                        <div style="font-size:3rem; font-weight:700; color:#0b48a4; line-height:1;">
+                            <?php echo $avgRating; ?>
+                        </div>
+                        <div class="my-1">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <span style="color:<?php echo $i <= round($avgRating) ? '#ffc107' : '#dee2e6'; ?>; font-size:1.3rem;">★</span>
+                            <?php endfor; ?>
+                        </div>
+                        <small class="text-muted"><?php echo $totalReviews; ?> review<?php echo $totalReviews != 1 ? 's' : ''; ?></small>
+                    </div>
+                    <div class="col-md-9">
+                        <?php foreach ([5, 4, 3, 2, 1] as $star):
+                            $count = $starCounts[$star];
+                            $pct   = $totalReviews > 0 ? round(($count / $totalReviews) * 100) : 0;
+                        ?>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div style="width:28px; text-align:right; font-size:.82rem; font-weight:600; color:#664d03; flex-shrink:0;">
+                                <?php echo $star; ?>★
+                            </div>
+                            <div class="progress flex-grow-1" style="height:12px; border-radius:6px;">
+                                <div class="progress-bar"
+                                     style="width:<?php echo $pct; ?>%;
+                                            background:linear-gradient(90deg,#ffc107,#fd7e14);
+                                            border-radius:6px;">
                                 </div>
-                                <p class="text-muted mb-1" style="font-size:.88rem; font-style:italic;">
-                                    "<?php echo htmlspecialchars($rv['comment'] ?? 'No comment.'); ?>"
-                                </p>
-                                <small class="text-muted"><?php echo date('d M Y', strtotime($rv['created_at'])); ?></small>
+                            </div>
+                            <div style="width:36px; font-size:.8rem; color:#555; flex-shrink:0;">
+                                <?php echo $count; ?>
                             </div>
                         </div>
-                    <?php endwhile; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Review Cards -->
+            <div class="row g-3">
+                <?php foreach ($allReviews as $rv):
+                    $nameParts = explode(' ', $rv['student_name']);
+                    $initials  = strtoupper(substr($nameParts[0], 0, 1) . (isset($nameParts[1]) ? substr($nameParts[1], 0, 1) : ''));
+                    $starColor = match(intval($rv['rating'])) {
+                        5 => '#198754', 4 => '#0d6efd',
+                        3 => '#ffc107', 2 => '#fd7e14',
+                        1 => '#dc3545', default => '#6c757d'
+                    };
+                ?>
+                <div class="col-md-6">
+                    <div class="card shadow-sm p-3 h-100" style="border-left:4px solid <?php echo $starColor; ?>;">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <!-- Student avatar -->
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
+                                 style="width:40px; height:40px; font-size:13px;
+                                        background:#e0f0ff; color:#0b48a4;">
+                                <?php echo $initials; ?>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold" style="color:#0b48a4; font-size:.95rem;">
+                                    <?php echo htmlspecialchars($rv['student_name']); ?>
+                                </div>
+                                <small class="text-muted"><?php echo date('d M Y', strtotime($rv['created_at'])); ?></small>
+                            </div>
+                            <!-- Star badge -->
+                            <div class="flex-shrink-0 text-center px-2 py-1 rounded-3"
+                                 style="background:<?php echo $starColor; ?>1a; border:1px solid <?php echo $starColor; ?>40;">
+                                <div style="font-size:.78rem; font-weight:700; color:<?php echo $starColor; ?>;">
+                                    <?php echo $rv['rating']; ?> ★
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Stars visual -->
+                        <div class="mb-2">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <span style="color:<?php echo $i <= $rv['rating'] ? '#ffc107' : '#dee2e6'; ?>; font-size:1rem;">★</span>
+                            <?php endfor; ?>
+                        </div>
+                        <!-- Comment -->
+                        <p class="text-muted mb-0" style="font-size:.88rem; font-style:italic; line-height:1.5;">
+                            "<?php echo htmlspecialchars($rv['comment'] ?? 'No comment.'); ?>"
+                        </p>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+
             <?php else: ?>
-                <div class="text-center py-5" style="background:rgba(255,255,255,.7); border-radius:14px; border:1.5px dashed #ffc107;">
+                <div class="text-center py-5" style="background:rgba(255,255,255,.7); border-radius:16px; border:1.5px dashed #ffc107;">
                     <div style="font-size:3rem;">⭐</div>
-                    <p class="mt-2 text-muted">No reviews yet. Complete sessions to receive ratings!</p>
+                    <h5 class="fw-bold mt-2 mb-2" style="color:#0b48a4;">No Reviews Yet</h5>
+                    <p class="text-muted">Complete sessions with students to start receiving ratings!</p>
                 </div>
             <?php endif; ?>
 
