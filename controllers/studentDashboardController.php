@@ -64,7 +64,9 @@ $bookings_stmt->execute();
 $bookings = $bookings_stmt->get_result();
 $bookings_stmt->close();
 
+// ============================================================
 //  BOOK TUTOR
+// ============================================================
 $bookingSuccess = "";
 $bookingError   = "";
 
@@ -160,7 +162,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_tutor'])) {
     }
 }
 
+// ============================================================
 //  CANCEL BOOKING (student cancels their own Pending booking)
+// ============================================================
 $cancelSuccess = "";
 $cancelError   = "";
 
@@ -222,7 +226,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_booking_id']))
     $bookings_stmt2->close();
 }
 
+// ============================================================
 //  COMPLAINT SUBMISSION
+// ============================================================
 $complaintSuccess = "";
 $complaintError   = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject'])) {
@@ -239,7 +245,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject']))
     }
 }
 
+// ============================================================
 //  EDIT PROFILE
+// ============================================================
 $profileSuccess = "";
 $profileError   = "";
 
@@ -321,7 +329,9 @@ $classes = $conn->query("SELECT id, name FROM classes WHERE is_active = 1 ORDER 
 $boards  = $conn->query("SELECT id, name FROM boards  WHERE is_active = 1 ORDER BY name ASC");
 $exams   = $conn->query("SELECT id, name FROM exams   WHERE is_active = 1 ORDER BY name ASC");
 
+// ============================================================
 //  BROWSE TUTORS
+// ============================================================
 $subjects     = $conn->query("SELECT id, name FROM subjects WHERE is_active = 1 ORDER BY name ASC");
 $browseBoards = $conn->query("SELECT id, name FROM boards   WHERE is_active = 1 ORDER BY name ASC");
 
@@ -371,7 +381,85 @@ $stmt->execute();
 $tutors = $stmt->get_result();
 $stmt->close();
 
+// ============================================================
 //  TOP TUTORS (dashboard widget)
+// ============================================================
+// ============================================================
+//  SUBMIT REVIEW
+// ============================================================
+$reviewSuccess = "";
+$reviewError   = "";
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
+    $review_booking_id = intval($_POST['review_booking_id'] ?? 0);
+    $review_tutor_id   = intval($_POST['review_tutor_id']   ?? 0);
+    $rating            = intval($_POST['rating']             ?? 0);
+    $comment           = trim($_POST['comment']              ?? '');
+
+    if ($rating < 1 || $rating > 5) {
+        $reviewError = "Please select a rating between 1 and 5 stars.";
+    } elseif ($comment === '') {
+        $reviewError = "Please write a comment before submitting.";
+    } else {
+        // Verify booking belongs to this student and is Completed
+        $chk = $conn->prepare("
+            SELECT id FROM bookings
+            WHERE id = ? AND student_id = ? AND tutor_id = ? AND status = 'Completed'
+        ");
+        $chk->bind_param("iii", $review_booking_id, $student_id, $review_tutor_id);
+        $chk->execute();
+        $chk->store_result();
+
+        if ($chk->num_rows === 0) {
+            $reviewError = "Invalid booking or session not completed.";
+        } else {
+            // Check if already reviewed
+            $dup = $conn->prepare("SELECT id FROM reviews WHERE booking_id = ? AND student_id = ?");
+            $dup->bind_param("ii", $review_booking_id, $student_id);
+            $dup->execute();
+            $dup->store_result();
+
+            if ($dup->num_rows > 0) {
+                $reviewError = "You have already submitted a review for this session.";
+            } else {
+                $ins = $conn->prepare("
+                    INSERT INTO reviews (student_id, tutor_id, booking_id, rating, comment)
+                    VALUES (?, ?, ?, ?, ?)
+                ");
+                $ins->bind_param("iiiis", $student_id, $review_tutor_id, $review_booking_id, $rating, $comment);
+                if ($ins->execute()) {
+                    $reviewSuccess = "Your review has been submitted successfully!";
+                } else {
+                    $reviewError = "Failed to submit review. Please try again.";
+                }
+                $ins->close();
+            }
+            $dup->close();
+        }
+        $chk->close();
+    }
+}
+
+// Fetch completed bookings for review page
+$completed_stmt = $conn->prepare("
+    SELECT bk.id AS booking_id, bk.created_at, bk.tutor_id,
+           u.name   AS tutor_name,
+           sub.name AS subject_name,
+           rv.id    AS review_id,
+           rv.rating, rv.comment
+    FROM bookings bk
+    JOIN tutors   t   ON t.id  = bk.tutor_id
+    JOIN users    u   ON u.id  = t.user_id
+    LEFT JOIN subjects sub ON sub.id = bk.subject_id
+    LEFT JOIN reviews  rv  ON rv.booking_id = bk.id AND rv.student_id = ?
+    WHERE bk.student_id = ? AND bk.status = 'Completed'
+    ORDER BY bk.created_at DESC
+");
+$completed_stmt->bind_param("ii", $student_id, $student_id);
+$completed_stmt->execute();
+$completedBookingsForReview = $completed_stmt->get_result();
+$completed_stmt->close();
+
 $topTutors = $conn->query("
     SELECT u.name, IFNULL(COUNT(b.id), 0) AS total
     FROM tutors t

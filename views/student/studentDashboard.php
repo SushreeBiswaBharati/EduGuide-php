@@ -670,15 +670,183 @@
         <!-- ==================== MY REVIEWS ==================== -->
         <?php elseif ($page === 'reviews'): ?>
 
-            <div class="mb-3 greet-bar rounded-4 p-3 text-white">
-                <h5 class="fw-bold mb-0">⭐ My Reviews</h5>
-                <small style="opacity:.85;">Reviews you've left for your tutors</small>
+            <div class="mb-4 greet-bar rounded-4 p-3 text-white d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div>
+                    <h5 class="fw-bold mb-0">⭐ My Reviews</h5>
+                    <small style="opacity:.85;">Rate your completed tutor sessions</small>
+                </div>
             </div>
 
-            <div class="text-center py-5" style="background:rgba(255,255,255,.7); border-radius:14px; border:1.5px dashed #ffc107;">
-                <div style="font-size:3rem;">⭐</div>
-                <p class="mt-2 text-muted">No reviews submitted yet. Complete a session to leave a review!</p>
-            </div>
+            <?php if ($reviewSuccess): ?>
+                <div class="alert alert-success alert-dismissible fade show py-2 mb-3">
+                    ✅ <?php echo $reviewSuccess; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php endif; ?>
+            <?php if ($reviewError): ?>
+                <div class="alert alert-danger alert-dismissible fade show py-2 mb-3">
+                    ⚠️ <?php echo $reviewError; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php endif; ?>
+
+            <?php
+            $completedBookingsForReview->data_seek(0);
+            $reviewRows = [];
+            while ($r = $completedBookingsForReview->fetch_assoc()) $reviewRows[] = $r;
+            ?>
+
+            <?php if (empty($reviewRows)): ?>
+                <div class="text-center py-5" style="background:rgba(255,255,255,.7); border-radius:16px; border:1.5px dashed #ffc107;">
+                    <div style="font-size:3rem;">⭐</div>
+                    <h5 class="fw-bold mt-2 mb-2" style="color:#0b48a4;">No Completed Sessions Yet</h5>
+                    <p class="text-muted mb-4">Complete a tutor session to leave a review.</p>
+                    <a href="?page=browse" class="btn fw-semibold px-4"
+                       style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff; border-radius:8px;">
+                        🔍 Browse Tutors
+                    </a>
+                </div>
+
+            <?php else: ?>
+
+                <?php foreach ($reviewRows as $row):
+                    $alreadyReviewed = !empty($row['review_id']);
+                    $nameParts = explode(' ', $row['tutor_name']);
+                    $initials  = strtoupper(substr($nameParts[0], 0, 1) . (isset($nameParts[1]) ? substr($nameParts[1], 0, 1) : ''));
+                    $sessionDate = date('d M Y', strtotime($row['created_at']));
+                ?>
+
+                <div class="mb-3 rounded-4 shadow-sm overflow-hidden"
+                     style="border-left:4px solid <?php echo $alreadyReviewed ? '#0d6efd' : '#ffc107'; ?>; border-top:.5px solid #dee2e6; border-right:.5px solid #dee2e6; border-bottom:.5px solid #dee2e6; background:#fff;">
+
+                    <!-- Session Info Row -->
+                    <div class="d-flex align-items-center gap-3 p-3 flex-wrap">
+                        <!-- Avatar -->
+                        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
+                             style="width:46px; height:46px; font-size:15px;
+                                    background:<?php echo $alreadyReviewed ? '#cfe2ff' : '#fff3cd'; ?>;
+                                    color:<?php echo $alreadyReviewed ? '#084298' : '#664d03'; ?>;">
+                            <?php echo $initials; ?>
+                        </div>
+
+                        <div class="flex-grow-1" style="min-width:0;">
+                            <div class="fw-bold" style="color:#0b48a4; font-size:1rem;">
+                                <?php echo htmlspecialchars($row['tutor_name']); ?>
+                            </div>
+                            <div class="text-muted" style="font-size:.82rem;">
+                                📚 <?php echo htmlspecialchars($row['subject_name'] ?? 'N/A'); ?>
+                                &nbsp;·&nbsp; 📆 <?php echo $sessionDate; ?>
+                            </div>
+                        </div>
+
+                        <div class="flex-shrink-0">
+                            <?php if ($alreadyReviewed): ?>
+                                <span class="badge bg-primary rounded-pill">✔ Reviewed</span>
+                            <?php else: ?>
+                                <span class="badge bg-warning text-dark rounded-pill">⭐ Pending Review</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- Already reviewed — show the submitted review -->
+                    <?php if ($alreadyReviewed): ?>
+                        <div class="mx-3 mb-3 p-3 rounded-3" style="background:#f0f6ff; border:1px solid #cfe2ff;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div>
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <span style="font-size:1.2rem; color:<?php echo $i <= $row['rating'] ? '#ffc107' : '#dee2e6'; ?>;">★</span>
+                                    <?php endfor; ?>
+                                    <span class="ms-1 fw-semibold" style="color:#0b48a4; font-size:.85rem;">
+                                        <?php echo $row['rating']; ?>/5
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="text-muted mb-0" style="font-size:.88rem; font-style:italic;">
+                                "<?php echo htmlspecialchars($row['comment']); ?>"
+                            </p>
+                        </div>
+
+                    <!-- Not yet reviewed — show the review form -->
+                    <?php else: ?>
+                        <div class="mx-3 mb-3 p-3 rounded-3" style="background:#fffbf0; border:1px solid #ffe8a1;">
+                            <div class="fw-semibold mb-2" style="color:#664d03; font-size:.88rem;">
+                                📝 Leave your review for this session
+                            </div>
+                            <form method="POST">
+                                <input type="hidden" name="submit_review"     value="1">
+                                <input type="hidden" name="review_booking_id" value="<?php echo $row['booking_id']; ?>">
+                                <input type="hidden" name="review_tutor_id"   value="<?php echo $row['tutor_id']; ?>">
+
+                                <!-- Star Rating -->
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <span class="fw-semibold text-primary" style="font-size:.88rem;">Rating:</span>
+                                    <div class="star-group" id="stars-<?php echo $row['booking_id']; ?>">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <span class="star"
+                                                  data-val="<?php echo $i; ?>"
+                                                  data-group="<?php echo $row['booking_id']; ?>"
+                                                  onclick="setRating(<?php echo $row['booking_id']; ?>, <?php echo $i; ?>)"
+                                                  style="font-size:1.6rem; cursor:pointer; color:#dee2e6; transition:color .1s;">★</span>
+                                        <?php endfor; ?>
+                                        <input type="hidden" name="rating" id="rating-<?php echo $row['booking_id']; ?>" value="0">
+                                        <small class="text-muted ms-1" id="ratingLabel-<?php echo $row['booking_id']; ?>" style="font-size:.8rem;"></small>
+                                    </div>
+                                </div>
+
+                                <!-- Comment -->
+                                <textarea name="comment" class="form-control mb-3" rows="2"
+                                    placeholder="Share your experience with this tutor..."
+                                    required style="font-size:.88rem; resize:none;"></textarea>
+
+                                <button type="submit" class="btn btn-sm fw-semibold px-4"
+                                        style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff; border:none; border-radius:8px;">
+                                    ✉️ Submit Review
+                                </button>
+                            </form>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+                <?php endforeach; ?>
+
+            <?php endif; ?>
+
+            <!-- Star rating JS -->
+            <script>
+                const ratingLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+
+                function setRating(groupId, val) {
+                    document.getElementById('rating-' + groupId).value = val;
+                    document.getElementById('ratingLabel-' + groupId).textContent = ratingLabels[val];
+
+                    const stars = document.querySelectorAll('.star[data-group="' + groupId + '"]');
+                    stars.forEach(function(s) {
+                        s.style.color = parseInt(s.dataset.val) <= val ? '#ffc107' : '#dee2e6';
+                    });
+                }
+
+                // Hover effect
+                document.querySelectorAll('.star').forEach(function(star) {
+                    star.addEventListener('mouseenter', function() {
+                        const groupId = this.dataset.group;
+                        const val     = parseInt(this.dataset.val);
+                        document.querySelectorAll('.star[data-group="' + groupId + '"]').forEach(function(s) {
+                            s.style.color = parseInt(s.dataset.val) <= val ? '#ffc107' : '#dee2e6';
+                        });
+                    });
+                    star.addEventListener('mouseleave', function() {
+                        const groupId = this.dataset.group;
+                        const current = parseInt(document.getElementById('rating-' + groupId).value);
+                        document.querySelectorAll('.star[data-group="' + groupId + '"]').forEach(function(s) {
+                            s.style.color = parseInt(s.dataset.val) <= current ? '#ffc107' : '#dee2e6';
+                        });
+                    });
+                });
+
+                <?php if ($reviewError): ?>
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                <?php endif; ?>
+            </script>
 
         <!-- ==================== RAISE COMPLAINT ==================== -->
         <?php elseif ($page === 'complaint'): ?>
