@@ -136,13 +136,13 @@
             </div>
 
             <?php if ($profileSuccess): ?>
-                <div class="alert alert-success alert-dismissible fade show py-2">
+                <div class="alert alert-success alert-dismissible fade show py-2 mb-3">
                     ✅ <?php echo $profileSuccess; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
             <?php if ($profileError): ?>
-                <div class="alert alert-danger alert-dismissible fade show py-2">
+                <div class="alert alert-danger alert-dismissible fade show py-2 mb-3">
                     ⚠️ <?php echo $profileError; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>

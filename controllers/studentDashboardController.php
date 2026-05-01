@@ -340,14 +340,16 @@ $gender = $_GET['gender'] ?? '';
 $sort   = $_GET['sort']   ?? '';
 
 $sql = "
-    SELECT t.id, u.profile_image, u.name, t.gender, t.experience, t.rating,
-           GROUP_CONCAT(sub.name SEPARATOR ', ') AS subject_names,
+    SELECT t.id, u.profile_image, u.name, t.gender, t.experience,
+           ROUND(COALESCE(AVG(rv.rating), 0), 1) AS rating,
+           GROUP_CONCAT(DISTINCT sub.name ORDER BY sub.name SEPARATOR ', ') AS subject_names,
            b.name AS board_name
     FROM tutors t
     JOIN users u ON u.id = t.user_id
     LEFT JOIN tutor_subjects ts ON ts.tutor_id = t.id
     LEFT JOIN subjects sub ON sub.id = ts.subject_id
     LEFT JOIN boards b ON b.id = t.board_id
+    LEFT JOIN reviews rv ON rv.tutor_id = t.id
     WHERE t.is_verified = 1
 ";
 $params = [];
@@ -365,7 +367,7 @@ if ($gender !== '') {
     $types   .= "s";
 }
 
-$sql .= " GROUP BY t.id";
+$sql .= " GROUP BY t.id, u.profile_image, u.name, t.gender, t.experience, b.name";
 
 if ($sort === 'asc')          $sql .= " ORDER BY u.name ASC";
 elseif ($sort === 'desc')     $sql .= " ORDER BY u.name DESC";
@@ -428,6 +430,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
                 ");
                 $ins->bind_param("iiiis", $student_id, $review_tutor_id, $review_booking_id, $rating, $comment);
                 if ($ins->execute()) {
+
+                    // Recalculate and update tutors.rating from all reviews
+                    $conn->query("
+                        UPDATE tutors
+                        SET rating = (
+                            SELECT ROUND(AVG(rating), 1)
+                            FROM reviews
+                            WHERE tutor_id = $review_tutor_id
+                        )
+                        WHERE id = $review_tutor_id
+                    ");
+
                     $reviewSuccess = "Your review has been submitted successfully!";
                 } else {
                     $reviewError = "Failed to submit review. Please try again.";

@@ -18,9 +18,12 @@
             border: none;
             font-weight: 600;
         }
-        .filter-badge:hover  { opacity: .85; transform: translateY(-1px); }
-        .filter-badge.active { box-shadow: 0 0 0 3px rgba(255,255,255,.6),
-                                           0 0 0 5px rgba(11,72,164,.4); }
+        .filter-badge:hover  { 
+            opacity: .85; transform: translateY(-1px); 
+        }
+        .filter-badge.active {
+            box-shadow: 0 0 0 3px rgba(255,255,255,.6), 0 0 0 5px rgba(11,72,164,.4);
+        }
 
         /* ── request table row height ── */
         #requestsTable tbody tr { height: 52px; }
@@ -153,13 +156,13 @@
             </div>
 
             <?php if ($profileSuccess): ?>
-                <div class="alert alert-success alert-dismissible fade show py-2">
+                <div class="alert alert-success alert-dismissible fade show py-2 mb-3">
                     ✅ <?php echo $profileSuccess; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
             <?php if ($profileError): ?>
-                <div class="alert alert-danger alert-dismissible fade show py-2">
+                <div class="alert alert-danger alert-dismissible fade show py-2 mb-3">
                     ⚠️ <?php echo $profileError; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -411,7 +414,7 @@
                                         <button type="button" class="btn btn-sm fw-semibold view-student-btn"
                                             style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff; border:none; border-radius:7px;"
                                             data-student='<?php echo htmlspecialchars($studentData, ENT_QUOTES, 'UTF-8'); ?>'>
-                                            👁 View
+                                            👁️ View
                                         </button>
                                     </td>
                                     <td class="text-center">
@@ -647,10 +650,7 @@
                                 <?php echo $star; ?>★
                             </div>
                             <div class="progress flex-grow-1" style="height:12px; border-radius:6px;">
-                                <div class="progress-bar"
-                                     style="width:<?php echo $pct; ?>%;
-                                            background:linear-gradient(90deg,#ffc107,#fd7e14);
-                                            border-radius:6px;">
+                                <div class="progress-bar" style="width:<?php echo $pct; ?>%; background:linear-gradient(90deg,#ffc107,#fd7e14); border-radius:6px;">
                                 </div>
                             </div>
                             <div style="width:36px; font-size:.8rem; color:#555; flex-shrink:0;">
@@ -676,10 +676,9 @@
                 <div class="col-md-6">
                     <div class="card shadow-sm p-3 h-100" style="border-left:4px solid <?php echo $starColor; ?>;">
                         <div class="d-flex align-items-center gap-3 mb-2">
-                            <!-- Student avatar -->
+                            <!-- Student image -->
                             <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
-                                 style="width:40px; height:40px; font-size:13px;
-                                        background:#e0f0ff; color:#0b48a4;">
+                                 style="width:40px; height:40px; font-size:13px; background:#e0f0ff; color:#0b48a4;">
                                 <?php echo $initials; ?>
                             </div>
                             <div class="flex-grow-1">
@@ -743,15 +742,12 @@
             <div class="card shadow-sm p-4" style="max-width:640px; margin:0 auto;">
                 <form method="POST">
                     <label class="form-label fw-semibold text-primary">Subject <span class="text-danger">*</span></label>
-                    <input type="text" name="complaint_subject" class="form-control mb-3"
-                           placeholder="Brief subject of your complaint" required>
+                    <input type="text" name="complaint_subject" class="form-control mb-3" placeholder="Brief subject of your complaint" required>
 
                     <label class="form-label fw-semibold text-primary">Message <span class="text-danger">*</span></label>
-                    <textarea name="complaint_message" class="form-control mb-4" rows="5"
-                              placeholder="Describe your issue in detail..." required></textarea>
+                    <textarea name="complaint_message" class="form-control mb-4" rows="5" placeholder="Describe your issue in detail..." required></textarea>
 
-                    <button type="submit" class="btn fw-semibold w-100"
-                            style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff;">
+                    <button type="submit" class="btn fw-semibold w-100" style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff;">
                         📤 Submit Complaint
                     </button>
                 </form>
@@ -817,8 +813,7 @@
     function openStudentModal(data) {
         const defaultPhoto = '/EduGuide-php/assets/default-user.png';
 
-        document.getElementById('modal-photo').src =
-            data.photo ? '/EduGuide-php/assets/profile/' + data.photo : defaultPhoto;
+        document.getElementById('modal-photo').src = data.photo ? '/EduGuide-php/assets/profile/' + data.photo : defaultPhoto;
         document.getElementById('modal-name').textContent         = data.name;
         document.getElementById('modal-email').textContent        = data.email;
         document.getElementById('modal-subject').textContent      = data.subject;
