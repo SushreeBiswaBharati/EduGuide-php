@@ -18,12 +18,8 @@
             border: none;
             font-weight: 600;
         }
-        .filter-badge:hover  { 
-            opacity: .85; transform: translateY(-1px); 
-        }
-        .filter-badge.active {
-            box-shadow: 0 0 0 3px rgba(255,255,255,.6), 0 0 0 5px rgba(11,72,164,.4);
-        }
+        .filter-badge:hover  { opacity: .85; transform: translateY(-1px); }
+        .filter-badge.active { box-shadow: 0 0 0 3px rgba(255,255,255,.6),0 0 0 5px rgba(11,72,164,.4); }
 
         /* ── request table row height ── */
         #requestsTable tbody tr { height: 52px; }
@@ -156,13 +152,13 @@
             </div>
 
             <?php if ($profileSuccess): ?>
-                <div class="alert alert-success alert-dismissible fade show py-2 mb-3">
+                <div class="alert alert-success alert-dismissible fade show py-2">
                     ✅ <?php echo $profileSuccess; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
             <?php if ($profileError): ?>
-                <div class="alert alert-danger alert-dismissible fade show py-2 mb-3">
+                <div class="alert alert-danger alert-dismissible fade show py-2">
                     ⚠️ <?php echo $profileError; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -345,15 +341,15 @@
                     <table class="table table-bordered table-hover bg-white shadow-sm align-middle" id="requestsTable">
                         <thead class="text-center" style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
                             <tr>
-                                <th class="text-white">#</th>
-                                <th class="text-white">Student</th>
-                                <th class="text-white">Subject</th>
-                                <th class="text-white">Requirement</th>
-                                <th class="text-white">Duration</th>
-                                <th class="text-white">Date</th>
-                                <th class="text-white">Status</th>
-                                <th class="text-white">Details</th>
-                                <th class="text-white">Action</th>
+                                <th class="text-white bg-black">#</th>
+                                <th class="text-white bg-black">Student</th>
+                                <th class="text-white bg-black">Subject</th>
+                                <th class="text-white bg-black">Requirement</th>
+                                <th class="text-white bg-black">Duration</th>
+                                <th class="text-white bg-black">Date</th>
+                                <th class="text-white bg-black">Status</th>
+                                <th class="text-white bg-black">Details</th>
+                                <th class="text-white bg-black">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -414,7 +410,7 @@
                                         <button type="button" class="btn btn-sm fw-semibold view-student-btn"
                                             style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff; border:none; border-radius:7px;"
                                             data-student='<?php echo htmlspecialchars($studentData, ENT_QUOTES, 'UTF-8'); ?>'>
-                                            👁️ View
+                                            👁 View
                                         </button>
                                     </td>
                                     <td class="text-center">
@@ -552,43 +548,184 @@
         <!-- ==================== MY SCHEDULES ==================== -->
         <?php elseif ($page === 'schedules'): ?>
 
-            <div class="mb-3 greet-bar rounded-4 p-3 text-white">
-                <h5 class="fw-bold mb-0">📅 My Schedules</h5>
-                <small style="opacity:.85;">Your confirmed active sessions</small>
+            <div class="mb-3 greet-bar rounded-4 p-3 text-white d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div>
+                    <h5 class="fw-bold mb-0">📅 My Schedules</h5>
+                    <small style="opacity:.85;">Track your active and completed sessions</small>
+                </div>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-white text-success fw-semibold px-3 py-2">
+                        Active: <?php echo $activeCount; ?>
+                    </span>
+                    <span class="badge bg-white text-primary fw-semibold px-3 py-2">
+                        Completed: <?php echo $completedSchCount; ?>
+                    </span>
+                </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle bg-white shadow-sm">
-                    <thead class="text-white" style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
-                        <tr>
-                            <th class="text-white">#</th>
-                            <th class="text-white">Student</th>
-                            <th class="text-white">Subject</th>
-                            <th class="text-white">Booked On</th>
-                            <th class="text-white">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ($schedule && $schedule->num_rows > 0):
-                            $n = 1; while ($sc = $schedule->fetch_assoc()): ?>
-                            <tr>
-                                <td><?php echo $n++; ?></td>
-                                <td class="fw-semibold"><?php echo htmlspecialchars($sc['student_name']); ?></td>
-                                <td><?php echo htmlspecialchars($sc['subject_name'] ?? '—'); ?></td>
-                                <td><?php echo date('d M Y', strtotime($sc['created_at'])); ?></td>
-                                <td><span class="badge bg-success">Confirmed</span></td>
-                            </tr>
-                        <?php endwhile; else: ?>
-                            <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
-                                    <div style="font-size:2rem;">📭</div>
-                                    No confirmed sessions yet.
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+            <!-- Filter Tabs -->
+            <div class="d-flex gap-2 flex-wrap mb-3">
+                <button class="filter-badge active"
+                        style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff; border:none;"
+                        data-filter="all" onclick="filterSchedule(this, 'all')">
+                    All (<?php echo $activeCount + $completedSchCount; ?>)
+                </button>
+                <button class="filter-badge"
+                        style="background:#d1e7dd; color:#0f5132; border:1px solid #198754;"
+                        data-filter="Confirmed" onclick="filterSchedule(this, 'Confirmed')">
+                    ✔ Active (<?php echo $activeCount; ?>)
+                </button>
+                <button class="filter-badge"
+                        style="background:#cfe2ff; color:#084298; border:1px solid #0d6efd;"
+                        data-filter="Completed" onclick="filterSchedule(this, 'Completed')">
+                    🎓 Completed (<?php echo $completedSchCount; ?>)
+                </button>
             </div>
+
+            <?php if ($schedule && ($activeCount + $completedSchCount) > 0):
+                $schedule->data_seek(0);
+            ?>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover bg-white shadow-sm align-middle" id="scheduleTable">
+                        <thead>
+                            <tr style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
+                                <th class="text-white bg-black" style="padding:10px 12px;">#</th>
+                                <th class="text-white bg-black" style="padding:10px 12px;">Student</th>
+                                <th class="text-white bg-black" style="padding:10px 12px;">Subject</th>
+                                <th class="text-white bg-black" style="padding:10px 12px;">Start Date</th>
+                                <th class="text-white bg-black" style="padding:10px 12px;">Progress</th>
+                                <th class="text-white bg-black" style="padding:10px 12px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $n = 1; while ($sc = $schedule->fetch_assoc()):
+                                $isConfirmed = $sc['status'] === 'Confirmed';
+                                $borderColor = $isConfirmed ? '#198754' : '#0d6efd';
+                                $badgeClass  = $isConfirmed ? 'bg-success' : 'bg-primary';
+                                $totalMonths = max(intval($sc['duration_months']), 1);
+                                $rowId       = 'row-' . $sc['id'];
+                                // Default start date = booking date
+                                $defaultStart = date('Y-m-d', strtotime($sc['created_at']));
+                            ?>
+                                <tr class="schedule-row" data-status="<?php echo $sc['status']; ?>"
+                                    style="border-left: 4px solid <?php echo $borderColor; ?>;">
+                                    <td class="text-center fw-semibold"><?php echo $n++; ?></td>
+                                    <td class="fw-semibold"><?php echo htmlspecialchars($sc['student_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($sc['subject_name'] ?? '—'); ?></td>
+
+                                    <!-- Editable start date -->
+                                    <td>
+                                        <input type="date"
+                                               id="start-<?php echo $sc['id']; ?>"
+                                               value="<?php echo $defaultStart; ?>"
+                                               max="<?php echo date('Y-m-d'); ?>"
+                                               onchange="updateProgress(<?php echo $sc['id']; ?>, <?php echo $totalMonths; ?>)"
+                                               style="font-size:.8rem; padding:3px 6px; border:1px solid #dee2e6; border-radius:6px; color:#0b48a4; cursor:pointer;">
+                                    </td>
+
+                                    <!-- Progress bar — JS driven -->
+                                    <td style="min-width:160px;">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div style="flex:1; height:8px; background:#e9ecef; border-radius:4px; overflow:hidden;">
+                                                <div id="bar-<?php echo $sc['id']; ?>"
+                                                     style="height:100%; width:0%; border-radius:4px; transition:width .4s; background:#5c8fdc;"></div>
+                                            </div>
+                                            <span id="counter-<?php echo $sc['id']; ?>"
+                                                  style="font-size:.75rem; color:#555; white-space:nowrap; flex-shrink:0;">
+                                                0/<?php echo $totalMonths; ?> mo
+                                            </span>
+                                        </div>
+                                        <div id="label-<?php echo $sc['id']; ?>"
+                                             style="font-size:.7rem; color:#888; margin-top:2px;">
+                                        </div>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <span class="badge <?php echo $badgeClass; ?> rounded-pill">
+                                            <?php echo $isConfirmed ? 'Active' : 'Completed'; ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <!-- Auto-init this row on page load -->
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        updateProgress(<?php echo $sc['id']; ?>, <?php echo $totalMonths; ?>);
+                                    });
+                                </script>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="noScheduleMsg" class="text-center py-4 text-muted" style="display:none;">
+                    <div style="font-size:2rem;">🔍</div>
+                    <p class="mt-1">No sessions match this filter.</p>
+                </div>
+
+            <?php else: ?>
+                <div class="text-center py-5" style="background:rgba(255,255,255,.7); border-radius:14px; border:1.5px dashed #5c8fdc;">
+                    <div style="font-size:3rem;">📭</div>
+                    <h5 class="fw-bold mt-2 mb-1" style="color:#0b48a4;">No Sessions Yet</h5>
+                    <p class="text-muted">Accept student requests to start managing sessions here.</p>
+                </div>
+            <?php endif; ?>
+
+            <script>
+                function updateProgress(id, totalMonths) {
+                    var startInput = document.getElementById('start-' + id);
+                    var bar        = document.getElementById('bar-'     + id);
+                    var counter    = document.getElementById('counter-' + id);
+                    var label      = document.getElementById('label-'   + id);
+
+                    if (!startInput || !bar) return;
+
+                    var startDate = new Date(startInput.value);
+                    var today     = new Date();
+
+                    if (isNaN(startDate.getTime())) return;
+
+                    // Calculate months elapsed
+                    var years  = today.getFullYear()  - startDate.getFullYear();
+                    var months = today.getMonth()     - startDate.getMonth();
+                    var elapsed = Math.max(0, Math.min(years * 12 + months, totalMonths));
+                    var pct     = Math.min(Math.round((elapsed / totalMonths) * 100), 100);
+
+                    // Bar color — primary only when session is 100% complete
+                    var color = pct >= 100 ? '#0d6efd' : '#5c8fdc';
+
+                    bar.style.width      = pct + '%';
+                    bar.style.background = color;
+                    counter.textContent  = elapsed + '/' + totalMonths + ' mo';
+
+                    var remaining = totalMonths - elapsed;
+                    if (pct >= 100) {
+                        label.textContent = 'Session complete';
+                        label.style.color = '#0d6efd';
+                    } else {
+                        label.textContent = remaining + ' month' + (remaining !== 1 ? 's' : '') + ' remaining';
+                        label.style.color = '#888';
+                    }
+                }
+
+                function filterSchedule(btn, filter) {
+                    document.querySelectorAll('.filter-badge').forEach(function(b) {
+                        b.classList.remove('active');
+                        b.style.opacity = '.75';
+                    });
+                    btn.classList.add('active');
+                    btn.style.opacity = '1';
+
+                    const rows    = document.querySelectorAll('.schedule-row');
+                    let   visible = 0;
+                    rows.forEach(function(row) {
+                        const match = filter === 'all' || row.dataset.status === filter;
+                        row.style.display = match ? '' : 'none';
+                        if (match) visible++;
+                    });
+                    const noMsg = document.getElementById('noScheduleMsg');
+                    if (noMsg) noMsg.style.display = visible === 0 ? 'block' : 'none';
+                }
+            </script>
 
         <!-- ==================== MY REVIEWS ==================== -->
         <?php elseif ($page === 'reviews'): ?>
@@ -650,7 +787,10 @@
                                 <?php echo $star; ?>★
                             </div>
                             <div class="progress flex-grow-1" style="height:12px; border-radius:6px;">
-                                <div class="progress-bar" style="width:<?php echo $pct; ?>%; background:linear-gradient(90deg,#ffc107,#fd7e14); border-radius:6px;">
+                                <div class="progress-bar"
+                                     style="width:<?php echo $pct; ?>%;
+                                            background:linear-gradient(90deg,#ffc107,#fd7e14);
+                                            border-radius:6px;">
                                 </div>
                             </div>
                             <div style="width:36px; font-size:.8rem; color:#555; flex-shrink:0;">
@@ -676,9 +816,10 @@
                 <div class="col-md-6">
                     <div class="card shadow-sm p-3 h-100" style="border-left:4px solid <?php echo $starColor; ?>;">
                         <div class="d-flex align-items-center gap-3 mb-2">
-                            <!-- Student image -->
+                            <!-- Student avatar -->
                             <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
-                                 style="width:40px; height:40px; font-size:13px; background:#e0f0ff; color:#0b48a4;">
+                                 style="width:40px; height:40px; font-size:13px;
+                                        background:#e0f0ff; color:#0b48a4;">
                                 <?php echo $initials; ?>
                             </div>
                             <div class="flex-grow-1">
@@ -742,12 +883,15 @@
             <div class="card shadow-sm p-4" style="max-width:640px; margin:0 auto;">
                 <form method="POST">
                     <label class="form-label fw-semibold text-primary">Subject <span class="text-danger">*</span></label>
-                    <input type="text" name="complaint_subject" class="form-control mb-3" placeholder="Brief subject of your complaint" required>
+                    <input type="text" name="complaint_subject" class="form-control mb-3"
+                           placeholder="Brief subject of your complaint" required>
 
                     <label class="form-label fw-semibold text-primary">Message <span class="text-danger">*</span></label>
-                    <textarea name="complaint_message" class="form-control mb-4" rows="5" placeholder="Describe your issue in detail..." required></textarea>
+                    <textarea name="complaint_message" class="form-control mb-4" rows="5"
+                              placeholder="Describe your issue in detail..." required></textarea>
 
-                    <button type="submit" class="btn fw-semibold w-100" style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff;">
+                    <button type="submit" class="btn fw-semibold w-100"
+                            style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff;">
                         📤 Submit Complaint
                     </button>
                 </form>
@@ -813,7 +957,8 @@
     function openStudentModal(data) {
         const defaultPhoto = '/EduGuide-php/assets/default-user.png';
 
-        document.getElementById('modal-photo').src = data.photo ? '/EduGuide-php/assets/profile/' + data.photo : defaultPhoto;
+        document.getElementById('modal-photo').src =
+            data.photo ? '/EduGuide-php/assets/profile/' + data.photo : defaultPhoto;
         document.getElementById('modal-name').textContent         = data.name;
         document.getElementById('modal-email').textContent        = data.email;
         document.getElementById('modal-subject').textContent      = data.subject;
@@ -899,6 +1044,7 @@
 
         const noMsg = document.getElementById('noFilterMsg');
         if (noMsg) noMsg.style.display = visible === 0 ? 'block' : 'none';
+    
 </script>
 </body>
 </html>

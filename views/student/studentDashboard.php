@@ -18,8 +18,7 @@
             font-weight: 600;
         }
         .booking-tab:hover  { opacity: .85; transform: translateY(-1px); }
-        .booking-tab.active { box-shadow: 0 0 0 3px rgba(255,255,255,.6),
-                                          0 0 0 5px rgba(11,72,164,.4); }
+        .booking-tab.active { box-shadow: 0 0 0 3px rgba(255,255,255,.6), 0 0 0 5px rgba(11,72,164,.4); }
     </style>
 </head>
 <body>
@@ -136,13 +135,13 @@
             </div>
 
             <?php if ($profileSuccess): ?>
-                <div class="alert alert-success alert-dismissible fade show py-2 mb-3">
+                <div class="alert alert-success alert-dismissible fade show py-2">
                     ✅ <?php echo $profileSuccess; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
             <?php if ($profileError): ?>
-                <div class="alert alert-danger alert-dismissible fade show py-2 mb-3">
+                <div class="alert alert-danger alert-dismissible fade show py-2">
                     ⚠️ <?php echo $profileError; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -343,14 +342,14 @@
                 <table class="table table-bordered table-hover bg-white shadow-sm align-middle text-center">
                     <thead style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
                         <tr>
-                            <th class="text-white">Photo</th>
-                            <th class="text-white">Name</th>
-                            <th class="text-white">Subjects</th>
-                            <th class="text-white">Board</th>
-                            <th class="text-white">Experience</th>
-                            <th class="text-white">Gender</th>
-                            <th class="text-white">Rating</th>
-                            <th class="text-white">Action</th>
+                            <th class="text-white bg-black">Photo</th>
+                            <th class="text-white bg-black">Name</th>
+                            <th class="text-white bg-black">Subjects</th>
+                            <th class="text-white bg-black">Board</th>
+                            <th class="text-white bg-black">Experience</th>
+                            <th class="text-white bg-black">Gender</th>
+                            <th class="text-white bg-black">Rating</th>
+                            <th class="text-white bg-black">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -369,13 +368,30 @@
                                     <td><?php echo htmlspecialchars($t['board_name'] ?? '—'); ?></td>
                                     <td><?php echo $t['experience']; ?> yrs</td>
                                     <td><?php echo htmlspecialchars($t['gender']); ?></td>
-                                    <td>⭐ <?php echo number_format($t['rating'], 1); ?></td>
+                                    <td class="text-center">
+                                        <div>
+                                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                <span style="color:<?php echo $i <= round($t['rating']) ? '#ffc107' : '#dee2e6'; ?>; font-size:.85rem;">★</span>
+                                            <?php endfor; ?>
+                                        </div>
+                                        <small style="font-size:.75rem; color:#555;">
+                                            <?php echo number_format($t['rating'], 1); ?>
+                                            (<?php echo intval($t['review_count']); ?>)
+                                        </small>
+                                    </td>
                                     <td>
-                                        <button class="btn btn-sm fw-semibold"
-                                            style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff; border:none;"
-                                            onclick="openBookingModal(<?php echo $t['id']; ?>, '<?php echo addslashes(htmlspecialchars($t['name'])); ?>')">
-                                            📅 Book Now
-                                        </button>
+                                        <div class="d-flex gap-1 justify-content-center flex-wrap">
+                                            <button class="btn btn-sm fw-semibold"
+                                                style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff; border:none;"
+                                                onclick="openBookingModal(<?php echo $t['id']; ?>, '<?php echo addslashes(htmlspecialchars($t['name'])); ?>')">
+                                                📅 Book
+                                            </button>
+                                            <button class="btn btn-sm fw-semibold"
+                                                style="background:#fff3cd; color:#664d03; border:1px solid #ffc107;"
+                                                onclick="openReviewsModal(<?php echo $t['id']; ?>, '<?php echo addslashes(htmlspecialchars($t['name'])); ?>')">
+                                                ⭐ Reviews
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
@@ -1051,5 +1067,198 @@
         }
     }
 </script>
+
+
+<?php
+// Build reviews modal HTML for every tutor that has reviews
+// This is output once — JS shows/hides the right one
+foreach ($allTutorReviews as $tid => $reviews):
+    // Calculate avg and star counts for this tutor
+    $totalRatings = count($reviews);
+    $sumRatings   = array_sum(array_column($reviews, 'rating'));
+    $avgRating    = $totalRatings > 0 ? round($sumRatings / $totalRatings, 1) : 0;
+    $starCounts   = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+    foreach ($reviews as $rv) $starCounts[intval($rv['rating'])]++;
+?>
+<div id="reviewsModal-<?php echo $tid; ?>"
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:1060; overflow-y:auto;"
+     onclick="if(event.target===this) closeReviewsModal(<?php echo $tid; ?>)">
+
+    <div style="background:#fff; width:560px; max-width:96%; margin:50px auto; border-radius:18px;
+                box-shadow:0 12px 48px rgba(11,72,164,.25); overflow:hidden;">
+
+        <!-- Header -->
+        <div style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); padding:16px 22px;"
+             class="d-flex align-items-center justify-content-between">
+            <div>
+                <div class="fw-bold text-white fs-6" id="rv-title-<?php echo $tid; ?>"></div>
+                <small class="text-white" style="opacity:.85;">
+                    ⭐ <?php echo $avgRating; ?> &nbsp;·&nbsp;
+                    <?php echo $totalRatings; ?> review<?php echo $totalRatings != 1 ? 's' : ''; ?>
+                </small>
+            </div>
+            <button onclick="closeReviewsModal(<?php echo $tid; ?>)"
+                style="background:rgba(255,255,255,.2); border:none; border-radius:50%;
+                       width:32px; height:32px; color:#fff; font-size:1.1rem;
+                       cursor:pointer; line-height:1;">✕</button>
+        </div>
+
+        <!-- Body -->
+        <div style="padding:20px 22px;">
+
+            <!-- Step 1: Summary card -->
+            <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded-3"
+                 style="background:#f0f6ff; border-left:4px solid #5c8fdc;">
+
+                <!-- Average number + stars -->
+                <div class="text-center" style="flex-shrink:0;">
+                    <div style="font-size:2.4rem; font-weight:700; color:#0b48a4; line-height:1;">
+                        <?php echo $avgRating; ?>
+                    </div>
+                    <div class="my-1">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <span style="font-size:1.1rem;
+                                  color:<?php echo $i <= round($avgRating) ? '#ffc107' : '#dee2e6'; ?>;">★</span>
+                        <?php endfor; ?>
+                    </div>
+                    <small class="text-muted"><?php echo $totalRatings; ?> review<?php echo $totalRatings != 1 ? 's' : ''; ?></small>
+                </div>
+
+                <!-- Step 2: Star breakdown bars -->
+                <div class="flex-grow-1">
+                    <?php foreach ([5, 4, 3, 2, 1] as $star):
+                        $count = $starCounts[$star];
+                        $pct   = $totalRatings > 0 ? round(($count / $totalRatings) * 100) : 0;
+                    ?>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div style="width:24px; font-size:.78rem; font-weight:600;
+                                    color:#664d03; text-align:right; flex-shrink:0;">
+                            <?php echo $star; ?>★
+                        </div>
+                        <div style="flex:1; height:10px; background:#e9ecef;
+                                    border-radius:5px; overflow:hidden;">
+                            <div style="height:100%; width:<?php echo $pct; ?>%;
+                                        background:linear-gradient(90deg,#ffc107,#fd7e14);
+                                        border-radius:5px;"></div>
+                        </div>
+                        <div style="width:20px; font-size:.78rem; color:#555; flex-shrink:0;">
+                            <?php echo $count; ?>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Step 3: Individual review cards -->
+            <?php if ($totalRatings === 0): ?>
+                <div class="text-center py-4"
+                     style="border:1.5px dashed #ffc107; border-radius:12px;">
+                    <div style="font-size:2.5rem;">⭐</div>
+                    <p class="text-muted mt-2 mb-0">No reviews yet for this tutor.</p>
+                </div>
+
+            <?php else: ?>
+                <div class="d-flex flex-column gap-3" style="max-height:380px; overflow-y:auto; padding-right:4px;">
+                    <?php foreach ($reviews as $rv):
+
+                        // Star border color by rating
+                        $starColor = match(intval($rv['rating'])) {
+                            5 => '#198754',
+                            4 => '#0d6efd',
+                            3 => '#ffc107',
+                            2 => '#fd7e14',
+                            1 => '#dc3545',
+                            default => '#6c757d'
+                        };
+
+                        // Student initials
+                        $parts    = explode(' ', $rv['student_name']);
+                        $initials = strtoupper(substr($parts[0], 0, 1) . (isset($parts[1]) ? substr($parts[1], 0, 1) : ''));
+
+                        $reviewDate = date('d M Y', strtotime($rv['created_at']));
+                    ?>
+                    <div style="border-left:4px solid <?php echo $starColor; ?>;
+                                background:#fafafa; border-radius:10px; padding:12px 14px;">
+
+                        <!-- Reviewer name + date + rating badge -->
+                        <div class="d-flex align-items-center gap-2 mb-1">
+
+                            <!-- Avatar initials -->
+                            <div style="width:36px; height:36px; border-radius:50%;
+                                        background:#e0f0ff; color:#0b48a4;
+                                        display:flex; align-items:center; justify-content:center;
+                                        font-size:12px; font-weight:600; flex-shrink:0;">
+                                <?php echo $initials; ?>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <div style="font-weight:600; color:#0b48a4; font-size:.9rem;">
+                                    <?php echo htmlspecialchars($rv['student_name']); ?>
+                                </div>
+                                <small style="color:#888;"><?php echo $reviewDate; ?></small>
+                            </div>
+
+                            <!-- Rating badge -->
+                            <div style="font-size:.78rem; font-weight:700;
+                                        color:<?php echo $starColor; ?>;
+                                        background:<?php echo $starColor; ?>1a;
+                                        border:1px solid <?php echo $starColor; ?>40;
+                                        padding:2px 8px; border-radius:99px; flex-shrink:0;">
+                                <?php echo $rv['rating']; ?> ★
+                            </div>
+                        </div>
+
+                        <!-- Star row -->
+                        <div class="mb-1">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <span style="font-size:.95rem;
+                                      color:<?php echo $i <= $rv['rating'] ? '#ffc107' : '#dee2e6'; ?>;">★</span>
+                            <?php endfor; ?>
+                        </div>
+
+                        <!-- Comment -->
+                        <p style="font-size:.88rem; color:#555; font-style:italic;
+                                  margin:6px 0 0 0; line-height:1.5;">
+                            "<?php echo htmlspecialchars($rv['comment'] ?? 'No comment.'); ?>"
+                        </p>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Close button -->
+            <div class="text-center mt-4">
+                <button onclick="closeReviewsModal(<?php echo $tid; ?>)"
+                        class="btn fw-semibold px-5"
+                        style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff; border:none;">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endforeach; ?>
+
+<script>
+    // Open the correct tutor's review modal by tutor ID
+    function openReviewsModal(tutorId, tutorName) {
+        var modal = document.getElementById('reviewsModal-' + tutorId);
+        if (modal) {
+            // Set the tutor name in the header
+            var title = document.getElementById('rv-title-' + tutorId);
+            if (title) title.textContent = tutorName;
+            modal.style.display = 'block';
+        } else {
+            // Tutor has no reviews yet — show a simple alert
+            alert(tutorName + ' has no reviews yet.');
+        }
+    }
+
+    function closeReviewsModal(tutorId) {
+        var modal = document.getElementById('reviewsModal-' + tutorId);
+        if (modal) modal.style.display = 'none';
+    }
+</script>
+
 </body>
 </html>

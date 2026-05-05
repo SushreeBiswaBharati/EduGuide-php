@@ -342,6 +342,7 @@ $sort   = $_GET['sort']   ?? '';
 $sql = "
     SELECT t.id, u.profile_image, u.name, t.gender, t.experience,
            ROUND(COALESCE(AVG(rv.rating), 0), 1) AS rating,
+           COUNT(DISTINCT rv.id) AS review_count,
            GROUP_CONCAT(DISTINCT sub.name ORDER BY sub.name SEPARATOR ', ') AS subject_names,
            b.name AS board_name
     FROM tutors t
@@ -486,6 +487,23 @@ $topTutors = $conn->query("
 ");
 
 // Subjects for booking modal
+// Fetch all reviews for all verified tutors — used by the Reviews modal
+// Grouped by tutor so we can look up reviews by tutor_id in PHP
+$allTutorReviews = [];
+$rv_result = $conn->query("
+    SELECT r.tutor_id, r.rating, r.comment, r.created_at,
+           u.name AS student_name
+    FROM reviews r
+    JOIN students s ON s.id = r.student_id
+    JOIN users    u ON u.id = s.user_id
+    ORDER BY r.tutor_id ASC, r.created_at DESC
+");
+if ($rv_result) {
+    while ($rv = $rv_result->fetch_assoc()) {
+        $allTutorReviews[$rv['tutor_id']][] = $rv;
+    }
+}
+
 $modalSubjects = $conn->query("SELECT id, name FROM subjects WHERE is_active = 1 ORDER BY name ASC");
 
 // Misc vars

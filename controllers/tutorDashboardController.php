@@ -85,9 +85,10 @@ $req_stmt->execute();
 $requests = $req_stmt->get_result();
 $req_stmt->close();
 
-// My schedules
+// My schedules — Confirmed + Completed for filter tabs
 $sch_stmt = $conn->prepare("
-    SELECT bk.id, bk.created_at,
+    SELECT bk.id, bk.created_at, bk.status,
+           bk.duration_months,
            u.name   AS student_name,
            sub.name AS subject_name
     FROM bookings bk
@@ -95,13 +96,25 @@ $sch_stmt = $conn->prepare("
     JOIN users     u   ON u.id   = st.user_id
     LEFT JOIN subjects sub ON sub.id = bk.subject_id
     WHERE bk.tutor_id = ?
-      AND bk.status   = 'Confirmed'
+      AND bk.status IN ('Confirmed', 'Completed')
     ORDER BY bk.created_at DESC
 ");
 $sch_stmt->bind_param("i", $tutor_id);
 $sch_stmt->execute();
 $schedule = $sch_stmt->get_result();
 $sch_stmt->close();
+
+// Counts for schedule filter tabs
+$activeCount    = 0;
+$completedSchCount = 0;
+if ($schedule && $schedule->num_rows > 0) {
+    $schedule->data_seek(0);
+    while ($row = $schedule->fetch_assoc()) {
+        if ($row['status'] === 'Confirmed') $activeCount++;
+        else $completedSchCount++;
+    }
+    $schedule->data_seek(0);
+}
 
 // Reviews
 $rev_stmt = $conn->prepare("

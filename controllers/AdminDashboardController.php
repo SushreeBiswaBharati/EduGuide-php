@@ -224,13 +224,15 @@ $tutorQuery = "
            COALESCE(t.phone, '') AS phone,
            COALESCE(t.address, '') AS address,
            COALESCE(t.experience, 0) AS experience,
-           COALESCE(t.rating, 0) AS rating,
+           ROUND(COALESCE(AVG(rv.rating), 0), 1) AS rating,
+           COUNT(rv.id) AS review_count,
            t.gender, t.qualification, t.is_verified, t.created_at,
            GROUP_CONCAT(DISTINCT s.name ORDER BY s.name SEPARATOR ', ') AS subjects
     FROM tutors t
     JOIN users u ON u.id = t.user_id
     LEFT JOIN tutor_subjects ts ON ts.tutor_id = t.id
     LEFT JOIN subjects s ON s.id = ts.subject_id
+    LEFT JOIN reviews rv ON rv.tutor_id = t.id
     WHERE 1
 ";
 
@@ -239,15 +241,15 @@ if ($status_t !== '') {
 }
 
 $tutorQuery .= " GROUP BY t.id, u.name, u.email, t.phone, t.address,
-                t.experience, t.rating, t.gender, t.qualification,
-                t.is_verified, t.created_at ";
+                           t.experience, t.gender, t.qualification,
+                           t.is_verified, t.created_at ";
 
 if ($search_t !== '') {
     $safe        = $conn->real_escape_string($search_t);
     $tutorQuery .= " HAVING (u.name LIKE '%$safe%' OR subjects LIKE '%$safe%' OR t.address LIKE '%$safe%') ";
 }
 
-if ($sort_t === 'rating')     $tutorQuery .= " ORDER BY t.rating DESC";
+if ($sort_t === 'rating')     $tutorQuery .= " ORDER BY rating DESC";
 elseif ($sort_t === 'exp')    $tutorQuery .= " ORDER BY t.experience DESC";
 else                          $tutorQuery .= " ORDER BY t.id DESC";
 

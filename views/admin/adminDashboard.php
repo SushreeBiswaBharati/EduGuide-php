@@ -28,7 +28,7 @@
             <a href="?page=manage_tutor"   class="nav-link"><small>🧑🏻‍🏫</small> <span>Manage Tutors</span></a>
             <a href="?page=manage_student" class="nav-link"><small>🧑🏻‍🎓</small> <span>Manage Students</span></a>
             <a href="?page=booking"        class="nav-link"><small>📅</small> <span>View Bookings</span></a>
-            <a href="?page=dropdown"       class="nav-link"><small>⚙️</small> <span>Academic Settings</span></a>
+            <a href="?page=dropdown"       class="nav-link"><small>⚙️</small> <span>Academic Setings</span></a>
             <a href="?page=complaint"      class="nav-link"><small>📢</small> <span>Handle Complaints</span></a>
         </nav>
 
@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- ===================== MAIN CONTENT ===================== -->
     <div class="flex-grow-1 main-content p-4 rounded-4 shadow-sm" style="overflow-y:auto;">
 
         <?php if (!empty($message)): ?>
@@ -51,7 +51,7 @@
             </div>
         <?php endif; ?>
 
-        <!-- Dashboard -->
+        <!-- ==================== DASHBOARD ==================== -->
         <?php if ($page === 'dashboard'): ?>
 
             <div class="mb-4 greet-bar rounded-4 p-4 text-white">
@@ -101,23 +101,21 @@
                                 : 0;
                         ?>
                             <div class="d-flex align-items-center gap-2 mb-2">
-                                <div style="width:68px; color:#0b48a4; flex-shrink:0;">
+                                <div style="width:68px; font-size:.78rem; color:#555; flex-shrink:0;">
                                     <?php echo $mb['month_label']; ?>
                                 </div>
                                 <div class="progress flex-grow-1" style="height:20px; border-radius:6px;">
                                     <div class="progress-bar progress-bar-striped"
-                                         style="width:<?php echo $barWidth; ?>%;
-                                                background:linear-gradient(90deg,#5c8fdc,#0b48a4);
-                                                border-radius:6px; font-size:.72rem; line-height:20px;">
+                                         style="width:<?php echo $barWidth; ?>%; background:linear-gradient(90deg,#5c8fdc,#0b48a4); border-radius:6px; font-size:.72rem; line-height:20px;">
                                         <?php if ($mb['total'] > 0) echo $mb['total']; ?>
                                     </div>
                                 </div>
-                                <div style="width:22px; text-align:right;  font-weight:600; color:#0b48a4; flex-shrink:0;">
+                                <div style="width:22px; text-align:right; font-size:.8rem; font-weight:600; color:#0b48a4; flex-shrink:0;">
                                     <?php echo $mb['total']; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
-                        <small class="text-muted mt-2 d-block">
+                        <small class="text-muted mt-2 d-block" style="font-size:.75rem;">
                             Total: <strong><?php echo array_sum(array_column($monthlyBookings, 'total')); ?></strong> bookings in 3 months
                         </small>
                     </div>
@@ -134,10 +132,8 @@
                                 <small class="fw-bold"><?php echo $totalVerifiedTutors; ?> tutors (<?php echo $verifiedPct; ?>%)</small>
                             </div>
                             <div class="progress" style="height:22px; border-radius:8px;">
-                                <div class="progress-bar progress-bar"
-                                     style="width:<?php echo $verifiedPct; ?>%;
-                                            background:linear-gradient(90deg,#198754,#20c997);
-                                            border-radius:8px; font-size:.78rem; line-height:22px;">
+                                <div class="progress-bar progress-bar-striped"
+                                    style="width:<?php echo $verifiedPct; ?>%; background:linear-gradient(90deg,#198754,#20c997); border-radius:8px; font-size:.78rem; line-height:22px;">
                                     <?php if ($verifiedPct > 10) echo $verifiedPct . '%'; ?>
                                 </div>
                             </div>
@@ -149,7 +145,7 @@
                                 <small class="fw-bold"><?php echo $totalPendingTutors; ?> tutors (<?php echo $pendingPct; ?>%)</small>
                             </div>
                             <div class="progress" style="height:22px; border-radius:8px;">
-                                <div class="progress-bar progress-bar"
+                                <div class="progress-bar progress-bar-striped"
                                      style="width:<?php echo $pendingPct; ?>%;
                                             background:linear-gradient(90deg,#ffc107,#fd7e14);
                                             border-radius:8px; font-size:.78rem; line-height:22px; color:#333;">
@@ -263,16 +259,16 @@
                 <table class="table table-hover align-middle bg-white shadow-sm">
                     <thead class="table-dark">
                         <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Subjects</th>
-                            <th>Qualification</th>
-                            <th>Exp (yrs)</th>
-                            <th>Rating</th>
-                            <th>Status</th>
-                            <th>Action</th>
+                            <th class="text-white bg-black">#</th>
+                            <th class="text-white bg-black">Name</th>
+                            <th class="text-white bg-black">Email</th>
+                            <th class="text-white bg-black">Phone</th>
+                            <th class="text-white bg-black">Subjects</th>
+                            <th class="text-white bg-black">Qualification</th>
+                            <th class="text-white bg-black">Exp (yrs)</th>
+                            <th class="text-white bg-black">Rating</th>
+                            <th class="text-white bg-black">Status</th>
+                            <th class="text-white bg-black">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -287,7 +283,21 @@
                                     <td><?php echo htmlspecialchars($t['subjects'] ?? '—'); ?></td>
                                     <td><?php echo htmlspecialchars($t['qualification'] ?? '—'); ?></td>
                                     <td class="text-center"><?php echo $t['experience']; ?></td>
-                                    <td class="text-center">⭐ <?php echo number_format($t['rating'], 1); ?></td>
+                                    <td class="text-center">
+                                        <?php
+                                        $rat = floatval($t['rating']);
+                                        $cnt = intval($t['review_count'] ?? 0);
+                                        ?>
+                                        <div>
+                                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                <span style="color:<?php echo $i <= round($rat) ? '#ffc107' : '#dee2e6'; ?>; font-size:.85rem;">★</span>
+                                            <?php endfor; ?>
+                                        </div>
+                                        <small style="font-size:.75rem; color:#555;">
+                                            <?php echo number_format($rat, 1); ?>
+                                            (<?php echo $cnt; ?> review<?php echo $cnt != 1 ? 's' : ''; ?>)
+                                        </small>
+                                    </td>
                                     <td>
                                         <?php if ($isVerified === 1): ?>
                                             <span class="badge bg-success">Verified</span>
@@ -424,7 +434,7 @@
         <?php elseif ($page === 'dropdown'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
-                <h5 class="fw-bold mb-0">⚙️ Academic Settings</h5>
+                <h5 class="fw-bold mb-0">⚙️ Manage Dropdowns</h5>
             </div>
 
             <?php
@@ -433,9 +443,10 @@
                 $totalRows = $rows ? $rows->num_rows : 0;
             ?>
             <div class="card shadow-sm mb-4">
-                <div class="card-header py-2 d-flex justify-content-between align-items-center" style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
+                <div class="card-header py-2 d-flex justify-content-between align-items-center"
+                     style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
                     <span class="fw-bold text-white"><?php echo $icon . ' ' . $title; ?></span>
-                    <span class="badge bg-white text-primary fs-6"><?php echo $totalRows; ?> entries</span>
+                    <span class="badge bg-white text-primary"><?php echo $totalRows; ?> entries</span>
                 </div>
                 <div class="card-body p-3">
 
@@ -480,13 +491,13 @@
             <?php } ?>
 
             <div class="row g-3">
+                <div class="col-md-6"><?php showSection('Classes',  '📚', 'class',   $dd_classes);  ?></div>
                 <div class="col-md-6"><?php showSection('Boards',   '🏫', 'board',   $dd_boards);   ?></div>
                 <div class="col-md-6"><?php showSection('Exams',    '📝', 'exam',    $dd_exams);    ?></div>
-                <div class="col-md-6"><?php showSection('Classes',  '📚', 'class',   $dd_classes);  ?></div>
                 <div class="col-md-6"><?php showSection('Subjects', '🔬', 'subject', $dd_subjects); ?></div>
             </div>
 
-        <!-- HANDLE COMPLAINTS  -->
+        <!-- ==================== HANDLE COMPLAINTS ==================== -->
         <?php elseif ($page === 'complaint'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -497,13 +508,13 @@
                 <table class="table table-hover align-middle bg-white shadow-sm">
                     <thead class="table-dark">
                         <tr>
-                            <th>#</th>
-                            <th>Submitted By</th>
-                            <th>Subject</th>
-                            <th>Message</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Action</th>
+                            <th class="text-white bg-black">#</th>
+                            <th class="text-white bg-black">Submitted By</th>
+                            <th class="text-white bg-black">Subject</th>
+                            <th class="text-white bg-black">Message</th>
+                            <th class="text-white bg-black">Date</th>
+                            <th class="text-white bg-black">Status</th>
+                            <th class="text-white bg-black">Action</th>
                         </tr>
                     </thead>
                     <tbody>
