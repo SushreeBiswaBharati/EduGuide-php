@@ -245,6 +245,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject']))
     }
 }
 
+// Fetch this student's own complaints with status
+$myComplaints_stmt = $conn->prepare("
+    SELECT id, subject, message, status, created_at
+    FROM complaints
+    WHERE user_id = ?
+    ORDER BY created_at DESC
+");
+$myComplaints_stmt->bind_param("i", $_SESSION['user_id']);
+$myComplaints_stmt->execute();
+$myComplaints = $myComplaints_stmt->get_result();
+$myComplaints_stmt->close();
+
 // ============================================================
 //  EDIT PROFILE
 // ============================================================

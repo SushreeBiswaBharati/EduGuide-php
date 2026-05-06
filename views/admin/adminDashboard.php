@@ -24,11 +24,11 @@
         </div>
 
         <nav class="flex-grow-1 px-3 py-3 d-flex flex-column gap-2 fw-semibold">
-            <a href="?page=dashboard"      class="nav-link"><small>🏡</small> <span>Home</span></a>
+            <a href="?page=dashboard"      class="nav-link"><small>🏡</small> <span>Dashboard</span></a>
             <a href="?page=manage_tutor"   class="nav-link"><small>🧑🏻‍🏫</small> <span>Manage Tutors</span></a>
             <a href="?page=manage_student" class="nav-link"><small>🧑🏻‍🎓</small> <span>Manage Students</span></a>
             <a href="?page=booking"        class="nav-link"><small>📅</small> <span>View Bookings</span></a>
-            <a href="?page=dropdown"       class="nav-link"><small>⚙️</small> <span>Academic Setings</span></a>
+            <a href="?page=dropdown"       class="nav-link"><small>⚙️</small> <span>Manage Dropdowns</span></a>
             <a href="?page=complaint"      class="nav-link"><small>📢</small> <span>Handle Complaints</span></a>
         </nav>
 
@@ -106,7 +106,9 @@
                                 </div>
                                 <div class="progress flex-grow-1" style="height:20px; border-radius:6px;">
                                     <div class="progress-bar progress-bar-striped"
-                                         style="width:<?php echo $barWidth; ?>%; background:linear-gradient(90deg,#5c8fdc,#0b48a4); border-radius:6px; font-size:.72rem; line-height:20px;">
+                                         style="width:<?php echo $barWidth; ?>%;
+                                                background:linear-gradient(90deg,#5c8fdc,#0b48a4);
+                                                border-radius:6px; font-size:.72rem; line-height:20px;">
                                         <?php if ($mb['total'] > 0) echo $mb['total']; ?>
                                     </div>
                                 </div>
@@ -133,7 +135,9 @@
                             </div>
                             <div class="progress" style="height:22px; border-radius:8px;">
                                 <div class="progress-bar progress-bar-striped"
-                                    style="width:<?php echo $verifiedPct; ?>%; background:linear-gradient(90deg,#198754,#20c997); border-radius:8px; font-size:.78rem; line-height:22px;">
+                                     style="width:<?php echo $verifiedPct; ?>%;
+                                            background:linear-gradient(90deg,#198754,#20c997);
+                                            border-radius:8px; font-size:.78rem; line-height:22px;">
                                     <?php if ($verifiedPct > 10) echo $verifiedPct . '%'; ?>
                                 </div>
                             </div>
@@ -259,16 +263,16 @@
                 <table class="table table-hover align-middle bg-white shadow-sm">
                     <thead class="table-dark">
                         <tr>
-                            <th class="text-white bg-black">#</th>
-                            <th class="text-white bg-black">Name</th>
-                            <th class="text-white bg-black">Email</th>
-                            <th class="text-white bg-black">Phone</th>
-                            <th class="text-white bg-black">Subjects</th>
-                            <th class="text-white bg-black">Qualification</th>
-                            <th class="text-white bg-black">Exp (yrs)</th>
-                            <th class="text-white bg-black">Rating</th>
-                            <th class="text-white bg-black">Status</th>
-                            <th class="text-white bg-black">Action</th>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Subjects</th>
+                            <th>Qualification</th>
+                            <th>Exp (yrs)</th>
+                            <th>Rating</th>
+                            <th>Status</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -500,60 +504,171 @@
         <!-- ==================== HANDLE COMPLAINTS ==================== -->
         <?php elseif ($page === 'complaint'): ?>
 
-            <div class="mb-3 greet-bar rounded-4 p-3 text-white">
-                <h5 class="fw-bold mb-0">📢 Handle Complaints</h5>
+            <?php
+            // Count open vs resolved for filter badges
+            $complaints->data_seek(0);
+            $allComplaints   = [];
+            $openCount       = 0;
+            $resolvedCount   = 0;
+            while ($c = $complaints->fetch_assoc()) {
+                $allComplaints[] = $c;
+                if ($c['status'] === 'Resolved') $resolvedCount++;
+                else $openCount++;
+            }
+            $totalComplaints2 = count($allComplaints);
+            ?>
+
+            <!-- Header -->
+            <div class="mb-3 greet-bar rounded-4 p-3 text-white d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div>
+                    <h5 class="fw-bold mb-0">📢 Complaint Centre</h5>
+                    <small style="opacity:.85;">Review and resolve complaints from students and tutors</small>
+                </div>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-white text-warning fw-semibold px-3 py-2">
+                        ⏳ Open: <?php echo $openCount; ?>
+                    </span>
+                    <span class="badge bg-white text-success fw-semibold px-3 py-2">
+                        ✔ Resolved: <?php echo $resolvedCount; ?>
+                    </span>
+                </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle bg-white shadow-sm">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="text-white bg-black">#</th>
-                            <th class="text-white bg-black">Submitted By</th>
-                            <th class="text-white bg-black">Subject</th>
-                            <th class="text-white bg-black">Message</th>
-                            <th class="text-white bg-black">Date</th>
-                            <th class="text-white bg-black">Status</th>
-                            <th class="text-white bg-black">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ($complaints && $complaints->num_rows > 0): ?>
-                            <?php $sno = 1; while ($c = $complaints->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?php echo $sno++; ?></td>
-                                    <td class="fw-semibold"><?php echo htmlspecialchars($c['submitted_by']); ?></td>
-                                    <td><?php echo htmlspecialchars($c['subject']); ?></td>
-                                    <td style="max-width:200px;"><?php echo htmlspecialchars($c['message']); ?></td>
-                                    <td><?php echo date('d M Y', strtotime($c['created_at'])); ?></td>
-                                    <td>
-                                        <?php if ($c['status'] === 'Resolved'): ?>
-                                            <span class="badge bg-success">Resolved</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-warning text-dark">Open</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($c['status'] !== 'Resolved'): ?>
-                                            <form method="POST" action="?page=complaint" style="display:inline;">
-                                                <input type="hidden" name="resolve_id" value="<?php echo $c['id']; ?>">
-                                                <button type="submit" class="btn btn-success btn-sm">✔ Resolve</button>
-                                            </form>
-                                        <?php endif; ?>
-                                        <form method="POST" action="?page=complaint" style="display:inline;">
-                                            <input type="hidden" name="delete_complaint_id" value="<?php echo $c['id']; ?>">
-                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Delete this complaint?')">🗑 Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="7" class="text-center text-muted py-4">No complaints found.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-info alert-dismissible fade show py-2 mb-3">
+                    <?php echo htmlspecialchars($message); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php endif; ?>
+
+            <!-- Filter tabs -->
+            <div class="d-flex gap-2 flex-wrap mb-3">
+                <button class="filter-badge active-tab"
+                        style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff; border:none;
+                               padding:6px 16px; border-radius:99px; font-weight:600; cursor:pointer;"
+                        onclick="filterComplaints(this, 'all')">
+                    All (<?php echo $totalComplaints2; ?>)
+                </button>
+                <button class="filter-badge"
+                        style="background:#fff3cd; color:#664d03; border:1px solid #ffc107;
+                               padding:6px 16px; border-radius:99px; font-weight:600; cursor:pointer;"
+                        onclick="filterComplaints(this, 'Open')">
+                    ⏳ Open (<?php echo $openCount; ?>)
+                </button>
+                <button class="filter-badge"
+                        style="background:#d1e7dd; color:#0f5132; border:1px solid #198754;
+                               padding:6px 16px; border-radius:99px; font-weight:600; cursor:pointer;"
+                        onclick="filterComplaints(this, 'Resolved')">
+                    ✔ Resolved (<?php echo $resolvedCount; ?>)
+                </button>
+            </div>
+
+            <!-- Complaints list -->
+            <?php if (empty($allComplaints)): ?>
+                <div class="text-center py-5"
+                     style="background:rgba(255,255,255,.7); border-radius:14px; border:1.5px dashed #5c8fdc;">
+                    <div style="font-size:3rem;">📭</div>
+                    <h5 class="fw-bold mt-2 mb-1" style="color:#0b48a4;">No Complaints Found</h5>
+                    <p class="text-muted">No complaints have been submitted yet.</p>
+                </div>
+
+            <?php else: ?>
+                <div id="complaintCards">
+                <?php foreach ($allComplaints as $c):
+                    $isResolved  = $c['status'] === 'Resolved';
+                    $borderColor = $isResolved ? '#198754' : '#ffc107';
+                    $badgeClass  = $isResolved ? 'bg-success' : 'bg-warning text-dark';
+                    $statusIcon  = $isResolved ? '✔' : '⏳';
+                    $datePosted  = date('d M Y', strtotime($c['created_at']));
+                ?>
+                <div class="card shadow-sm mb-3 complaint-card"
+                     data-status="<?php echo $c['status']; ?>"
+                     style="border-left:4px solid <?php echo $borderColor; ?>;">
+                    <div class="card-body py-3 px-4">
+
+                        <!-- Row 1: submitted by + status badge -->
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                            <div>
+                                <span class="fw-bold" style="color:#0b48a4; font-size:.95rem;">
+                                    <?php echo htmlspecialchars($c['subject']); ?>
+                                </span>
+                                <small class="text-muted ms-2">
+                                    — by <strong><?php echo htmlspecialchars($c['submitted_by']); ?></strong>
+                                </small>
+                            </div>
+                            <span class="badge <?php echo $badgeClass; ?> rounded-pill flex-shrink-0">
+                                <?php echo $statusIcon; ?> <?php echo $c['status']; ?>
+                            </span>
+                        </div>
+
+                        <!-- Row 2: message -->
+                        <p class="text-muted mb-2" style="font-size:.88rem; line-height:1.5;">
+                            <?php echo nl2br(htmlspecialchars($c['message'])); ?>
+                        </p>
+
+                        <!-- Row 3: date + action buttons -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <small class="text-muted">
+                                📆 <?php echo $datePosted; ?>
+                                <?php if ($isResolved): ?>
+                                    &nbsp;·&nbsp; <span style="color:#198754; font-weight:500;">✔ Resolved by Admin</span>
+                                <?php else: ?>
+                                    &nbsp;·&nbsp; <span style="color:#856404;">⏳ Awaiting resolution</span>
+                                <?php endif; ?>
+                            </small>
+
+                            <div class="d-flex gap-2">
+                                <?php if (!$isResolved): ?>
+                                    <form method="POST" action="?page=complaint"
+                                          onsubmit="return confirm('Mark this complaint as Resolved?')">
+                                        <input type="hidden" name="resolve_id" value="<?php echo $c['id']; ?>">
+                                        <button type="submit" class="btn btn-success btn-sm fw-semibold px-3">
+                                            ✔ Mark Resolved
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
+                                <form method="POST" action="?page=complaint"
+                                      onsubmit="return confirm('Delete this complaint permanently?')">
+                                    <input type="hidden" name="delete_complaint_id" value="<?php echo $c['id']; ?>">
+                                    <button type="submit" class="btn btn-danger btn-sm fw-semibold px-3">
+                                        🗑 Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <?php endforeach; ?>
+
+                <div id="noComplaintMsg" class="text-center py-4 text-muted" style="display:none;">
+                    <div style="font-size:2rem;">🔍</div>
+                    <p class="mt-1">No complaints match this filter.</p>
+                </div>
+                </div>
+            <?php endif; ?>
+
+            <script>
+                function filterComplaints(btn, filter) {
+                    // Update active tab style
+                    document.querySelectorAll('.filter-badge').forEach(function(b) {
+                        b.style.opacity = '.7';
+                    });
+                    btn.style.opacity = '1';
+
+                    // Show / hide complaint cards
+                    var cards   = document.querySelectorAll('.complaint-card');
+                    var visible = 0;
+                    cards.forEach(function(card) {
+                        var match = filter === 'all' || card.dataset.status === filter;
+                        card.style.display = match ? '' : 'none';
+                        if (match) visible++;
+                    });
+
+                    var noMsg = document.getElementById('noComplaintMsg');
+                    if (noMsg) noMsg.style.display = visible === 0 ? 'block' : 'none';
+                }
+            </script>
                 </table>
             </div>
 

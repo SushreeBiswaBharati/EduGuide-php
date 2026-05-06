@@ -19,7 +19,8 @@
             font-weight: 600;
         }
         .filter-badge:hover  { opacity: .85; transform: translateY(-1px); }
-        .filter-badge.active { box-shadow: 0 0 0 3px rgba(255,255,255,.6),0 0 0 5px rgba(11,72,164,.4); }
+        .filter-badge.active { box-shadow: 0 0 0 3px rgba(255,255,255,.6),
+                                           0 0 0 5px rgba(11,72,164,.4); }
 
         /* ── request table row height ── */
         #requestsTable tbody tr { height: 52px; }
@@ -44,7 +45,7 @@
         </div>
 
         <nav class="flex-grow-1 px-3 py-3 d-flex flex-column gap-2 fw-semibold">
-            <a href="?page=dashboard" class="nav-link"><small>🏡</small> <span>Home</span></a>
+            <a href="?page=dashboard" class="nav-link"><small>🏡</small> <span>Dashboard</span></a>
             <a href="?page=profile"   class="nav-link"><small>👤</small> <span>My Profile</span></a>
             <a href="?page=requests"  class="nav-link"><small>📋</small> <span>Student Requests</span></a>
             <a href="?page=schedules" class="nav-link"><small>📅</small> <span>My Schedules</span></a>
@@ -341,15 +342,15 @@
                     <table class="table table-bordered table-hover bg-white shadow-sm align-middle" id="requestsTable">
                         <thead class="text-center" style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
                             <tr>
-                                <th class="text-white bg-black">#</th>
-                                <th class="text-white bg-black">Student</th>
-                                <th class="text-white bg-black">Subject</th>
-                                <th class="text-white bg-black">Requirement</th>
-                                <th class="text-white bg-black">Duration</th>
-                                <th class="text-white bg-black">Date</th>
-                                <th class="text-white bg-black">Status</th>
-                                <th class="text-white bg-black">Details</th>
-                                <th class="text-white bg-black">Action</th>
+                                <th class="text-white">#</th>
+                                <th class="text-white">Student</th>
+                                <th class="text-white">Subject</th>
+                                <th class="text-white">Requirement</th>
+                                <th class="text-white">Duration</th>
+                                <th class="text-white">Date</th>
+                                <th class="text-white">Status</th>
+                                <th class="text-white">Details</th>
+                                <th class="text-white">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -589,12 +590,12 @@
                     <table class="table table-bordered table-hover bg-white shadow-sm align-middle" id="scheduleTable">
                         <thead>
                             <tr style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
-                                <th class="text-white bg-black" style="padding:10px 12px;">#</th>
-                                <th class="text-white bg-black" style="padding:10px 12px;">Student</th>
-                                <th class="text-white bg-black" style="padding:10px 12px;">Subject</th>
-                                <th class="text-white bg-black" style="padding:10px 12px;">Start Date</th>
-                                <th class="text-white bg-black" style="padding:10px 12px;">Progress</th>
-                                <th class="text-white bg-black" style="padding:10px 12px;">Status</th>
+                                <th class="text-white" style="background:transparent; padding:10px 12px;">#</th>
+                                <th class="text-white" style="background:transparent; padding:10px 12px;">Student</th>
+                                <th class="text-white" style="background:transparent; padding:10px 12px;">Subject</th>
+                                <th class="text-white" style="background:transparent; padding:10px 12px;">Start Date</th>
+                                <th class="text-white" style="background:transparent; padding:10px 12px;">Progress</th>
+                                <th class="text-white" style="background:transparent; padding:10px 12px;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -880,14 +881,16 @@
                 </div>
             <?php endif; ?>
 
-            <div class="card shadow-sm p-4" style="max-width:640px; margin:0 auto;">
+            <!-- Complaint Form -->
+            <div class="card shadow-sm p-4 mb-4" style="max-width:640px; margin:0 auto;">
+                <h6 class="fw-bold mb-3" style="color:#0b48a4;">📝 Submit a New Complaint</h6>
                 <form method="POST">
                     <label class="form-label fw-semibold text-primary">Subject <span class="text-danger">*</span></label>
                     <input type="text" name="complaint_subject" class="form-control mb-3"
                            placeholder="Brief subject of your complaint" required>
 
                     <label class="form-label fw-semibold text-primary">Message <span class="text-danger">*</span></label>
-                    <textarea name="complaint_message" class="form-control mb-4" rows="5"
+                    <textarea name="complaint_message" class="form-control mb-4" rows="4"
                               placeholder="Describe your issue in detail..." required></textarea>
 
                     <button type="submit" class="btn fw-semibold w-100"
@@ -895,6 +898,67 @@
                         📤 Submit Complaint
                     </button>
                 </form>
+            </div>
+
+            <!-- My Submitted Complaints -->
+            <div style="max-width:640px; margin:0 auto;">
+                <h6 class="fw-bold mb-3" style="color:#0b48a4;">📋 My Submitted Complaints</h6>
+
+                <?php
+                $myComplaintList = [];
+                while ($c = $myComplaints->fetch_assoc()) {
+                    $myComplaintList[] = $c;
+                }
+                ?>
+
+                <?php if (empty($myComplaintList)): ?>
+                    <div class="text-center py-4"
+                         style="background:rgba(255,255,255,.7); border-radius:14px; border:1.5px dashed #5c8fdc;">
+                        <div style="font-size:2.5rem;">📭</div>
+                        <p class="text-muted mt-2 mb-0">You have not submitted any complaints yet.</p>
+                    </div>
+
+                <?php else: ?>
+                    <?php foreach ($myComplaintList as $c):
+                        $isResolved  = $c['status'] === 'Resolved';
+                        $borderColor = $isResolved ? '#198754' : '#ffc107';
+                        $badgeClass  = $isResolved ? 'bg-success' : 'bg-warning text-dark';
+                        $statusIcon  = $isResolved ? '✔' : '⏳';
+                        $datePosted  = date('d M Y', strtotime($c['created_at']));
+                    ?>
+                    <div class="card shadow-sm mb-3"
+                         style="border-left:4px solid <?php echo $borderColor; ?>;">
+                        <div class="card-body py-3 px-4">
+
+                            <!-- Subject + status badge -->
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                <div class="fw-bold" style="color:#0b48a4; font-size:.95rem;">
+                                    <?php echo htmlspecialchars($c['subject']); ?>
+                                </div>
+                                <span class="badge <?php echo $badgeClass; ?> rounded-pill flex-shrink-0">
+                                    <?php echo $statusIcon; ?> <?php echo $c['status']; ?>
+                                </span>
+                            </div>
+
+                            <!-- Message -->
+                            <p class="text-muted mb-2" style="font-size:.88rem; line-height:1.5;">
+                                <?php echo nl2br(htmlspecialchars($c['message'])); ?>
+                            </p>
+
+                            <!-- Date + resolution note -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">📆 Submitted: <?php echo $datePosted; ?></small>
+                                <?php if ($isResolved): ?>
+                                    <small style="color:#198754; font-weight:500;">✔ Resolved by Admin</small>
+                                <?php else: ?>
+                                    <small style="color:#856404;">⏳ Awaiting admin review</small>
+                                <?php endif; ?>
+                            </div>
+
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
 
         <?php endif; ?>
