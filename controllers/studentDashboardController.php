@@ -257,6 +257,21 @@ $myComplaints_stmt->execute();
 $myComplaints = $myComplaints_stmt->get_result();
 $myComplaints_stmt->close();
 
+// Delete own complaint
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_my_complaint'])) {
+    $del_id = intval($_POST['delete_my_complaint']);
+    $del    = $conn->prepare("DELETE FROM complaints WHERE id = ? AND user_id = ?");
+    $del->bind_param("ii", $del_id, $_SESSION['user_id']);
+    $del->execute();
+    $del->close();
+    // Refresh list
+    $myComplaints_stmt2 = $conn->prepare("SELECT id, subject, message, status, created_at FROM complaints WHERE user_id = ? ORDER BY created_at DESC");
+    $myComplaints_stmt2->bind_param("i", $_SESSION['user_id']);
+    $myComplaints_stmt2->execute();
+    $myComplaints = $myComplaints_stmt2->get_result();
+    $myComplaints_stmt2->close();
+}
+
 // ============================================================
 //  EDIT PROFILE
 // ============================================================
@@ -352,7 +367,7 @@ $gender = $_GET['gender'] ?? '';
 $sort   = $_GET['sort']   ?? '';
 
 $sql = "
-    SELECT t.id, u.profile_image, u.name, t.gender, t.experience,
+    SELECT t.id, u.profile_image, u.name, t.gender, t.experience, t.availability,
            ROUND(COALESCE(AVG(rv.rating), 0), 1) AS rating,
            COUNT(DISTINCT rv.id) AS review_count,
            GROUP_CONCAT(DISTINCT sub.name ORDER BY sub.name SEPARATOR ', ') AS subject_names,
@@ -380,7 +395,7 @@ if ($gender !== '') {
     $types   .= "s";
 }
 
-$sql .= " GROUP BY t.id, u.profile_image, u.name, t.gender, t.experience, b.name";
+$sql .= " GROUP BY t.id, u.profile_image, u.name, t.gender, t.experience, t.availability, b.name";
 
 if ($sort === 'asc')          $sql .= " ORDER BY u.name ASC";
 elseif ($sort === 'desc')     $sql .= " ORDER BY u.name DESC";

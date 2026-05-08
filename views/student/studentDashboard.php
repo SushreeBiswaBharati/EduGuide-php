@@ -349,6 +349,7 @@
                             <th class="text-white">Board</th>
                             <th class="text-white">Experience</th>
                             <th class="text-white">Gender</th>
+                            <th class="text-white">Availability</th>
                             <th class="text-white">Rating</th>
                             <th class="text-white">Action</th>
                         </tr>
@@ -369,6 +370,13 @@
                                     <td><?php echo htmlspecialchars($t['board_name'] ?? '—'); ?></td>
                                     <td><?php echo $t['experience']; ?> yrs</td>
                                     <td><?php echo htmlspecialchars($t['gender']); ?></td>
+                                    <td class="text-center">
+                                        <?php if ($t['availability'] === 'Yes'): ?>
+                                            <span class="badge bg-success rounded-pill">✔ Available</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-danger rounded-pill">✖ Unavailable</span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td class="text-center">
                                         <div>
                                             <?php for ($i = 1; $i <= 5; $i++): ?>
@@ -951,14 +959,23 @@
                                 <?php echo nl2br(htmlspecialchars($c['message'])); ?>
                             </p>
 
-                            <!-- Date + resolution note -->
-                            <div class="d-flex justify-content-between align-items-center">
+                            <!-- Date + resolution note + delete -->
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <small class="text-muted">📆 Submitted: <?php echo $datePosted; ?></small>
-                                <?php if ($isResolved): ?>
-                                    <small style="color:#198754; font-weight:500;">✔ Resolved by Admin</small>
-                                <?php else: ?>
-                                    <small style="color:#856404;">⏳ Awaiting admin review</small>
-                                <?php endif; ?>
+                                <div class="d-flex align-items-center gap-3">
+                                    <?php if ($isResolved): ?>
+                                        <small style="color:#198754; font-weight:500;">✔ Resolved by Admin</small>
+                                    <?php else: ?>
+                                        <small style="color:#856404;">⏳ Awaiting admin review</small>
+                                    <?php endif; ?>
+                                    <form method="POST"
+                                          onsubmit="return confirm('Delete this complaint permanently?')">
+                                        <input type="hidden" name="delete_my_complaint" value="<?php echo $c['id']; ?>">
+                                        <button type="submit" class="btn btn-danger btn-sm fw-semibold px-3">
+                                            🗑 Delete
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
 
                         </div>
@@ -1040,7 +1057,7 @@
     toggleBtn.addEventListener('click', function () {
         isCollapsed = !isCollapsed;
         if (isCollapsed) {
-            sidebar.style.width = '100px';
+            sidebar.style.width = '70px';
             navSpans.forEach(s => s.style.display = 'none');
             brandTitle.style.display = 'none';
             subTitle.style.display   = 'none';

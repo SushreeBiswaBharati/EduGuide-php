@@ -192,6 +192,21 @@ $myComplaints_stmt->execute();
 $myComplaints = $myComplaints_stmt->get_result();
 $myComplaints_stmt->close();
 
+// Delete own complaint
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_my_complaint'])) {
+    $del_id = intval($_POST['delete_my_complaint']);
+    $del    = $conn->prepare("DELETE FROM complaints WHERE id = ? AND user_id = ?");
+    $del->bind_param("ii", $del_id, $_SESSION['user_id']);
+    $del->execute();
+    $del->close();
+    // Refresh list
+    $myComplaints_stmt2 = $conn->prepare("SELECT id, subject, message, status, created_at FROM complaints WHERE user_id = ? ORDER BY created_at DESC");
+    $myComplaints_stmt2->bind_param("i", $_SESSION['user_id']);
+    $myComplaints_stmt2->execute();
+    $myComplaints = $myComplaints_stmt2->get_result();
+    $myComplaints_stmt2->close();
+}
+
 // Edit profile
 $profileSuccess = "";
 $profileError   = "";

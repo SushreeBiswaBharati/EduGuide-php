@@ -945,14 +945,23 @@
                                 <?php echo nl2br(htmlspecialchars($c['message'])); ?>
                             </p>
 
-                            <!-- Date + resolution note -->
-                            <div class="d-flex justify-content-between align-items-center">
+                            <!-- Date + resolution note + delete -->
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <small class="text-muted">📆 Submitted: <?php echo $datePosted; ?></small>
-                                <?php if ($isResolved): ?>
-                                    <small style="color:#198754; font-weight:500;">✔ Resolved by Admin</small>
-                                <?php else: ?>
-                                    <small style="color:#856404;">⏳ Awaiting admin review</small>
-                                <?php endif; ?>
+                                <div class="d-flex align-items-center gap-3">
+                                    <?php if ($isResolved): ?>
+                                        <small style="color:#198754; font-weight:500;">✔ Resolved by Admin</small>
+                                    <?php else: ?>
+                                        <small style="color:#856404;">⏳ Awaiting admin review</small>
+                                    <?php endif; ?>
+                                    <form method="POST"
+                                          onsubmit="return confirm('Delete this complaint permanently?')">
+                                        <input type="hidden" name="delete_my_complaint" value="<?php echo $c['id']; ?>">
+                                        <button type="submit" class="btn btn-danger btn-sm fw-semibold px-3">
+                                            🗑 Delete
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
 
                         </div>
@@ -979,7 +988,7 @@
     toggleBtn.addEventListener('click', function () {
         isCollapsed = !isCollapsed;
         if (isCollapsed) {
-            sidebar.style.width = '100px';
+            sidebar.style.width = '70px';
             navSpans.forEach(s => s.style.display = 'none');
             brandTitle.style.display = 'none';
             subTitle.style.display   = 'none';
@@ -1108,7 +1117,7 @@
 
         const noMsg = document.getElementById('noFilterMsg');
         if (noMsg) noMsg.style.display = visible === 0 ? 'block' : 'none';
-    
+    }
 </script>
 </body>
 </html>

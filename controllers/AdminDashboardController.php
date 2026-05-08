@@ -156,8 +156,41 @@ if ($page === 'dropdown') {
 }
 
 // =====================================================
-// COMPLAINTS — Resolve / Delete
+// REVIEWS — Delete
 // =====================================================
+if ($page === 'reviews' && isset($_POST['delete_review_id'])) {
+    $rid = intval($_POST['delete_review_id']);
+    $conn->query("DELETE FROM reviews WHERE id = $rid");
+    $message = "Review deleted successfully.";
+
+    // Recalculate tutor rating after deletion
+    $affected_tutor = intval($_POST['review_tutor_id'] ?? 0);
+    if ($affected_tutor > 0) {
+        $conn->query("
+            UPDATE tutors
+            SET rating = COALESCE((
+                SELECT ROUND(AVG(rating), 1)
+                FROM reviews
+                WHERE tutor_id = $affected_tutor
+            ), 0)
+            WHERE id = $affected_tutor
+        ");
+    }
+}
+
+// Fetch all reviews
+$allReviews = $conn->query("
+    SELECT r.id, r.rating, r.comment, r.created_at,
+           r.tutor_id,
+           tu.name AS tutor_name,
+           su.name AS student_name
+    FROM reviews r
+    JOIN tutors   t  ON t.id  = r.tutor_id
+    JOIN users    tu ON tu.id = t.user_id
+    JOIN students s  ON s.id  = r.student_id
+    JOIN users    su ON su.id = s.user_id
+    ORDER BY r.created_at DESC
+");
 if ($page === 'complaint') {
 
     if (isset($_POST['resolve_id'])) {
