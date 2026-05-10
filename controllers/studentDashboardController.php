@@ -397,11 +397,11 @@ if ($gender !== '') {
 
 $sql .= " GROUP BY t.id, u.profile_image, u.name, t.gender, t.experience, t.availability, b.name";
 
-if ($sort === 'asc')          $sql .= " ORDER BY u.name ASC";
-elseif ($sort === 'desc')     $sql .= " ORDER BY u.name DESC";
-elseif ($sort === 'exp')      $sql .= " ORDER BY t.experience DESC";
-elseif ($sort === 'rating_high') $sql .= " ORDER BY t.rating DESC";
-elseif ($sort === 'rating_low')  $sql .= " ORDER BY t.rating ASC";
+if ($sort === 'asc')             $sql .= " ORDER BY u.name ASC";
+elseif ($sort === 'desc')        $sql .= " ORDER BY u.name DESC";
+elseif ($sort === 'exp')         $sql .= " ORDER BY t.experience DESC";
+elseif ($sort === 'rating_high') $sql .= " ORDER BY rating DESC";
+elseif ($sort === 'rating_low')  $sql .= " ORDER BY rating ASC";
 
 $stmt = $conn->prepare($sql);
 if (!empty($params)) {

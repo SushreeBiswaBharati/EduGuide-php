@@ -1117,7 +1117,7 @@
 
         const noMsg = document.getElementById('noFilterMsg');
         if (noMsg) noMsg.style.display = visible === 0 ? 'block' : 'none';
-    }
+    
 </script>
 </body>
 </html>

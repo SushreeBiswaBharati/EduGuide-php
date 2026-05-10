@@ -496,9 +496,9 @@
             <?php } ?>
 
             <div class="row g-3">
-                <div class="col-md-6"><?php showSection('Classes',  '📚', 'class',   $dd_classes);  ?></div>
                 <div class="col-md-6"><?php showSection('Boards',   '🏫', 'board',   $dd_boards);   ?></div>
                 <div class="col-md-6"><?php showSection('Exams',    '📝', 'exam',    $dd_exams);    ?></div>
+                <div class="col-md-6"><?php showSection('Classes',  '📚', 'class',   $dd_classes);  ?></div>
                 <div class="col-md-6"><?php showSection('Subjects', '🔬', 'subject', $dd_subjects); ?></div>
             </div>
 

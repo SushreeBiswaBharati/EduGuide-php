@@ -2,6 +2,6 @@
 session_start();
 $_SESSION = [];
 session_destroy();
-header("location: /EduGuide-php/views/auth/login.php");
+header("Location: /EduGuide-php/controllers/AuthController.php");
 exit();
 ?>

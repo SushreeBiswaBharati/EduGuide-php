@@ -211,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_my_complaint']
 $profileSuccess = "";
 $profileError   = "";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_phone'])) {
 
     if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
 

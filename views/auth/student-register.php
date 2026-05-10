@@ -53,7 +53,7 @@
                             <label class="form-label">Password <span class="text-danger">*</span></label>                           
                             <div class="input-group">
                                 <input type="password" id="password" name="password" class="form-control"
-                                    placeholder="Min 6 characters">                    
+                                    placeholder="Min 8 chars, 1 upper, 1 lower, 1 number, 1 special">                    
                                 <button type="button" class="btn btn-light border" onclick="togglePassword('password', this)">
                                     <i class="bi bi-eye"></i>
                                 </button>

@@ -11,7 +11,8 @@ if (!isset($emailError)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - EduGuide</title>
     <link rel="stylesheet" href="/EduGuide-php/assets/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="/EduGuide-php/assets/css/formStyle.css ? v=1.1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/EduGuide-php/assets/css/formStyle.css?v=1.1">
 
     <style>
        .form-bg {
@@ -65,13 +66,20 @@ if (!isset($emailError)) {
                                     <small id="emailError" class="error"><?php echo $emailError; ?></small>
                                 </div>
 
-                                <!-- Password -->
+                                                                <!-- Password -->
                                 <div class="mb-3">
                                     <label class="form-label">Password <span class="text-danger">*</span></label>
-                                    <input type="password"
-                                        name="password"
-                                        placeholder="Enter your password"
-                                        class="form-control">
+                                    <div class="input-group">
+                                        <input type="password"
+                                            id="passwordInput"
+                                            name="password"
+                                            placeholder="Enter your password"
+                                            class="form-control">
+                                        <button type="button" class="btn btn-light border"
+                                            onclick="togglePassword('passwordInput', this)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
                                     <small id="passwordError" class="error"><?php echo $passwordError; ?></small>
                                 </div>
 
@@ -80,7 +88,7 @@ if (!isset($emailError)) {
                                         Login to EduGuide
                                     </button>
                                     <div class="mb-3">
-                                        <a href="/EduGuide-php/controllers/forgetPasswordController.php" 
+                                        <a href="/EduGuide-php/controllers/forgetPasswordController.php"
                                         class="text-decoration-none small text-primary">
                                             Forgot Password?
                                         </a>
@@ -120,5 +128,18 @@ if (!isset($emailError)) {
 
     <script src="/EduGuide-php/assets/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="/EduGuide-php/assets/js/validation.js"></script>
+        <script>
+        function togglePassword(fieldId, btn) {
+            const input = document.getElementById(fieldId);
+            const icon  = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        }
+    </script>
 </body>
 </html>
