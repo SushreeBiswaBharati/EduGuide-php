@@ -2,6 +2,7 @@
 require_once '../middleware/auth.php';
 requireRole('admin');
 require_once '../database/dbconnection.php';
+require_once '../helpers/sendMail.php';  // PHPMailer via SMTP
 
 $page    = $_GET['page'] ?? 'dashboard';
 $message = '';
@@ -40,10 +41,10 @@ if ($page === 'manage_tutor' && isset($_POST['tutor_action'])) {
             $body    .= "Dashboard: http://localhost/EduGuide-php/controllers/TutorDashboardController.php\r\n\r\n";
             $body    .= "If you have any questions, feel free to contact us.\r\n\r\n";
             $body    .= "Best regards,\r\nEduGuide Admin Team\r\n";
-            $headers  = "From: no-reply@eduguide.com\r\n";
-            $headers .= "Reply-To: no-reply@eduguide.com\r\n";
-            $headers .= "X-Mailer: PHP/" . phpversion();
-            @mail($tutorEmail, $subject, $body, $headers);
+            $result = sendMail($tutorEmail, $tutorName, $subject, $body);
+            if ($result !== true) {
+                $message .= " <small class='text-warning'>(Email could not be sent: " . htmlspecialchars($result) . ")</small>";
+            }
         }
     }
 
@@ -58,10 +59,10 @@ if ($page === 'manage_tutor' && isset($_POST['tutor_action'])) {
             $body    .= "We're writing to inform you that your tutor profile on EduGuide has been temporarily revoked by our admin team.\r\n\r\n";
             $body    .= "This may be due to a policy review or incomplete information. Please contact our support team for more details.\r\n\r\n";
             $body    .= "Best regards,\r\nEduGuide Admin Team\r\n";
-            $headers  = "From: no-reply@eduguide.com\r\n";
-            $headers .= "Reply-To: no-reply@eduguide.com\r\n";
-            $headers .= "X-Mailer: PHP/" . phpversion();
-            @mail($tutorEmail, $subject, $body, $headers);
+            $result = sendMail($tutorEmail, $tutorName, $subject, $body);
+            if ($result !== true) {
+                $message .= " <small class='text-warning'>(Email could not be sent: " . htmlspecialchars($result) . ")</small>";
+            }
         }
     }
 }

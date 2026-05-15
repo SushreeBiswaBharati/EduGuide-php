@@ -988,7 +988,7 @@
     toggleBtn.addEventListener('click', function () {
         isCollapsed = !isCollapsed;
         if (isCollapsed) {
-            sidebar.style.width = '70px';
+            sidebar.style.width = '100px';
             navSpans.forEach(s => s.style.display = 'none');
             brandTitle.style.display = 'none';
             subTitle.style.display   = 'none';
@@ -1098,8 +1098,11 @@
     document.getElementById('studentModal')?.addEventListener('click', function(e) {
         if (e.target === this) closeStudentModal();
     });
+
+    // ── Filter badges on requests page ──
+    function filterRequests(btn, filter) {
         // Update active badge style
-        document.querySelectorAll('.filter-badge').forEach(b => {
+        document.querySelectorAll('.filter-badge').forEach(function(b) {
             b.classList.remove('active');
             b.style.opacity = '.75';
         });
@@ -1117,7 +1120,7 @@
 
         const noMsg = document.getElementById('noFilterMsg');
         if (noMsg) noMsg.style.display = visible === 0 ? 'block' : 'none';
-    
+    }
 </script>
 </body>
 </html>

@@ -24,11 +24,11 @@
         </div>
 
         <nav class="flex-grow-1 px-3 py-3 d-flex flex-column gap-2 fw-semibold">
-            <a href="?page=dashboard"      class="nav-link"><small>🏡</small> <span>Dashboard</span></a>
+            <a href="?page=dashboard"      class="nav-link"><small>🏡</small> <span>Home</span></a>
             <a href="?page=manage_tutor"   class="nav-link"><small>🧑🏻‍🏫</small> <span>Manage Tutors</span></a>
             <a href="?page=manage_student" class="nav-link"><small>🧑🏻‍🎓</small> <span>Manage Students</span></a>
             <a href="?page=booking"        class="nav-link"><small>📅</small> <span>View Bookings</span></a>
-            <a href="?page=dropdown"       class="nav-link"><small>⚙️</small> <span>Manage Dropdowns</span></a>
+            <a href="?page=dropdown"       class="nav-link"><small>⚙️</small> <span>Academic Settings</span></a>
             <a href="?page=reviews"        class="nav-link"><small>⭐</small> <span>Manage Reviews</span></a>
             <a href="?page=complaint"      class="nav-link"><small>📢</small> <span>Complaint Centre</span></a>
         </nav>

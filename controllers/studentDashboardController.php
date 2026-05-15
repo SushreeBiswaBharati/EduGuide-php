@@ -86,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_tutor'])) {
     } elseif ($duration_months <= 0 || $duration_months > 24) {
         $bookingError = "Duration must be between 1 and 24 months.";
     } else {
-        // Check for existing pending booking with same tutor
         $dupCheck = $conn->prepare("
             SELECT id FROM bookings
             WHERE student_id = ? AND tutor_id = ? AND status = 'Pending'
@@ -98,7 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_tutor'])) {
         if ($dupCheck->num_rows > 0) {
             $bookingError = "You already have a pending request with this tutor. Please wait for their response.";
         } else {
-            // Insert into bookings — exact schema columns only
             $ins = $conn->prepare("
                 INSERT INTO bookings (student_id, tutor_id, subject_id, requirement, duration_months)
                 VALUES (?, ?, ?, ?, ?)
@@ -106,8 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_tutor'])) {
             $ins->bind_param("iiisi", $student_id, $tutor_id, $subject_id, $requirement, $duration_months);
 
             if ($ins->execute()) {
-
-                // Fetch tutor email + name for notification email
                 $tInfo = $conn->prepare("
                     SELECT u.email, u.name AS tutor_name
                     FROM tutors t JOIN users u ON u.id = t.user_id
@@ -118,7 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_tutor'])) {
                 $tRow = $tInfo->get_result()->fetch_assoc();
                 $tInfo->close();
 
-                // Fetch subject name for email body
                 $subStmt = $conn->prepare("SELECT name FROM subjects WHERE id = ?");
                 $subStmt->bind_param("i", $subject_id);
                 $subStmt->execute();
@@ -129,9 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_tutor'])) {
                     $tutorEmail  = $tRow['email'];
                     $tutorName   = $tRow['tutor_name'];
                     $studentName = $student['name'];
-
                     $emailSubject = "New Tuition Request from {$studentName} - EduGuide";
-
                     $body  = "Dear {$tutorName},\r\n\r\n";
                     $body .= "You have received a new tuition session request on EduGuide.\r\n\r\n";
                     $body .= "========== Request Details ==========\r\n";
@@ -143,16 +136,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_tutor'])) {
                     $body .= "Log in to your EduGuide Tutor Dashboard to Accept or Reject this request:\r\n";
                     $body .= "http://localhost/EduGuide-php/controllers/TutorDashboardController.php?page=requests\r\n\r\n";
                     $body .= "Regards,\r\nEduGuide Team\r\n";
-
                     $headers  = "From: no-reply@eduguide.com\r\n";
                     $headers .= "Reply-To: no-reply@eduguide.com\r\n";
                     $headers .= "X-Mailer: PHP/" . phpversion();
-
                     @mail($tutorEmail, $emailSubject, $body, $headers);
                 }
-
                 $bookingSuccess = "Your booking request has been sent successfully! The tutor will be notified by email.";
-
             } else {
                 $bookingError = "Failed to send booking request. Please try again.";
             }
@@ -163,19 +152,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_tutor'])) {
 }
 
 // ============================================================
-//  CANCEL BOOKING (student cancels their own Pending booking)
+//  CANCEL BOOKING
 // ============================================================
 $cancelSuccess = "";
 $cancelError   = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_booking_id'])) {
     $cancel_id = intval($_POST['cancel_booking_id']);
-
-    // Verify the booking belongs to this student and is still Pending
-    $chk = $conn->prepare("
-        SELECT id FROM bookings
-        WHERE id = ? AND student_id = ? AND status = 'Pending'
-    ");
+    $chk = $conn->prepare("SELECT id FROM bookings WHERE id = ? AND student_id = ? AND status = 'Pending'");
     $chk->bind_param("ii", $cancel_id, $student_id);
     $chk->execute();
     $chk->store_result();
@@ -194,7 +178,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_booking_id']))
     }
     $chk->close();
 
-    // Refresh booking counts after cancel
     $totalBookings = $confirmedBookings = $pendingBookings = $completedBookings = 0;
     $count_stmt2 = $conn->prepare("SELECT status, COUNT(*) AS cnt FROM bookings WHERE student_id = ? GROUP BY status");
     $count_stmt2->bind_param("i", $student_id);
@@ -208,14 +191,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_booking_id']))
     }
     $count_stmt2->close();
 
-    // Re-fetch bookings list
     $bookings_stmt2 = $conn->prepare("
         SELECT bk.id, bk.status, bk.created_at, bk.requirement, bk.duration_months,
-               u.name   AS tutor_name,
-               sub.name AS subject_name
+               u.name AS tutor_name, sub.name AS subject_name
         FROM bookings bk
-        JOIN tutors   t   ON t.id = bk.tutor_id
-        JOIN users    u   ON u.id = t.user_id
+        JOIN tutors t ON t.id = bk.tutor_id
+        JOIN users u ON u.id = t.user_id
         LEFT JOIN subjects sub ON sub.id = bk.subject_id
         WHERE bk.student_id = ?
         ORDER BY bk.created_at DESC
@@ -245,11 +226,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject']))
     }
 }
 
-// Fetch this student's own complaints with status
+// Fetch this student's own complaints
 $myComplaints_stmt = $conn->prepare("
     SELECT id, subject, message, status, created_at
-    FROM complaints
-    WHERE user_id = ?
+    FROM complaints WHERE user_id = ?
     ORDER BY created_at DESC
 ");
 $myComplaints_stmt->bind_param("i", $_SESSION['user_id']);
@@ -264,7 +244,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_my_complaint']
     $del->bind_param("ii", $del_id, $_SESSION['user_id']);
     $del->execute();
     $del->close();
-    // Refresh list
     $myComplaints_stmt2 = $conn->prepare("SELECT id, subject, message, status, created_at FROM complaints WHERE user_id = ? ORDER BY created_at DESC");
     $myComplaints_stmt2->bind_param("i", $_SESSION['user_id']);
     $myComplaints_stmt2->execute();
@@ -279,7 +258,6 @@ $profileSuccess = "";
 $profileError   = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_class'])) {
-
     $class_id = $_POST['edit_class'] ?? '';
     $board_id = $_POST['edit_board'] ?? '';
     $exam_id  = !empty($_POST['edit_exam']) ? intval($_POST['edit_exam']) : null;
@@ -300,7 +278,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_class'])) {
     } elseif ($address === '') {
         $profileError = "Address cannot be empty.";
     } else {
-
         if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
             $fileName = $_FILES['profile_image']['name'];
             $tmpName  = $_FILES['profile_image']['tmp_name'];
@@ -324,7 +301,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_class'])) {
             WHERE user_id = ?
         ");
         $stmt->bind_param("iiisssi", $class_id, $board_id, $exam_id, $school, $phone, $address, $_SESSION['user_id']);
-
         if ($stmt->execute()) {
             $profileSuccess = "Profile updated successfully!";
         } else {
@@ -332,7 +308,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_class'])) {
         }
         $stmt->close();
 
-        // Refresh student data after update
         $stmt2 = $conn->prepare("
             SELECT u.name, u.email, u.created_at, u.profile_image,
                    s.gender, s.school_name, s.parent_name, s.parent_phone, s.address,
@@ -412,9 +387,6 @@ $tutors = $stmt->get_result();
 $stmt->close();
 
 // ============================================================
-//  TOP TUTORS (dashboard widget)
-// ============================================================
-// ============================================================
 //  SUBMIT REVIEW
 // ============================================================
 $reviewSuccess = "";
@@ -431,7 +403,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
     } elseif ($comment === '') {
         $reviewError = "Please write a comment before submitting.";
     } else {
-        // Verify booking belongs to this student and is Completed
         $chk = $conn->prepare("
             SELECT id FROM bookings
             WHERE id = ? AND student_id = ? AND tutor_id = ? AND status = 'Completed'
@@ -443,7 +414,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
         if ($chk->num_rows === 0) {
             $reviewError = "Invalid booking or session not completed.";
         } else {
-            // Check if already reviewed
             $dup = $conn->prepare("SELECT id FROM reviews WHERE booking_id = ? AND student_id = ?");
             $dup->bind_param("ii", $review_booking_id, $student_id);
             $dup->execute();
@@ -458,18 +428,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
                 ");
                 $ins->bind_param("iiiis", $student_id, $review_tutor_id, $review_booking_id, $rating, $comment);
                 if ($ins->execute()) {
-
-                    // Recalculate and update tutors.rating from all reviews
                     $conn->query("
                         UPDATE tutors
-                        SET rating = (
-                            SELECT ROUND(AVG(rating), 1)
-                            FROM reviews
-                            WHERE tutor_id = $review_tutor_id
-                        )
+                        SET rating = (SELECT ROUND(AVG(rating), 1) FROM reviews WHERE tutor_id = $review_tutor_id)
                         WHERE id = $review_tutor_id
                     ");
-
                     $reviewSuccess = "Your review has been submitted successfully!";
                 } else {
                     $reviewError = "Failed to submit review. Please try again.";
@@ -502,6 +465,9 @@ $completed_stmt->execute();
 $completedBookingsForReview = $completed_stmt->get_result();
 $completed_stmt->close();
 
+// ============================================================
+//  TOP TUTORS (dashboard widget)
+// ============================================================
 $topTutors = $conn->query("
     SELECT u.name, IFNULL(COUNT(b.id), 0) AS total
     FROM tutors t
@@ -513,9 +479,7 @@ $topTutors = $conn->query("
     LIMIT 5
 ");
 
-// Subjects for booking modal
-// Fetch all reviews for all verified tutors — used by the Reviews modal
-// Grouped by tutor so we can look up reviews by tutor_id in PHP
+// All reviews grouped by tutor — for the Reviews modal in Browse Tutors
 $allTutorReviews = [];
 $rv_result = $conn->query("
     SELECT r.tutor_id, r.rating, r.comment, r.created_at,
@@ -531,6 +495,7 @@ if ($rv_result) {
     }
 }
 
+// Subjects for booking modal
 $modalSubjects = $conn->query("SELECT id, name FROM subjects WHERE is_active = 1 ORDER BY name ASC");
 
 // Misc vars
