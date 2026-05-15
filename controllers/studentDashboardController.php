@@ -3,6 +3,7 @@
 require_once '../middleware/Auth.php';
 requireRole('student');
 require_once '../database/dbconnection.php';
+require_once '../helpers/sendmail.php';
 
 // Fetch student profile
 $stmt = $conn->prepare("
@@ -121,25 +122,135 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_tutor'])) {
                 $subStmt->close();
 
                 if ($tRow) {
+
                     $tutorEmail  = $tRow['email'];
                     $tutorName   = $tRow['tutor_name'];
                     $studentName = $student['name'];
-                    $emailSubject = "New Tuition Request from {$studentName} - EduGuide";
-                    $body  = "Dear {$tutorName},\r\n\r\n";
-                    $body .= "You have received a new tuition session request on EduGuide.\r\n\r\n";
-                    $body .= "========== Request Details ==========\r\n";
-                    $body .= "Student     : {$studentName}\r\n";
-                    $body .= "Subject     : {$subName}\r\n";
-                    $body .= "Requirement : {$requirement}\r\n";
-                    $body .= "Duration    : {$duration_months} month(s)\r\n";
-                    $body .= "=====================================\r\n\r\n";
-                    $body .= "Log in to your EduGuide Tutor Dashboard to Accept or Reject this request:\r\n";
-                    $body .= "http://localhost/EduGuide-php/controllers/TutorDashboardController.php?page=requests\r\n\r\n";
-                    $body .= "Regards,\r\nEduGuide Team\r\n";
-                    $headers  = "From: no-reply@eduguide.com\r\n";
-                    $headers .= "Reply-To: no-reply@eduguide.com\r\n";
-                    $headers .= "X-Mailer: PHP/" . phpversion();
-                    @mail($tutorEmail, $emailSubject, $body, $headers);
+
+                    $emailSubject = "New Tuition Request - EduGuide";
+
+                    // Dashboard URL
+                    $requestUrl = "http://localhost:8888/EduGuide-php/controllers/TutorDashboardController.php?page=requests";
+
+                    // HTML Email Body
+                    $body = '
+                    <div style="font-family: Arial, sans-serif; background:#f4f6f9; padding:40px;">
+
+                        <div style="
+                            max-width:600px;
+                            margin:auto;
+                            background:#ffffff;
+                            border-radius:12px;
+                            overflow:hidden;
+                            box-shadow:0 4px 10px rgba(0,0,0,0.1);
+                        ">
+
+                            <!-- Header -->
+                            <div style="
+                                background:linear-gradient(135deg,#4e73df,#224abe);
+                                padding:25px;
+                                text-align:center;
+                                color:white;
+                            ">
+                                <h1 style="margin:0;">EduGuide</h1>
+                                <p style="margin-top:8px; font-size:16px;">
+                                    New Tuition Request
+                                </p>
+                            </div>
+
+                            <!-- Content -->
+                            <div style="padding:30px; color:#333;">
+
+                                <h2 style="margin-top:0;">
+                                    Hello '.$tutorName.',
+                                </h2>
+
+                                <p style="font-size:15px; line-height:1.7;">
+                                    You have received a new tuition session request from a student on 
+                                    <strong>EduGuide</strong>.
+                                </p>
+
+                                <!-- Request Details -->
+                                <div style="
+                                    background:#f8f9fc;
+                                    border-left:5px solid #4e73df;
+                                    padding:20px;
+                                    margin:25px 0;
+                                    border-radius:8px;
+                                ">
+
+                                    <h3 style="margin-top:0; color:#4e73df;">
+                                        Request Details
+                                    </h3>
+
+                                    <p><strong>Student:</strong> '.$studentName.'</p>
+
+                                    <p><strong>Subject:</strong> '.$subName.'</p>
+
+                                    <p><strong>Requirement:</strong><br>
+                                    '.$requirement.'</p>
+
+                                    <p><strong>Duration:</strong> '.$duration_months.' month(s)</p>
+
+                                </div>
+
+                                <p style="font-size:15px;">
+                                    Please login to your Tutor Dashboard to accept or reject this request.
+                                </p>
+
+                                <!-- Button -->
+                                <div style="text-align:center; margin:35px 0;">
+
+                                    <a href="'.$requestUrl.'" 
+                                    style="
+                                            background:#4e73df;
+                                            color:white;
+                                            text-decoration:none;
+                                            padding:14px 30px;
+                                            border-radius:8px;
+                                            display:inline-block;
+                                            font-size:16px;
+                                            font-weight:bold;
+                                    ">
+                                        View Student Requests
+                                    </a>
+
+                                </div>
+
+                                <p style="
+                                    font-size:14px;
+                                    color:#777;
+                                    line-height:1.6;
+                                ">
+                                    Thank you for being a part of EduGuide.<br>
+                                    We wish you a great teaching experience!
+                                </p>
+
+                            </div>
+
+                            <!-- Footer -->
+                            <div style="
+                                background:#f1f1f1;
+                                text-align:center;
+                                padding:18px;
+                                font-size:13px;
+                                color:#666;
+                            ">
+                                © '.date("Y").' EduGuide. All Rights Reserved.
+                            </div>
+
+                        </div>
+
+                    </div>
+                    ';
+
+                    $result = sendMail($tutorEmail, $tutorName, $emailSubject, $body);
+
+                    if ($result !== true) {
+                        $message .= " <small class='text-warning'>
+                            (Email could not be sent: " . htmlspecialchars($result) . ")
+                        </small>";
+                    }
                 }
                 $bookingSuccess = "Your booking request has been sent successfully! The tutor will be notified by email.";
             } else {

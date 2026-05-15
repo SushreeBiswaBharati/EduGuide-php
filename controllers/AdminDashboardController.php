@@ -30,38 +30,239 @@ if ($page === 'manage_tutor' && isset($_POST['tutor_action'])) {
 
     if ($_POST['tutor_action'] === 'verify') {
         $conn->query("UPDATE tutors SET is_verified = 1 WHERE id = $tutor_id");
-        $message = "✅ Tutor <strong>" . htmlspecialchars($tutorName) . "</strong> has been verified successfully.";
+        $message = "Tutor <strong>" . htmlspecialchars($tutorName) . "</strong> has been verified successfully.";
 
-        // Email to tutor — profile approved
         if ($tutorEmail !== '') {
-            $subject  = "🎉 Your EduGuide Tutor Profile Has Been Approved!";
-            $body     = "Dear {$tutorName},\r\n\r\n";
-            $body    .= "Congratulations! Your tutor profile on EduGuide has been reviewed and approved by our admin team.\r\n\r\n";
-            $body    .= "You can now log in to your Tutor Dashboard and start receiving student booking requests.\r\n\r\n";
-            $body    .= "Dashboard: http://localhost/EduGuide-php/controllers/TutorDashboardController.php\r\n\r\n";
-            $body    .= "If you have any questions, feel free to contact us.\r\n\r\n";
-            $body    .= "Best regards,\r\nEduGuide Admin Team\r\n";
+
+            $subject = "Your EduGuide Tutor Profile Has Been Approved!";
+
+            $dashboardUrl = "http://localhost:8888/EduGuide-php/controllers/TutorDashboardController.php";
+
+            $body = '
+            <div style="font-family:Arial,sans-serif;background:#f4f6f9;padding:40px;">
+
+                <div style="
+                    max-width:600px;
+                    margin:auto;
+                    background:#ffffff;
+                    border-radius:12px;
+                    overflow:hidden;
+                    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+                ">
+
+                    <!-- Header -->
+                    <div style="
+                        background:linear-gradient(135deg,#1cc88a,#13855c);
+                        padding:25px;
+                        text-align:center;
+                        color:white;
+                    ">
+                        <h1 style="margin:0;">EduGuide</h1>
+                        <p style="margin-top:8px;font-size:16px;">
+                            Tutor Profile Approved
+                        </p>
+                    </div>
+
+                    <!-- Content -->
+                    <div style="padding:30px;color:#333;">
+
+                        <h2>Hello '.$tutorName.',</h2>
+
+                        <p style="font-size:15px;line-height:1.7;">
+                            Congratulations! 🎉
+                        </p>
+
+                        <p style="font-size:15px;line-height:1.7;">
+                            Your tutor profile on <strong>EduGuide</strong> has been successfully reviewed and approved by our admin team.
+                        </p>
+
+                        <div style="
+                            background:#f8f9fc;
+                            border-left:5px solid #1cc88a;
+                            padding:20px;
+                            margin:25px 0;
+                            border-radius:8px;
+                        ">
+                            <h3 style="margin-top:0;color:#1cc88a;">
+                                You Can Now:
+                            </h3>
+
+                            <ul style="line-height:1.8;padding-left:20px;">
+                                <li>Receive student booking requests</li>
+                                <li>Manage your tutoring sessions</li>
+                                <li>Access your Tutor Dashboard</li>
+                                <li>Grow your teaching profile</li>
+                            </ul>
+                        </div>
+
+                        <div style="text-align:center;margin:35px 0;">
+
+                            <a href="'.$dashboardUrl.'" 
+                            style="
+                                    background:#1cc88a;
+                                    color:white;
+                                    text-decoration:none;
+                                    padding:14px 30px;
+                                    border-radius:8px;
+                                    display:inline-block;
+                                    font-size:16px;
+                                    font-weight:bold;
+                            ">
+                                Open Tutor Dashboard
+                            </a>
+
+                        </div>
+
+                        <p style="font-size:14px;color:#777;line-height:1.6;">
+                            Thank you for joining EduGuide.<br>
+                            We wish you success in your teaching journey!
+                        </p>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="
+                        background:#f1f1f1;
+                        text-align:center;
+                        padding:18px;
+                        font-size:13px;
+                        color:#666;
+                    ">
+                        © '.date("Y").' EduGuide. All Rights Reserved.
+                    </div>
+
+                </div>
+
+            </div>
+            ';
+
             $result = sendMail($tutorEmail, $tutorName, $subject, $body);
+
             if ($result !== true) {
-                $message .= " <small class='text-warning'>(Email could not be sent: " . htmlspecialchars($result) . ")</small>";
+                $message .= " <small class='text-warning'>
+                    (Email could not be sent: " . htmlspecialchars($result) . ")
+                </small>";
             }
         }
     }
 
     if ($_POST['tutor_action'] === 'revoke') {
         $conn->query("UPDATE tutors SET is_verified = 0 WHERE id = $tutor_id");
-        $message = "⚠️ Tutor <strong>" . htmlspecialchars($tutorName) . "</strong>'s access has been revoked.";
+        $message = " Tutor <strong>" . htmlspecialchars($tutorName) . "</strong>'s access has been revoked.";
 
         // Email to tutor — profile revoked
-        if ($tutorEmail !== '') {
-            $subject  = "EduGuide — Tutor Profile Access Revoked";
-            $body     = "Dear {$tutorName},\r\n\r\n";
-            $body    .= "We're writing to inform you that your tutor profile on EduGuide has been temporarily revoked by our admin team.\r\n\r\n";
-            $body    .= "This may be due to a policy review or incomplete information. Please contact our support team for more details.\r\n\r\n";
-            $body    .= "Best regards,\r\nEduGuide Admin Team\r\n";
+       if ($tutorEmail !== '') {
+
+            $subject = " EduGuide — Tutor Profile Access Revoked";
+
+            $supportUrl = "http://localhost:8888/EduGuide-php/contact.php";
+
+            $body = '
+            <div style="font-family:Arial,sans-serif;background:#f4f6f9;padding:40px;">
+
+                <div style="
+                    max-width:600px;
+                    margin:auto;
+                    background:#ffffff;
+                    border-radius:12px;
+                    overflow:hidden;
+                    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+                ">
+
+                    <!-- Header -->
+                    <div style="
+                        background:linear-gradient(135deg,#e74a3b,#c0392b);
+                        padding:25px;
+                        text-align:center;
+                        color:white;
+                    ">
+                        <h1 style="margin:0;">EduGuide</h1>
+                        <p style="margin-top:8px;font-size:16px;">
+                            Tutor Access Revoked
+                        </p>
+                    </div>
+
+                    <!-- Content -->
+                    <div style="padding:30px;color:#333;">
+
+                        <h2>Hello '.$tutorName.',</h2>
+
+                        <p style="font-size:15px;line-height:1.7;">
+                            We would like to inform you that your tutor access on 
+                            <strong>EduGuide</strong> has been temporarily revoked by the admin team.
+                        </p>
+
+                        <div style="
+                            background:#fff5f5;
+                            border-left:5px solid #e74a3b;
+                            padding:20px;
+                            margin:25px 0;
+                            border-radius:8px;
+                        ">
+
+                            <h3 style="margin-top:0;color:#e74a3b;">
+                                Possible Reasons
+                            </h3>
+
+                            <ul style="line-height:1.8;padding-left:20px;">
+                                <li>Profile review in progress</li>
+                                <li>Incomplete tutor information</li>
+                                <li>Policy or guideline verification</li>
+                            </ul>
+
+                        </div>
+
+                        <p style="font-size:15px;line-height:1.7;">
+                            If you believe this was done in error or would like more information, please contact our support team.
+                        </p>
+
+                        <div style="text-align:center;margin:35px 0;">
+
+                            <a href="'.$supportUrl.'" 
+                            style="
+                                    background:#e74a3b;
+                                    color:white;
+                                    text-decoration:none;
+                                    padding:14px 30px;
+                                    border-radius:8px;
+                                    display:inline-block;
+                                    font-size:16px;
+                                    font-weight:bold;
+                            ">
+                                Contact Support
+                            </a>
+
+                        </div>
+
+                        <p style="font-size:14px;color:#777;line-height:1.6;">
+                            Thank you for your understanding.<br>
+                            EduGuide Admin Team
+                        </p>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="
+                        background:#f1f1f1;
+                        text-align:center;
+                        padding:18px;
+                        font-size:13px;
+                        color:#666;
+                    ">
+                        © '.date("Y").' EduGuide. All Rights Reserved.
+                    </div>
+
+                </div>
+
+            </div>
+            ';
+
             $result = sendMail($tutorEmail, $tutorName, $subject, $body);
+
             if ($result !== true) {
-                $message .= " <small class='text-warning'>(Email could not be sent: " . htmlspecialchars($result) . ")</small>";
+                $message .= " <small class='text-warning'>
+                    (Email could not be sent: " . htmlspecialchars($result) . ")
+                </small>";
             }
         }
     }
