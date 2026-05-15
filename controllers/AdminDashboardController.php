@@ -2,7 +2,7 @@
 require_once '../middleware/auth.php';
 requireRole('admin');
 require_once '../database/dbconnection.php';
-require_once '../helpers/sendMail.php';  // PHPMailer via SMTP
+require_once '../helpers/sendmail.php';  // PHPMailer via SMTP
 
 $page    = $_GET['page'] ?? 'dashboard';
 $message = '';

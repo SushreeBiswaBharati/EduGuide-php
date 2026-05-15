@@ -5,14 +5,16 @@ if (function_exists('sendMail')) {
     return;
 }
 
-// Load Composer autoload
-require_once __DIR__ . '/../vendor/autoload.php';
 
 // Load mail configuration
 require_once __DIR__ . '/mailer_config.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+
+require 'phpmailer/src/Exception.php';
+require 'phpmailer/src/PHPMailer.php';
+require 'phpmailer/src/SMTP.php';
 
 /**
  * Send Email using PHPMailer SMTP
