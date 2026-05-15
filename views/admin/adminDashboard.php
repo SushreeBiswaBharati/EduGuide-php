@@ -10,7 +10,7 @@
 <body>
 <div class="d-flex p-3 gap-3 vh-100">
 
-    <!-- ===================== SIDEBAR ===================== -->
+    <!-- sidebar -->
     <div class="sidebar d-flex flex-column justify-content-between p-0 rounded-4" id="sidebar">
 
         <div class="p-3 border-bottom border-white border-opacity-25 d-flex align-items-center justify-content-between">
@@ -22,15 +22,54 @@
                 <img src="/EduGuide-php/assets/icons/list.svg" alt="menu">
             </button>
         </div>
+        <?php
+        $currentPage = $_GET['page'] ?? 'dashboard';
+        ?>
 
-        <nav class="flex-grow-1 px-3 py-3 d-flex flex-column gap-2 fw-semibold">
-            <a href="?page=dashboard"      class="nav-link"><small>🏡</small> <span>Home</span></a>
-            <a href="?page=manage_tutor"   class="nav-link"><small>🧑🏻‍🏫</small> <span>Manage Tutors</span></a>
-            <a href="?page=manage_student" class="nav-link"><small>🧑🏻‍🎓</small> <span>Manage Students</span></a>
-            <a href="?page=booking"        class="nav-link"><small>📅</small> <span>View Bookings</span></a>
-            <a href="?page=dropdown"       class="nav-link"><small>⚙️</small> <span>Academic Settings</span></a>
-            <a href="?page=reviews"        class="nav-link"><small>⭐</small> <span>Manage Reviews</span></a>
-            <a href="?page=complaint"      class="nav-link"><small>📢</small> <span>Complaint Centre</span></a>
+        <nav class="flex-grow-1 px-3 py-3 d-flex flex-column gap-2 fw-semibold sidebar-menu">
+
+            <a href="?page=dashboard"
+            class="nav-link sidebar-link <?php echo $currentPage === 'dashboard' ? 'active-link' : ''; ?>">
+                <small>🏡</small>
+                <span>Home</span>
+            </a>
+
+            <a href="?page=manage_tutor"
+            class="nav-link sidebar-link <?php echo $currentPage === 'manage_tutor' ? 'active-link' : ''; ?>">
+                <small>🧑🏻‍🏫</small>
+                <span>Manage Tutors</span>
+            </a>
+
+            <a href="?page=manage_student"
+            class="nav-link sidebar-link <?php echo $currentPage === 'manage_student' ? 'active-link' : ''; ?>">
+                <small>🧑🏻‍🎓</small>
+                <span>Manage Students</span>
+            </a>
+
+            <a href="?page=booking"
+            class="nav-link sidebar-link <?php echo $currentPage === 'booking' ? 'active-link' : ''; ?>">
+                <small>📅</small>
+                <span>View Bookings</span>
+            </a>
+
+            <a href="?page=dropdown"
+            class="nav-link sidebar-link <?php echo $currentPage === 'dropdown' ? 'active-link' : ''; ?>">
+                <small>⚙️</small>
+                <span>Academic Settings</span>
+            </a>
+
+            <a href="?page=reviews"
+            class="nav-link sidebar-link <?php echo $currentPage === 'reviews' ? 'active-link' : ''; ?>">
+                <small>⭐</small>
+                <span>Manage Reviews</span>
+            </a>
+
+            <a href="?page=complaint"
+            class="nav-link sidebar-link <?php echo $currentPage === 'complaint' ? 'active-link' : ''; ?>">
+                <small>📢</small>
+                <span>Complaint Centre</span>
+            </a>
+
         </nav>
 
         <div class="pb-3 px-2 mb-3 d-flex justify-content-center">
@@ -207,7 +246,7 @@
                 </div>
             </div>
 
-        <!-- ==================== MANAGE TUTORS ==================== -->
+        <!-- Manage tutors-->
         <?php elseif ($page === 'manage_tutor'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -264,16 +303,16 @@
                 <table class="table table-hover align-middle bg-white shadow-sm">
                     <thead class="table-dark">
                         <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Subjects</th>
-                            <th>Qualification</th>
-                            <th>Exp (yrs)</th>
-                            <th>Rating</th>
-                            <th>Status</th>
-                            <th>Action</th>
+                            <th class="bg-black text-white">#</th>
+                            <th class="bg-black text-white">Name</th>
+                            <th class="bg-black text-white">Email</th>
+                            <th class="bg-black text-white">Phone</th>
+                            <th class="bg-black text-white">Subjects</th>
+                            <th class="bg-black text-white">Qualification</th>
+                            <th class="bg-black text-white">Exp (yrs)</th>
+                            <th class="bg-black text-white">Rating</th>
+                            <th class="bg-black text-white">Status</th>
+                            <th class="bg-black text-white">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -338,7 +377,7 @@
                 </table>
             </div>
 
-        <!-- ==================== MANAGE STUDENTS ==================== -->
+        <!--manage students -->
         <?php elseif ($page === 'manage_student'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -360,7 +399,7 @@
                                     <td class="text-center">
                                         <form method="POST" action="?page=manage_student" style="display:inline;">
                                             <input type="hidden" name="delete_student_id" value="<?php echo $s['id']; ?>">
-                                            <button type="submit" class="btn btn-danger btn-sm"
+                                            <button type="submit" class="btn btn-outline-danger btn-sm"
                                                 onclick="return confirm('Delete this student permanently?')">
                                                 🗑 Delete
                                             </button>
@@ -377,7 +416,7 @@
                 </table>
             </div>
 
-        <!-- ==================== VIEW BOOKINGS ==================== -->
+        <!-- view bookings -->
         <?php elseif ($page === 'booking'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -388,14 +427,14 @@
                 <table class="table table-hover align-middle bg-white shadow-sm">
                     <thead class="table-dark">
                         <tr>
-                            <th>#</th>
-                            <th>Student</th>
-                            <th>Tutor</th>
-                            <th>Subject</th>
-                            <th>Requirement</th>
-                            <th>Duration</th>
-                            <th>Status</th>
-                            <th>Date</th>
+                            <th class="bg-black text-white">#</th>
+                            <th class="bg-black text-white">Student</th>
+                            <th class="bg-black text-white">Tutor</th>
+                            <th class="bg-black text-white">Subject</th>
+                            <th class="bg-black text-white">Requirement</th>
+                            <th class="bg-black text-white">Duration</th>
+                            <th class="bg-black text-white">Status</th>
+                            <th class="bg-black text-white">Date</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -435,7 +474,7 @@
                 </table>
             </div>
 
-        <!-- ==================== MANAGE DROPDOWNS ==================== -->
+        <!-- Academic settings -->
         <?php elseif ($page === 'dropdown'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -479,7 +518,7 @@
                                         <form method="POST" action="?page=dropdown" style="display:inline;">
                                             <input type="hidden" name="delete_id"   value="<?php echo $r['id']; ?>">
                                             <input type="hidden" name="delete_type" value="<?php echo $type; ?>">
-                                            <button type="submit" class="btn btn-danger btn-sm"
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
                                                 onclick="return confirm('Delete \'<?php echo htmlspecialchars($r['name'], ENT_QUOTES); ?>\'?')">
                                                 🗑 Delete
                                             </button>
@@ -496,14 +535,13 @@
             <?php } ?>
 
             <div class="row g-3">
-                <div class="col-md-6"><?php showSection('Boards',   '🏫', 'board',   $dd_boards);   ?></div>
-                <div class="col-md-6"><?php showSection('Exams',    '📝', 'exam',    $dd_exams);    ?></div>
                 <div class="col-md-6"><?php showSection('Classes',  '📚', 'class',   $dd_classes);  ?></div>
+                <div class="col-md-6"><?php showSection('Exams',    '📝', 'exam',    $dd_exams);    ?></div>
+                <div class="col-md-6"><?php showSection('Boards',   '🏫', 'board',   $dd_boards);   ?></div>
                 <div class="col-md-6"><?php showSection('Subjects', '🔬', 'subject', $dd_subjects); ?></div>
             </div>
 
-        <!-- ==================== HANDLE COMPLAINTS ==================== -->
-        <!-- ==================== MANAGE REVIEWS ==================== -->
+        <!-- manage reviews -->
         <?php elseif ($page === 'reviews'): ?>
 
             <?php
@@ -525,18 +563,19 @@
             }
             ?>
 
-            <!-- Header -->
-            <div class="mb-3 greet-bar rounded-4 p-3 text-white d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="mb-4 greet-bar rounded-4 p-3 text-white d-flex align-items-center justify-content-between flex-wrap gap-2">
                 <div>
-                    <h5 class="fw-bold mb-0">⭐ Manage Reviews</h5>
-                    <small style="opacity:.85;">All student feedback grouped by tutor — admin can delete any review</small>
+                    <h5 class="fw-bold mb-0">⭐ My Reviews</h5>
+                    <small style="opacity:.85;">View and manage Students feedback for tutors</small>
                 </div>
+
                 <div class="d-flex gap-2">
-                    <span class="badge bg-white text-primary fw-semibold px-3 py-2">
-                        <?php echo count($groupedReviews); ?> Tutor<?php echo count($groupedReviews) != 1 ? 's' : ''; ?>
+                    <span class="badge bg-primary px-3 py-2">
+                        Tutors: <?php echo count($groupedReviews); ?>
                     </span>
-                    <span class="badge bg-white text-warning fw-semibold px-3 py-2">
-                        <?php echo $totalReviews; ?> Review<?php echo $totalReviews != 1 ? 's' : ''; ?>
+
+                    <span class="badge bg-dark px-3 py-2">
+                        Reviews: <?php echo $totalReviews; ?>
                     </span>
                 </div>
             </div>
@@ -549,151 +588,124 @@
             <?php endif; ?>
 
             <?php if (empty($groupedReviews)): ?>
-                <div class="text-center py-5"
-                     style="background:rgba(255,255,255,.7); border-radius:14px; border:1.5px dashed #ffc107;">
-                    <div style="font-size:3rem;">⭐</div>
-                    <h5 class="fw-bold mt-2 mb-1" style="color:#0b48a4;">No Reviews Yet</h5>
-                    <p class="text-muted">No students have submitted any reviews yet.</p>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body text-center py-5">
+                        <h5 class="fw-bold">No Reviews Yet</h5>
+                        <p class="text-muted mb-0">
+                            No student reviews available right now.
+                        </p>
+                    </div>
                 </div>
 
             <?php else: ?>
 
                 <?php foreach ($groupedReviews as $tid => $group):
 
-                    // Step 2: Calculate avg and star counts for this tutor
-                    $tutorReviews  = $group['reviews'];
-                    $tutorName     = $group['tutor_name'];
-                    $reviewCount   = count($tutorReviews);
-                    $avgRating     = round(array_sum(array_column($tutorReviews, 'rating')) / $reviewCount, 1);
-                    $starCounts    = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
-                    foreach ($tutorReviews as $rv) $starCounts[intval($rv['rating'])]++;
+                    $tutorReviews = $group['reviews'];
+                    $tutorName    = $group['tutor_name'];
 
-                    // Tutor initials
-                    $tParts   = explode(' ', $tutorName);
-                    $tInitials = strtoupper(substr($tParts[0], 0, 1) . (isset($tParts[1]) ? substr($tParts[1], 0, 1) : ''));
+                    $reviewCount = count($tutorReviews);
+
+                    $avgRating = round(
+                        array_sum(array_column($tutorReviews, 'rating')) / $reviewCount,
+                        1
+                    );
                 ?>
 
-                <!-- Tutor Group Card -->
-                <div class="card shadow-sm mb-4" style="border-top:3px solid #0b48a4;">
+                <div class="card shadow-sm mb-4">
 
-                    <!-- Tutor Header -->
-                    <div class="card-header py-3 px-4 d-flex align-items-center justify-content-between flex-wrap gap-2"
-                         style="background:#f0f6ff; border-bottom:1px solid #dee2e6;">
+                    <div class="card-header bg-white py-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
 
-                        <div class="d-flex align-items-center gap-3">
-                            <!-- Tutor initials avatar -->
-                            <div style="width:44px; height:44px; border-radius:50%;
-                                        background:linear-gradient(135deg,#5c8fdc,#0b48a4);
-                                        color:#fff; display:flex; align-items:center;
-                                        justify-content:center; font-weight:700; font-size:15px;
-                                        flex-shrink:0;">
-                                <?php echo $tInitials; ?>
-                            </div>
                             <div>
-                                <div class="fw-bold" style="color:#0b48a4; font-size:1rem;">
+                                <h5 class="mb-1 fw-bold text-primary">
                                     <?php echo htmlspecialchars($tutorName); ?>
-                                </div>
-                                <div>
-                                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                                        <span style="color:<?php echo $i <= round($avgRating) ? '#ffc107' : '#dee2e6'; ?>; font-size:.85rem;">★</span>
-                                    <?php endfor; ?>
-                                    <span style="font-size:.82rem; color:#555; margin-left:4px;">
-                                        <?php echo $avgRating; ?> avg &nbsp;·&nbsp;
-                                        <?php echo $reviewCount; ?> review<?php echo $reviewCount != 1 ? 's' : ''; ?>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                                </h5>
 
-                        <!-- Step 3: Star breakdown mini bars -->
-                        <div style="min-width:180px;">
-                            <?php foreach ([5, 4, 3, 2, 1] as $star):
-                                $count = $starCounts[$star];
-                                $pct   = $reviewCount > 0 ? round(($count / $reviewCount) * 100) : 0;
-                            ?>
-                            <div class="d-flex align-items-center gap-1 mb-1">
-                                <div style="width:20px; font-size:.72rem; font-weight:600;
-                                            color:#664d03; text-align:right; flex-shrink:0;">
-                                    <?php echo $star; ?>★
-                                </div>
-                                <div style="flex:1; height:7px; background:#e9ecef; border-radius:4px; overflow:hidden;">
-                                    <div style="height:100%; width:<?php echo $pct; ?>%;
-                                                background:linear-gradient(90deg,#ffc107,#fd7e14);
-                                                border-radius:4px;"></div>
-                                </div>
-                                <div style="width:16px; font-size:.72rem; color:#555; flex-shrink:0;">
-                                    <?php echo $count; ?>
-                                </div>
+                                <small class="text-muted">
+                                    Average Rating:
+                                    <strong><?php echo $avgRating; ?>/5</strong>
+                                    •
+                                    <?php echo $reviewCount; ?> review<?php echo $reviewCount != 1 ? 's' : ''; ?>
+                                </small>
                             </div>
-                            <?php endforeach; ?>
+
+                            <div>
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <span style="color:<?php echo $i <= round($avgRating) ? '#ffc107' : '#dee2e6'; ?>;">
+                                        ★
+                                    </span>
+                                <?php endfor; ?>
+                            </div>
+
                         </div>
                     </div>
 
-                    <!-- Step 4: Individual reviews table -->
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0" style="font-size:.88rem;">
-                            <thead>
-                                <tr style="background:#f8f9fa;">
-                                    <th style="padding:8px 12px; color:#555; font-weight:600; width:30px;">#</th>
-                                    <th style="padding:8px 12px; color:#555; font-weight:600;">Student</th>
-                                    <th style="padding:8px 12px; color:#555; font-weight:600;">Rating</th>
-                                    <th style="padding:8px 12px; color:#555; font-weight:600;">Feedback</th>
-                                    <th style="padding:8px 12px; color:#555; font-weight:600;">Date</th>
-                                    <th style="padding:8px 12px; color:#555; font-weight:600; text-align:center;">Action</th>
+                        <table class="table table-hover align-middle mb-0">
+
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="bg-black text-white">#</th>
+                                    <th class="bg-black text-white">Student</th>
+                                    <th class="bg-black text-white">Rating</th>
+                                    <th class="bg-black text-white">Feedback</th>
+                                    <th class="bg-black text-white">Date</th>
+                                    <th class="bg-black text-white text-center">Action</th>
                                 </tr>
                             </thead>
+
                             <tbody>
-                                <?php foreach ($tutorReviews as $n => $rv):
-                                    $starColor = match(intval($rv['rating'])) {
-                                        5 => '#198754', 4 => '#0d6efd',
-                                        3 => '#ffc107', 2 => '#fd7e14',
-                                        1 => '#dc3545', default => '#6c757d'
-                                    };
-                                    // Student initials
-                                    $sParts    = explode(' ', $rv['student_name']);
-                                    $sInitials = strtoupper(substr($sParts[0], 0, 1) . (isset($sParts[1]) ? substr($sParts[1], 0, 1) : ''));
-                                ?>
-                                <tr style="border-left:3px solid <?php echo $starColor; ?>;">
-                                    <td class="text-center" style="padding:10px 12px; color:#888;">
-                                        <?php echo $n + 1; ?>
+
+                                <?php foreach ($tutorReviews as $n => $rv): ?>
+
+                                <tr>
+
+                                    <td><?php echo $n + 1; ?></td>
+
+                                    <td class="fw-semibold">
+                                        <?php echo htmlspecialchars($rv['student_name']); ?>
                                     </td>
-                                    <td style="padding:10px 12px;">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div style="width:30px; height:30px; border-radius:50%;
-                                                        background:#e0f0ff; color:#0b48a4;
-                                                        display:flex; align-items:center;
-                                                        justify-content:center; font-size:11px;
-                                                        font-weight:600; flex-shrink:0;">
-                                                <?php echo $sInitials; ?>
-                                            </div>
-                                            <span class="fw-semibold" style="color:#0b48a4;">
-                                                <?php echo htmlspecialchars($rv['student_name']); ?>
+
+                                    <td>
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <span style="color:<?php echo $i <= $rv['rating'] ? '#ffc107' : '#dee2e6'; ?>;">
+                                                ★
                                             </span>
-                                        </div>
-                                    </td>
-                                    <td style="padding:10px 12px;">
+                                        <?php endfor; ?>
+
                                         <div>
-                                            <?php for ($i = 1; $i <= 5; $i++): ?>
-                                                <span style="color:<?php echo $i <= $rv['rating'] ? '#ffc107' : '#dee2e6'; ?>;">★</span>
-                                            <?php endfor; ?>
+                                            <small class="text-muted">
+                                                <?php echo $rv['rating']; ?>/5
+                                            </small>
                                         </div>
-                                        <small style="font-weight:600; color:<?php echo $starColor; ?>;">
-                                            <?php echo $rv['rating']; ?>/5
-                                        </small>
                                     </td>
-                                    <td style="padding:10px 12px; max-width:240px; color:#555; font-style:italic;">
-                                        "<?php echo htmlspecialchars(strlen($rv['comment']) > 90 ? substr($rv['comment'], 0, 90) . '…' : $rv['comment']); ?>"
+
+                                    <td style="max-width:300px;">
+                                        <?php echo htmlspecialchars($rv['comment']); ?>
                                     </td>
-                                    <td style="padding:10px 12px; white-space:nowrap; color:#888;">
+
+                                    <td>
                                         <?php echo date('d M Y', strtotime($rv['created_at'])); ?>
                                     </td>
-                                    <td style="padding:10px 12px; text-align:center;">
-                                        <form method="POST" action="?page=reviews"
-                                              onsubmit="return confirm('Delete this review? Tutor rating will be recalculated.')">
-                                            <input type="hidden" name="delete_review_id" value="<?php echo $rv['id']; ?>">
-                                            <input type="hidden" name="review_tutor_id"  value="<?php echo $tid; ?>">
-                                            <button type="submit" class="btn btn-danger btn-sm fw-semibold px-3">
-                                                🗑 Delete
+
+                                    <td class="text-center">
+
+                                        <form method="POST"
+                                            action="?page=reviews"
+                                            onsubmit="return confirm('Delete this review?')">
+
+                                            <input type="hidden"
+                                                name="delete_review_id"
+                                                value="<?php echo $rv['id']; ?>">
+
+                                            <input type="hidden"
+                                                name="review_tutor_id"
+                                                value="<?php echo $tid; ?>">
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger">Delete
                                             </button>
                                         </form>
                                     </td>
@@ -706,6 +718,8 @@
 
                 <?php endforeach; ?>
             <?php endif; ?>
+
+            <!-- Manage complaints -->
 
         <?php elseif ($page === 'complaint'): ?>
 
@@ -835,7 +849,7 @@
                                 <form method="POST" action="?page=complaint"
                                       onsubmit="return confirm('Delete this complaint permanently?')">
                                     <input type="hidden" name="delete_complaint_id" value="<?php echo $c['id']; ?>">
-                                    <button type="submit" class="btn btn-danger btn-sm fw-semibold px-3">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger ">
                                         🗑 Delete
                                     </button>
                                 </form>

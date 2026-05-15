@@ -19,8 +19,7 @@
             font-weight: 600;
         }
         .filter-badge:hover  { opacity: .85; transform: translateY(-1px); }
-        .filter-badge.active { box-shadow: 0 0 0 3px rgba(255,255,255,.6),
-                                           0 0 0 5px rgba(11,72,164,.4); }
+        .filter-badge.active { box-shadow: 0 0 0 3px rgba(255,255,255,.6), 0 0 0 5px rgba(11,72,164,.4); }
 
         /* ── request table row height ── */
         #requestsTable tbody tr { height: 52px; }
@@ -31,7 +30,7 @@
 <body>
 <div class="d-flex p-3 gap-3 vh-100">
 
-    <!-- ===================== SIDEBAR ===================== -->
+    <!-- sidebar -->
     <div class="sidebar d-flex flex-column justify-content-between p-0 rounded-4" id="sidebar">
 
         <div class="p-3 border-bottom border-white border-opacity-25 d-flex align-items-center justify-content-between">
@@ -44,13 +43,48 @@
             </button>
         </div>
 
+        <?php
+        $currentPage = $_GET['page'] ?? 'dashboard';
+        ?>
+
         <nav class="flex-grow-1 px-3 py-3 d-flex flex-column gap-2 fw-semibold">
-            <a href="?page=dashboard" class="nav-link"><small>🏡</small> <span>Dashboard</span></a>
-            <a href="?page=profile"   class="nav-link"><small>👤</small> <span>My Profile</span></a>
-            <a href="?page=requests"  class="nav-link"><small>📋</small> <span>Student Requests</span></a>
-            <a href="?page=schedules" class="nav-link"><small>📅</small> <span>My Schedules</span></a>
-            <a href="?page=reviews"   class="nav-link"><small>⭐</small> <span>My Reviews</span></a>
-            <a href="?page=complaint" class="nav-link"><small>📢</small> <span>Raise Complaint</span></a>
+
+            <a href="?page=dashboard"
+            class="nav-link <?php echo $currentPage === 'dashboard' ? 'active-link' : ''; ?>">
+                <small>🏡</small>
+                <span>Home</span>
+            </a>
+
+            <a href="?page=profile"
+            class="nav-link <?php echo $currentPage === 'profile' ? 'active-link' : ''; ?>">
+                <small>👤</small>
+                <span>My Profile</span>
+            </a>
+
+            <a href="?page=requests"
+            class="nav-link <?php echo $currentPage === 'requests' ? 'active-link' : ''; ?>">
+                <small>📋</small>
+                <span>Student Requests</span>
+            </a>
+
+            <a href="?page=schedules"
+            class="nav-link <?php echo $currentPage === 'schedules' ? 'active-link' : ''; ?>">
+                <small>📅</small>
+                <span>My Schedules</span>
+            </a>
+
+            <a href="?page=reviews"
+            class="nav-link <?php echo $currentPage === 'reviews' ? 'active-link' : ''; ?>">
+                <small>⭐</small>
+                <span>My Reviews</span>
+            </a>
+
+            <a href="?page=complaint"
+            class="nav-link <?php echo $currentPage === 'complaint' ? 'active-link' : ''; ?>">
+                <small>📢</small>
+                <span>Raise Complaint</span>
+            </a>
+
         </nav>
 
         <div class="pb-3 px-2 mb-3 d-flex justify-content-center">
@@ -62,10 +96,9 @@
         </div>
     </div>
 
-    <!-- ===================== MAIN CONTENT ===================== -->
+    <!--main content-->
     <div class="flex-grow-1 main-content p-4 rounded-4 shadow-sm" style="overflow-y:auto;">
 
-        <!-- ==================== DASHBOARD ==================== -->
         <?php if ($page === 'dashboard'): ?>
 
             <div class="mb-4 greet-bar rounded-4 p-4 text-white">
@@ -144,7 +177,7 @@
                 </div>
             </div>
 
-        <!-- ==================== MY PROFILE ==================== -->
+        <!-- my profile -->
         <?php elseif ($page === 'profile'): ?>
 
             <div class="mb-4 greet-bar rounded-4 p-3 text-white">
@@ -295,7 +328,7 @@
                 </div>
             </div>
 
-        <!-- ==================== STUDENT REQUESTS ==================== -->
+        <!-- student requests -->
         <?php elseif ($page === 'requests'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
@@ -342,15 +375,15 @@
                     <table class="table table-bordered table-hover bg-white shadow-sm align-middle" id="requestsTable">
                         <thead class="text-center" style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
                             <tr>
-                                <th class="text-white">#</th>
-                                <th class="text-white">Student</th>
-                                <th class="text-white">Subject</th>
-                                <th class="text-white">Requirement</th>
-                                <th class="text-white">Duration</th>
-                                <th class="text-white">Date</th>
-                                <th class="text-white">Status</th>
-                                <th class="text-white">Details</th>
-                                <th class="text-white">Action</th>
+                                <th class="bg-black text-white">#</th>
+                                <th class="bg-black text-white">Student</th>
+                                <th class="bg-black text-white">Subject</th>
+                                <th class="bg-black text-white">Requirement</th>
+                                <th class="bg-black text-white">Duration</th>
+                                <th class="bg-black text-white">Date</th>
+                                <th class="bg-black text-white">Status</th>
+                                <th class="bg-black text-white">Details</th>
+                                <th class="bg-black text-white">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -546,7 +579,7 @@
                 </div>
             </div>
 
-        <!-- ==================== MY SCHEDULES ==================== -->
+        <!-- my schedule -->
         <?php elseif ($page === 'schedules'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -590,12 +623,12 @@
                     <table class="table table-bordered table-hover bg-white shadow-sm align-middle" id="scheduleTable">
                         <thead>
                             <tr style="background:linear-gradient(90deg,#5c8fdc,#0b48a4);">
-                                <th class="text-white" style="background:transparent; padding:10px 12px;">#</th>
-                                <th class="text-white" style="background:transparent; padding:10px 12px;">Student</th>
-                                <th class="text-white" style="background:transparent; padding:10px 12px;">Subject</th>
-                                <th class="text-white" style="background:transparent; padding:10px 12px;">Start Date</th>
-                                <th class="text-white" style="background:transparent; padding:10px 12px;">Progress</th>
-                                <th class="text-white" style="background:transparent; padding:10px 12px;">Status</th>
+                                <th class="bg-black text-white">#</th>
+                                <th class="bg-black text-white">Student</th>
+                                <th class="bg-black text-white">Subject</th>
+                                <th class="bg-black text-white">Start Date</th>
+                                <th class="bg-black text-white">Progress</th>
+                                <th class="bg-black text-white">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -728,7 +761,7 @@
                 }
             </script>
 
-        <!-- ==================== MY REVIEWS ==================== -->
+        <!--my reviews -->
         <?php elseif ($page === 'reviews'): ?>
 
             <div class="mb-4 greet-bar rounded-4 p-3 text-white d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -860,7 +893,7 @@
                 </div>
             <?php endif; ?>
 
-        <!-- ==================== RAISE COMPLAINT ==================== -->
+        <!-- raise complaints -->
         <?php elseif ($page === 'complaint'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">

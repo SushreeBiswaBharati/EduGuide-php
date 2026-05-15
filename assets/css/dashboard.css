@@ -73,17 +73,56 @@ body {
 }
 .sidebar .nav-link {
     font-size: larger;
-    border-radius: 8px;
-    padding: 8px 10px;
+    border-radius: 12px;
+    padding: 12px 14px;
     white-space: nowrap;
-    display: flex;          
-    align-items: center;   
-    gap: 8px;               
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: rgba(255,255,255,0.85);
+    transition: all 0.25s ease;
+
+    position: relative;
 }
 
-.sidebar .nav-link:hover{
-    background: rgba(255,255,255,0.18);
-    color: white;
+/* Hover */
+.sidebar .nav-link:hover {
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+
+    transform: translateX(3px);
+}
+
+/* ACTIVE PAGE */
+.sidebar .nav-link.active-link {
+    background: white;
+    color: #0b48a4 !important;
+
+    font-weight: 700;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Left indicator */
+.sidebar .nav-link.active-link::before {
+    content: "";
+
+    position: absolute;
+    left: -10px;
+    top: 10%;
+    
+    width: 5px;
+    height: 80%;
+
+    border-radius: 10px;
+
+    background: white;
+}
+
+/* Active icon */
+.sidebar .nav-link.active-link small {
+    transform: scale(1.1);
 }
 
 .sidebar.collapsed .nav-link {
