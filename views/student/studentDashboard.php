@@ -544,186 +544,160 @@
             ?>
 
             <?php if (empty($allBookings)): ?>
-                <div class="text-center py-5" style="background:rgba(255,255,255,.7); border-radius:16px; border:1.5px dashed #5c8fdc;">
+
+                <div class="text-center py-5 bg-white rounded shadow-sm">
                     <div style="font-size:3rem;">📭</div>
-                    <h5 class="fw-bold text-primary mt-2 mb-2">No Booking Sessions Yet</h5>
-                    <p class="text-muted mb-4">Start learning today by booking a tutor!</p>
-                    <a href="?page=browse" class="btn fw-semibold px-4"
-                       style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff; border-radius:8px;">
-                        🔍 Browse Tutors
+                    <h5 class="fw-bold text-primary mt-2">No Booking Sessions Yet</h5>
+                    <p class="text-muted">Start learning today by booking a tutor.</p>
+
+                    <a href="?page=browse" class="btn btn-primary">
+                        Browse Tutors
                     </a>
                 </div>
+
             <?php else: ?>
 
-                <div id="bookingCardsList">
-                <?php foreach ($allBookings as $bk):
-                    $status      = $bk['status'];
-                    $borderColor = match($status) {
-                        'Pending'   => '#ffc107',
-                        'Confirmed' => '#198754',
-                        'Completed' => '#0d6efd',
-                        'Cancelled' => '#dc3545',
-                        default     => '#5c8fdc'
-                    };
+            <div id="bookingCardsList">
+
+                <?php foreach ($allBookings as $bk): ?>
+
+                    <?php
+                    $status = $bk['status'];
+
                     $badgeClass = match($status) {
                         'Pending'   => 'bg-warning text-dark',
-                        'Confirmed' => 'bg-success text-white',
-                        'Completed' => 'bg-primary text-white',
-                        'Cancelled' => 'bg-danger text-white',
-                        default     => 'bg-secondary text-white'
+                        'Confirmed' => 'bg-success',
+                        'Completed' => 'bg-primary',
+                        'Cancelled' => 'bg-danger',
+                        default     => 'bg-secondary'
                     };
-                    $avatarStyle = match($status) {
-                        'Pending'   => 'background:#fff3cd; color:#664d03;',
-                        'Confirmed' => 'background:#d1e7dd; color:#0f5132;',
-                        'Completed' => 'background:#cfe2ff; color:#084298;',
-                        'Cancelled' => 'background:#f8d7da; color:#842029;',
-                        default     => 'background:#e0f0ff; color:#0b48a4;'
-                    };
-                    $progressStep = match($status) {
-                        'Pending'   => 1, 'Confirmed' => 3,
-                        'Completed' => 4, default     => 0
-                    };
-                    $nameParts   = explode(' ', $bk['tutor_name']);
-                    $initials    = strtoupper(substr($nameParts[0], 0, 1) . (isset($nameParts[1]) ? substr($nameParts[1], 0, 1) : ''));
-                    $reqPreview  = strlen($bk['requirement']) > 70 ? substr($bk['requirement'], 0, 70) . '...' : $bk['requirement'];
-                    $bookingDate = date('d M Y', strtotime($bk['created_at']));
-                ?>
-                <div class="booking-card-item mb-3" data-status="<?php echo $status; ?>">
-                    <div class="p-3 rounded-4 shadow-sm"
-                         style="background:rgba(255,255,255,.92); border-left:4px solid <?php echo $borderColor; ?>; border-top:.5px solid #dee2e6; border-right:.5px solid #dee2e6; border-bottom:.5px solid #dee2e6;">
 
-                        <!-- Top Row -->
-                        <div class="d-flex align-items-center gap-3 flex-wrap">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
-                                 style="width:46px; height:46px; font-size:15px; <?php echo $avatarStyle; ?>">
-                                <?php echo $initials; ?>
-                            </div>
-                            <div class="flex-grow-1" style="min-width:0;">
-                                <div class="d-flex align-items-center gap-2 flex-wrap">
-                                    <span class="fw-bold" style="color:#0b48a4; font-size:1rem;">
-                                        <?php echo htmlspecialchars($bk['tutor_name']); ?>
-                                    </span>
-                                    <span class="badge <?php echo $badgeClass; ?> rounded-pill" style="font-size:.72rem;">
+                    $bookingDate = date('d M Y', strtotime($bk['created_at']));
+                    ?>
+
+                    <div class="booking-card-item mb-3" data-status="<?php echo $status; ?>">
+
+                        <div class="card shadow-sm border-1-black ">
+
+                            <div class="card-body">
+
+                                <!-- Top -->
+                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+
+                                    <div>
+                                        <h6 class="fw-bold fs-3 text-primary mb-1">
+                                            <?php echo htmlspecialchars($bk['tutor_name']); ?>
+                                        </h6>
+
+                                        <div class="text-muted fs-5 small">
+                                            <?php echo htmlspecialchars($bk['subject_name'] ?? 'N/A'); ?>
+                                        </div>
+                                    </div>
+
+                                    <span class="badge <?php echo $badgeClass; ?>">
                                         <?php echo $status; ?>
                                     </span>
-                                </div>
-                                <div class="text-muted" style="font-size:.82rem; margin-top:2px;">
-                                    📚 <?php echo htmlspecialchars($bk['subject_name'] ?? 'N/A'); ?>
-                                    &nbsp;·&nbsp;
-                                    🗓 <?php echo $bk['duration_months']; ?> month<?php echo $bk['duration_months'] > 1 ? 's' : ''; ?>
-                                    &nbsp;·&nbsp;
-                                    📆 <?php echo $bookingDate; ?>
-                                </div>
-                                <div class="text-muted mt-1" style="font-size:.8rem; font-style:italic;">
-                                    "<?php echo htmlspecialchars($reqPreview); ?>"
-                                </div>
-                            </div>
-                            <button class="btn btn-sm ms-auto flex-shrink-0"
-                                    style="background:rgba(92,143,220,.12); color:#0b48a4; border:none; border-radius:8px; font-size:.78rem; padding:4px 12px;"
-                                    onclick="toggleCard('detail-<?php echo $bk['id']; ?>', this)">
-                                View Details ▾
-                            </button>
-                        </div>
 
-                        <!-- Progress Steps -->
-                        <?php if ($status !== 'Cancelled'): ?>
-                        <div class="mt-3 px-1">
-                            <div class="d-flex align-items-center gap-1" style="font-size:.7rem;">
-                                <?php
-                                $steps = ['Requested', 'Reviewed', 'Confirmed', 'Completed'];
-                                foreach ($steps as $i => $stepLabel):
-                                    $stepNum   = $i + 1;
-                                    $isDone    = $stepNum <= $progressStep;
-                                    $isCurrent = $stepNum === $progressStep;
-                                    $dotColor  = $isDone ? ($status === 'Completed' ? '#0d6efd' : '#198754') : '#ced4da';
-                                    $textColor = $isDone ? '#0b48a4' : '#adb5bd';
-                                ?>
-                                <div class="text-center" style="flex:1;">
-                                    <div style="width:10px; height:10px; border-radius:50%; background:<?php echo $dotColor; ?>; margin:0 auto 3px; <?php echo $isCurrent ? 'outline:2px solid '.$borderColor.'; outline-offset:2px;' : ''; ?>"></div>
-                                    <div style="color:<?php echo $textColor; ?>; font-size:.65rem; white-space:nowrap;"><?php echo $stepLabel; ?></div>
                                 </div>
-                                <?php if ($i < 3): ?>
-                                <div style="flex:2; height:2px; background:<?php echo $stepNum < $progressStep ? $dotColor : '#ced4da'; ?>; border-radius:1px; margin-bottom:13px;"></div>
-                                <?php endif; ?>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                        <?php else: ?>
-                        <div class="mt-2">
-                            <span style="font-size:.75rem; color:#842029; background:#f8d7da; padding:2px 10px; border-radius:99px;">
-                                ✖ This booking was cancelled
-                            </span>
-                        </div>
-                        <?php endif; ?>
 
-                        <!-- Expandable Detail -->
-                        <div id="detail-<?php echo $bk['id']; ?>" style="display:none; margin-top:14px; padding-top:12px; border-top:1px dashed #dee2e6;">
-                            <div class="row g-2" style="font-size:.85rem;">
-                                <div class="col-md-6">
-                                    <div style="background:#f8f9fa; border-radius:8px; padding:10px 14px;">
-                                        <div class="fw-semibold text-muted mb-1" style="font-size:.75rem; text-transform:uppercase; letter-spacing:.05em;">Full Requirement</div>
-                                        <div><?php echo nl2br(htmlspecialchars($bk['requirement'])); ?></div>
+                                <!-- Booking Info -->
+                                <div class="row mt-3">
+
+                                    <div class="col-md-4 mb-2">
+                                        <small class="text-muted d-block">Duration</small>
+                                        <span class="fw-semibold">
+                                            <?php echo $bk['duration_months']; ?> Month(s)
+                                        </span>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div style="background:#f8f9fa; border-radius:8px; padding:10px 14px;">
-                                        <div class="fw-semibold text-muted mb-1" style="font-size:.75rem; text-transform:uppercase; letter-spacing:.05em;">Session Info</div>
-                                        <table style="width:100%; font-size:.82rem;">
-                                            <tr>
-                                                <td class="text-muted">Subject</td>
-                                                <td class="fw-semibold text-end"><?php echo htmlspecialchars($bk['subject_name'] ?? 'N/A'); ?></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-muted">Duration</td>
-                                                <td class="fw-semibold text-end"><?php echo $bk['duration_months']; ?> month(s)</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-muted">Booked On</td>
-                                                <td class="fw-semibold text-end"><?php echo $bookingDate; ?></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-muted">Status</td>
-                                                <td class="text-end"><span class="badge <?php echo $badgeClass; ?> rounded-pill" style="font-size:.7rem;"><?php echo $status; ?></span></td>
-                                            </tr>
-                                        </table>
+
+                                    <div class="col-md-4 mb-2">
+                                        <small class="text-muted d-block">Booked On</small>
+                                        <span class="fw-semibold">
+                                            <?php echo $bookingDate; ?>
+                                        </span>
                                     </div>
+
+                                    <div class="col-md-4 mb-2">
+                                        <small class="text-muted d-block">Progress</small>
+
+                                        <span class="fw-semibold">
+                                            <?php
+                                            if ($status === 'Pending') {
+                                                echo 'Requested';
+                                            } elseif ($status === 'Confirmed') {
+                                                echo 'Confirmed';
+                                            } elseif ($status === 'Completed') {
+                                                echo 'Completed';
+                                            } else {
+                                                echo 'Cancelled';
+                                            }
+                                            ?>
+                                        </span>
+                                    </div>
+
                                 </div>
+
+                                <!-- Requirement -->
+                                <div class="mt-3">
+
+                                    <small class="text-muted d-block mb-1">
+                                        Requirement
+                                    </small>
+
+                                    <div class="border rounded p-2 bg-light small">
+                                        <?php echo nl2br(htmlspecialchars($bk['requirement'])); ?>
+                                    </div>
+
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="d-flex gap-2 flex-wrap mt-3">
+
+                                    <?php if ($status === 'Pending'): ?>
+
+                                        <form method="POST"
+                                            onsubmit="return confirm('Cancel this booking?')">
+
+                                            <input type="hidden"
+                                                name="cancel_booking_id"
+                                                value="<?php echo $bk['id']; ?>">
+
+                                            <button type="submit"
+                                                    class="btn btn-danger btn-sm">
+                                                Cancel Booking
+                                            </button>
+
+                                        </form>
+
+                                    <?php endif; ?>
+
+                                    <a href="?page=browse"
+                                    class="btn btn-outline-primary btn-sm">
+                                        Browse Tutors
+                                    </a>
+
+                                </div>
+
                             </div>
-                            <div class="d-flex gap-2 mt-3 flex-wrap">
-                                <?php if ($status === 'Pending'): ?>
-                                    <form method="POST" onsubmit="return confirm('Cancel this booking?')">
-                                        <input type="hidden" name="cancel_booking_id" value="<?php echo $bk['id']; ?>">
-                                        <button type="submit" class="btn btn-sm btn-danger px-3 fw-semibold">✖ Cancel Booking</button>
-                                    </form>
-                                    <a href="?page=browse" class="btn btn-sm px-3 fw-semibold"
-                                       style="background:rgba(92,143,220,.15); color:#0b48a4; border:1px solid #5c8fdc;">
-                                        🔍 Browse Other Tutors
-                                    </a>
-                                <?php elseif ($status === 'Confirmed'): ?>
-                                    <a href="?page=browse" class="btn btn-sm px-3 fw-semibold"
-                                       style="background:linear-gradient(90deg,#5c8fdc,#0b48a4); color:#fff; border:none;">
-                                        + Book Another Subject
-                                    </a>
-                                <?php elseif ($status === 'Cancelled'): ?>
-                                    <a href="?page=browse" class="btn btn-sm px-3 fw-semibold"
-                                       style="background:#fff3cd; color:#664d03; border:1px solid #ffc107;">
-                                        🔄 Book Again
-                                    </a>
-                                <?php endif; ?>
-                            </div>
+
                         </div>
 
                     </div>
-                </div>
+
                 <?php endforeach; ?>
 
-                <div id="noFilterResult" class="text-center py-4 text-muted" style="display:none;">
-                    <div style="font-size:2.5rem;">🔍</div>
+                <div id="noFilterResult"
+                    class="text-center py-4 text-muted"
+                    style="display:none;">
+
+                    <div style="font-size:2rem;">🔍</div>
                     <p class="mt-2">No bookings match this filter.</p>
-                </div>
+
                 </div>
 
-            <?php endif; ?>
+            </div>
+
+        <?php endif; ?>
 
         <!--My reviews-->
         <?php elseif ($page === 'reviews'): ?>
