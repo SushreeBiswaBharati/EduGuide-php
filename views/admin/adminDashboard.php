@@ -478,7 +478,7 @@
         <?php elseif ($page === 'dropdown'): ?>
 
             <div class="mb-3 greet-bar rounded-4 p-3 text-white">
-                <h5 class="fw-bold mb-0">⚙️ Manage Dropdowns</h5>
+                <h5 class="fw-bold mb-0">⚙️ Academic Settings</h5>
             </div>
 
             <?php
@@ -565,7 +565,7 @@
 
             <div class="mb-4 greet-bar rounded-4 p-3 text-white d-flex align-items-center justify-content-between flex-wrap gap-2">
                 <div>
-                    <h5 class="fw-bold mb-0">⭐ My Reviews</h5>
+                    <h5 class="fw-bold mb-0">⭐ All Reviews</h5>
                     <small style="opacity:.85;">View and manage Students feedback for tutors</small>
                 </div>
 
