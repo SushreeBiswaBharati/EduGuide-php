@@ -81,7 +81,7 @@
         </div>
     </div>
 
-    <!-- ===================== MAIN CONTENT ===================== -->
+    <!-- Main Content -->
     <div class="flex-grow-1 main-content p-4 rounded-4 shadow-sm" style="overflow-y:auto;">
 
         <?php if (!empty($message)): ?>
@@ -91,7 +91,7 @@
             </div>
         <?php endif; ?>
 
-        <!-- ==================== DASHBOARD ==================== -->
+        <!-- Dashboard -->
         <?php if ($page === 'dashboard'): ?>
 
             <div class="mb-4 greet-bar rounded-4 p-4 text-white">

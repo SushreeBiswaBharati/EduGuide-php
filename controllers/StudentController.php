@@ -1,5 +1,3 @@
-<!-- studentController only insert the data in to the database during registration. -->
-
 <?php
 // Handles student registration
 require_once('../database/dbconnection.php');

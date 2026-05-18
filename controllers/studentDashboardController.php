@@ -1,5 +1,4 @@
 <?php
-
 require_once '../middleware/Auth.php';
 requireRole('student');
 require_once '../database/dbconnection.php';
@@ -65,9 +64,7 @@ $bookings_stmt->execute();
 $bookings = $bookings_stmt->get_result();
 $bookings_stmt->close();
 
-// ============================================================
 //  BOOK TUTOR
-// ============================================================
 $bookingSuccess = "";
 $bookingError   = "";
 
@@ -262,9 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_tutor'])) {
     }
 }
 
-// ============================================================
 //  CANCEL BOOKING
-// ============================================================
 $cancelSuccess = "";
 $cancelError   = "";
 
@@ -318,9 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_booking_id']))
     $bookings_stmt2->close();
 }
 
-// ============================================================
 //  COMPLAINT SUBMISSION
-// ============================================================
 $complaintSuccess = "";
 $complaintError   = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaint_subject'])) {
@@ -362,9 +355,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_my_complaint']
     $myComplaints_stmt2->close();
 }
 
-// ============================================================
 //  EDIT PROFILE
-// ============================================================
 $profileSuccess = "";
 $profileError   = "";
 
@@ -442,9 +433,7 @@ $classes = $conn->query("SELECT id, name FROM classes WHERE is_active = 1 ORDER 
 $boards  = $conn->query("SELECT id, name FROM boards  WHERE is_active = 1 ORDER BY name ASC");
 $exams   = $conn->query("SELECT id, name FROM exams   WHERE is_active = 1 ORDER BY name ASC");
 
-// ============================================================
 //  BROWSE TUTORS
-// ============================================================
 $subjects     = $conn->query("SELECT id, name FROM subjects WHERE is_active = 1 ORDER BY name ASC");
 $browseBoards = $conn->query("SELECT id, name FROM boards   WHERE is_active = 1 ORDER BY name ASC");
 
@@ -497,9 +486,7 @@ $stmt->execute();
 $tutors = $stmt->get_result();
 $stmt->close();
 
-// ============================================================
 //  SUBMIT REVIEW
-// ============================================================
 $reviewSuccess = "";
 $reviewError   = "";
 
@@ -576,9 +563,7 @@ $completed_stmt->execute();
 $completedBookingsForReview = $completed_stmt->get_result();
 $completed_stmt->close();
 
-// ============================================================
 //  TOP TUTORS (dashboard widget)
-// ============================================================
 $topTutors = $conn->query("
     SELECT u.name, IFNULL(COUNT(b.id), 0) AS total
     FROM tutors t

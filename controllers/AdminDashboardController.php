@@ -7,9 +7,7 @@ require_once '../helpers/sendmail.php';  // PHPMailer via SMTP
 $page    = $_GET['page'] ?? 'dashboard';
 $message = '';
 
-// =====================================================
 // MANAGE TUTORS — Verify / Revoke
-// =====================================================
 if ($page === 'manage_tutor' && isset($_POST['tutor_action'])) {
     $tutor_id = intval($_POST['tutor_id']);
 
@@ -268,9 +266,7 @@ if ($page === 'manage_tutor' && isset($_POST['tutor_action'])) {
     }
 }
 
-// =====================================================
 // MANAGE STUDENTS — Delete
-// =====================================================
 if ($page === 'manage_student' && isset($_POST['delete_student_id'])) {
     $sid = intval($_POST['delete_student_id']);
 
@@ -288,9 +284,7 @@ if ($page === 'manage_student' && isset($_POST['delete_student_id'])) {
     }
 }
 
-// =====================================================
-// MANAGE DROPDOWNS — Add / Delete (classes, boards, exams, subjects)
-// =====================================================
+// MANAGE DROPDOWNS — Add / Delete 
 $allowedTables = [
     'class'   => 'classes',
     'board'   => 'boards',
@@ -357,9 +351,7 @@ if ($page === 'dropdown') {
     }
 }
 
-// =====================================================
 // REVIEWS — Delete
-// =====================================================
 if ($page === 'reviews' && isset($_POST['delete_review_id'])) {
     $rid = intval($_POST['delete_review_id']);
     $conn->query("DELETE FROM reviews WHERE id = $rid");
@@ -408,9 +400,7 @@ if ($page === 'complaint') {
     }
 }
 
-// =====================================================
 // FETCH DATA FOR EACH PAGE
-// =====================================================
 
 // --- Dashboard counts ---
 $totalTutors    = $conn->query("SELECT COUNT(*) AS c FROM tutors")->fetch_assoc()['c'];
@@ -476,8 +466,8 @@ if ($status_t !== '') {
 }
 
 $tutorQuery .= " GROUP BY t.id, u.name, u.email, t.phone, t.address,
-                           t.experience, t.gender, t.qualification,
-                           t.is_verified, t.created_at ";
+                    t.experience, t.gender, t.qualification,
+                    t.is_verified, t.created_at ";
 
 if ($search_t !== '') {
     $safe        = $conn->real_escape_string($search_t);
